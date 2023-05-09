@@ -16,3 +16,8 @@ find / -regex .*initrd.img.* -print
 ```
 to find all paths containing `initrd.img`.
 
+```bash
+ls .[^.]*
+```
+to list all hidden files and directories not including `.` and `..`.
+
