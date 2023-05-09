@@ -1,5 +1,6 @@
 # DotBashHistory
-
+This file contains some useful Linux commands and configs.
+## General
 ```bash
 chsh
 ```
