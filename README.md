@@ -27,3 +27,8 @@ tar -ztvf arch.tar.gz
 tar -zxvf arch.tar.gz
 ```
 to create then show table of contents for the archive then extract it.
+
+```bash
+journalctl SYSLOG_IDENTIFIER=sudo
+```
+to list commands ran with `sudo`.
