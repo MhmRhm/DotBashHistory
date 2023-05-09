@@ -22,6 +22,8 @@ ls .[^.]*
 to list all hidden files and directories not including `.` and `..`.
 
 ```bash
+tar -zcvf arch.tar.gz file dir
 tar -ztvf arch.tar.gz
+tar -zxvf arch.tar.gz
 ```
-to show table of contents for the archive. Use `zxvf` to extract. Use `zcvf` to create an archive from files.
+to create then show table of contents for the archive then extract it.
