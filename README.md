@@ -32,3 +32,8 @@ to create then show table of contents for the archive then extract it.
 journalctl SYSLOG_IDENTIFIER=sudo
 ```
 to list commands ran with `sudo`.
+
+```bash
+ps ax
+```
+to list all processes.
