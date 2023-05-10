@@ -34,6 +34,6 @@ journalctl SYSLOG_IDENTIFIER=sudo
 to list commands ran with `sudo`.
 
 ```bash
-ps ax
+ps ax 2>&1 1>> stdout.txt && cat stdout.txt
 ```
-to list all processes.
+to list all processes and send outputs to appropriate files.
