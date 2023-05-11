@@ -49,3 +49,12 @@ journalctl -S 06:00:00 -U 07:00:00
 ```
 to list all logs since 6 AM until 7 AM.
 
+```bash
+journalctl -f
+```
+to show a live feed. 
+
+```bash
+journalctl -p 3..4
+```
+to ahow priorities error and warning.
