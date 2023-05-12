@@ -57,4 +57,4 @@ to show a live feed.
 ```bash
 journalctl -p 3..4
 ```
-to ahow priorities error and warning.
+to show errors and warnings.
