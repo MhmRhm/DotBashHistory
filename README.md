@@ -4,12 +4,12 @@ This file contains some useful Linux commands and configs.
 ```bash
 chsh
 ```
-to change shell. 
+to change shell.
 
 ```bash
-ls -ahli .
+ls -alhF .
 ```
-to list all files and directories with inodes and readable size. 
+to list all files and directories with inodes and readable size.
 
 ```bash
 find / -regex .*initrd.img.* -print
@@ -24,7 +24,7 @@ to list all hidden files and directories not including `.` and `..`.
 ```bash
 tar -zcvf arch.tar.gz file dir
 tar -ztvf arch.tar.gz
-tar -zxvf arch.tar.gz
+tar -zxpvf arch.tar.gz
 ```
 to create then show table of contents for the archive then extract it.
 
@@ -32,6 +32,28 @@ to create then show table of contents for the archive then extract it.
 ps ax 2>&1 1>> stdout.txt && cat stdout.txt
 ```
 to list all processes and send outputs to appropriate files.
+
+```bash
+PATH=first:$PATH:last
+```
+to add directories to search path.
+
+```bash
+mknod mypipe p
+tail -f mypipe &
+man man > mypipe
+```
+to create a named pipe and connect two processes through it.
+
+```bash
+udevadm monitor
+```
+to monitor events passed between udev and kernel.
+
+```bash
+udevadm info /dev/sda
+```
+to get all information for a device.
 
 # Journal
 ```bash
@@ -50,11 +72,12 @@ journalctl -S 06:00:00 -U 07:00:00
 to list all logs since 6 AM until 7 AM.
 
 ```bash
-journalctl -f
+journalctl -fk
 ```
-to show a live feed. 
+to show a live feed for kernel messages.
 
 ```bash
 journalctl -p 3..4
 ```
-to show errors and warnings.
+to show only errors and warnings.
+
