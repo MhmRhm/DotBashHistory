@@ -94,7 +94,12 @@ cat /proc/partitions
 to list partitions.
 
 ```bash
-fdisk /dev/sda
+fdisk /dev/sdx
 ```
 to manipulate partitions on a device.
+
+```bash
+mkfs -t ext4 /dev/sdx
+```
+to create a filesystem on a partition.
 
