@@ -107,5 +107,5 @@ to create a filesystem on a partition.
 mount -t ext4 /dev/sdx mpoint/
 umount mpoint/
 ```
-to mount a filesystem.
+to mount and unmount a filesystem.
 
