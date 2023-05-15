@@ -96,5 +96,5 @@ to list partitions.
 ```bash
 fdisk /dev/sda
 ```
-to edit partitions on a device.
+to manipulate partitions on a device.
 
