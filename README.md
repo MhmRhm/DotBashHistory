@@ -81,3 +81,14 @@ journalctl -p 3..4
 ```
 to show only errors and warnings.
 
+# Disks and Partitions
+```bash
+lsblk
+```
+to list all block devices.
+
+```bash
+parted -l
+```
+to list partitions.
+
