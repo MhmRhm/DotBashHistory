@@ -105,7 +105,7 @@ to create a filesystem on a partition.
 
 ```bash
 mount -t ext4 /dev/sdx mpoint/
-umount mpoint/
+umount /dev/sdx
 ```
 to mount and unmount a filesystem.
 
