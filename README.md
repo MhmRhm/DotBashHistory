@@ -103,3 +103,9 @@ mkfs -t ext4 /dev/sdx
 ```
 to create a filesystem on a partition.
 
+```bash
+mount -t ext4 /dev/sdx mpoint/
+umount mpoint/
+```
+to mount a filesystem.
+
