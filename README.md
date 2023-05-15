@@ -89,6 +89,7 @@ to list all block devices.
 
 ```bash
 parted -l
+cat /proc/partitions
 ```
 to list partitions.
 
