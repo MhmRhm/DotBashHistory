@@ -109,3 +109,9 @@ umount /dev/sdx
 ```
 to mount and unmount a filesystem.
 
+```bash
+blkid
+mount UUID=xx mpoint/
+```
+to list UUIDs and mount using UUIDs.
+
