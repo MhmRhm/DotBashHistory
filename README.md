@@ -63,14 +63,9 @@ journalctl -S 06:00:00 -U 07:00:00
 to list all logs since 6 AM until 7 AM.
 
 ```bash
-journalctl -fk
+journalctl -fkp 3..4
 ```
-to show a live feed for kernel messages.
-
-```bash
-journalctl -p 3..4
-```
-to show only errors and warnings.
+to show a live feed for kernel messages including only errors and warnings.
 
 ```bash
 udevadm monitor
