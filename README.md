@@ -144,6 +144,10 @@ mount -a
 to mount all partitions in `/etc/fstab` except `noauto` ones.
 
 ```bash
+mount -t tmpfs -o size=10M tmpfs mpoint/
+```
+to create a filesystem on RAM.
+```bash
 du -sh *
 ```
 to get folder and file sizes in a directory.
