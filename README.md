@@ -157,3 +157,20 @@ df
 ```
 to get filesystems disk usage.
 
+```bash
+pvs && vgs && lvs
+pvdisplay && vgdisplay && lvdisplay
+```
+to list physical volumes, volume groups and logical volumes.
+
+```bash
+vgcreate myvg /dev/sdx
+vgextend myvg /dev/sdy
+lvcreate --size 10g --type linear -n mylv1 myvg
+lvcreate --size 10g --type linear -n mylv2 myvg
+mkfs -t ext4 /dev/mapper/myvg-mylv1
+lvremove myvg/mylv2
+lvresize -r -l +100%FREE myvg/mylv1
+```
+to create, remove and resize logical volumes.
+
