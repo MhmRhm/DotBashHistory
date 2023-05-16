@@ -1,5 +1,6 @@
 # DotBashHistory
 This file contains some useful Linux commands and configs.
+
 ## General
 ```bash
 chsh
@@ -111,7 +112,34 @@ to mount and unmount a filesystem.
 
 ```bash
 blkid
-mount UUID=xx mpoint/
+mount UUID=662A-CC93 mpoint/
+mount PARTUUID=a0ccdae8-d24c-774c-8d71-3814390703bd mpoint/
 ```
 to list UUIDs and mount using UUIDs.
+
+```bash
+mount -t vfat /dev/sdx mpoint/ -o ro,noexec,nosuid,uid=1000
+mount -t vfat /dev/sdx mpoint/ -o rw,noexec,nosuid,uid=1000,remount
+```
+to mount a partition read-only then remount it with writing enabled.
+
+```bash
+mount -n -o remount /
+```
+to remount a read-only root filesystem without changing `/etc/mtab`.
+
+```bash
+mount -a
+```
+to mount all partitions in `/etc/fstab` except `noauto` ones.
+
+```bash
+du -sh *
+```
+to get folder and file sizes in a directory.
+
+```bash
+df
+```
+to get filesystems disk usage.
 
