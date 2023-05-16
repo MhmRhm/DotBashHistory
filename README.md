@@ -46,16 +46,6 @@ man man > mypipe
 ```
 to create a named pipe and connect two processes through it.
 
-```bash
-udevadm monitor
-```
-to monitor events passed between udev and kernel.
-
-```bash
-udevadm info /dev/sda
-```
-to get all information for a device.
-
 # Journal
 ```bash
 journalctl -r SYSLOG_IDENTIFIER=sudo
@@ -82,6 +72,16 @@ journalctl -p 3..4
 ```
 to show only errors and warnings.
 
+```bash
+udevadm monitor
+```
+to monitor events passed between udev and kernel.
+
+```bash
+udevadm info /dev/sda
+```
+to get all information for a device.
+
 # Disks and Partitions
 ```bash
 lsblk
@@ -103,6 +103,21 @@ to manipulate partitions on a device.
 mkfs -t ext4 /dev/sdx
 ```
 to create a filesystem on a partition.
+
+```bash
+mkfs -n /dev/sdx
+```
+to not to create filesystem; instead show where superblock backups will be.
+
+```bash
+fsck -p /dev/sdx
+```
+to automatically fix minor issues.
+
+```bash
+fsck -b 32768
+```
+to replace the superblock with backup at 32768.
 
 ```bash
 mount -t ext4 /dev/sdx mpoint/
