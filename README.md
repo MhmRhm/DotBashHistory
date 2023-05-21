@@ -1,7 +1,7 @@
 # DotBashHistory
 This file contains some useful Linux commands and configs.
 
-## General
+# General
 ```bash
 chsh
 ```
@@ -173,4 +173,51 @@ lvremove myvg/mylv2
 lvresize -r -l +100%FREE myvg/mylv1
 ```
 to create, remove and resize logical volumes.
+
+# Kernel Bootup
+```bash
+cat /proc/cmdline
+```
+to show parameters passed to the kernel by the boot loader.
+
+```
+systemd.unit=multi-user.target ro quiet splash video=HDMI-A-1:D
+```
+to boot into text mode with GRUB press `e` and add the above kernel arguments.
+
+```
+setenv extraargs ${extraargs} systemd.unit=rescue.target; env print;
+```
+to add rescue mode to kernel arguments using [uboot](https://u-boot.readthedocs.io/en/v2021.04/index.html) on OrangePi 5 and print environment variables.
+
+```
+mmc dev 1; setenv scriptaddr 0x00500000; setenv prefix /; setenv script boot.scr; load ${devtype} ${devnum}:${distro_bootpart} ${scriptaddr} ${prefix}${script}; source ${scriptaddr}
+```
+to boot into MMC using uboot on OrangePi 5.
+
+```
+setenv devtype usb; setenv devnum 0; setenv distro_bootpart 1; setenv scriptaddr 0x00500000; setenv prefix /; setenv script boot.scr; usb start; load ${devtype} ${devnum}:${distro_bootpart} ${scriptaddr} ${prefix}${script}; source ${scriptaddr}
+```
+to boot into USB using uboot on OrangePi 5.
+
+```
+videoinfo
+terminal_output console
+set gfxmode=1280x1024 # set gfxmode=auto
+set # print env
+terminal_output gfxterm
+```
+to list available resolutions in GRUB, set the resolution and print environment variables.
+
+```
+ls ($root)/
+```
+to list files and directories in the GRUB root directory.
+
+```
+linux /($root)/vmlinuz quiet splash systemd.unit=graphical.target
+initrd /($root)/initrd
+boot
+```
+to manually boot from the GRUB command line.
 
