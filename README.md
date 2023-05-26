@@ -77,6 +77,11 @@ udevadm info /dev/sda
 ```
 to get all information for a device.
 
+```bash
+journalctl --unit=ssh.service
+```
+to list logs related to a service.
+
 # Disks and Partitions
 ```bash
 lsblk
@@ -220,4 +225,15 @@ initrd /($root)/initrd
 boot
 ```
 to manually boot from the GRUB command line.
+
+# Systemd
+```bash
+systemd-cgls
+```
+to list control groups.
+
+```bash
+systemctl list-units --all --full
+```
+to list all systemd units.
 
