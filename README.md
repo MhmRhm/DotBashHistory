@@ -46,6 +46,11 @@ man man > mypipe
 ```
 to create a named pipe and connect two processes through it.
 
+```bash
+watch "ps aux | grep ssh | grep -Eo '^[^ ]+' | sort | uniq"
+```
+to list online users.
+
 # Journal
 ```bash
 journalctl -r SYSLOG_IDENTIFIER=sudo
@@ -236,4 +241,21 @@ to list control groups.
 systemctl list-units --all --full
 ```
 to list all systemd units.
+
+```
+[Unit]
+Description=My Service
+
+[Service]
+Type=simple
+WorkingDirectory=<dir>
+User=<username>
+ExecStart=<dir>/.venv/bin/python3 <dir>/script.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+```
+to add new service to systemd. Create service file at `/etc/systemd/system/`. Run `systemctl daemon-reload` afterward.
 
