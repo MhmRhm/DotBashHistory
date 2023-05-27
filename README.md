@@ -264,4 +264,3 @@ to add a new service to systemd. Create the service file at `/etc/systemd/system
 systemctl show <unit>
 ```
 to list all properties for a unit.
-
