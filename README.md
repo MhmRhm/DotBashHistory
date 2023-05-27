@@ -5,7 +5,7 @@ This file contains some useful Linux commands and configs.
 ```bash
 chsh
 ```
-to change shell.
+to change the shell.
 
 ```bash
 ls -alhF .
@@ -27,7 +27,7 @@ tar -zcvf arch.tar.gz file dir
 tar -ztvf arch.tar.gz
 tar -zxpvf arch.tar.gz
 ```
-to create then show table of contents for the archive then extract it.
+to create then show the table of contents for the archive then extract it.
 
 ```bash
 ps ax 2>&1 1>> stdout.txt && cat stdout.txt
@@ -37,7 +37,7 @@ to list all processes and send outputs to appropriate files.
 ```bash
 PATH=first:$PATH:last
 ```
-to add directories to search path.
+to add directories to the search path.
 
 ```bash
 mknod mypipe p
@@ -55,7 +55,7 @@ to list online users.
 ```bash
 journalctl -r SYSLOG_IDENTIFIER=sudo
 ```
-to list most recent commands ran with `sudo`.
+to list the most recent commands ran with `sudo`.
 
 ```bash
 journalctl -S -1h30m
@@ -112,7 +112,7 @@ to create a filesystem on a partition.
 ```bash
 mkfs -n /dev/sdx
 ```
-to not to create filesystem; instead show where superblock backups will be.
+to not create a filesystem; instead, show where superblock backups will be.
 
 ```bash
 fsck -p /dev/sdx
@@ -171,7 +171,7 @@ to get filesystems disk usage.
 pvs && vgs && lvs
 pvdisplay && vgdisplay && lvdisplay
 ```
-to list physical volumes, volume groups and logical volumes.
+to list physical volumes, volume groups, and logical volumes.
 
 ```bash
 vgcreate myvg /dev/sdx
@@ -217,7 +217,7 @@ set gfxmode=1280x1024 # set gfxmode=auto
 set # print env
 terminal_output gfxterm
 ```
-to list available resolutions in GRUB, set the resolution and print environment variables.
+to list available resolutions in GRUB, set the resolution, and print environment variables.
 
 ```
 ls ($root)/
@@ -245,9 +245,10 @@ to list all systemd units.
 ```
 [Unit]
 Description=My Service
+After=network.target
 
 [Service]
-Type=simple
+Type=idle
 WorkingDirectory=<dir>
 User=<username>
 ExecStart=<dir>/.venv/bin/python3 <dir>/script.py
@@ -257,5 +258,10 @@ RestartSec=10
 [Install]
 WantedBy=multi-user.target
 ```
-to add new service to systemd. Create service file at `/etc/systemd/system/`. Run `systemctl daemon-reload` afterward.
+to add a new service to systemd. Create the service file at `/etc/systemd/system/`. Run `systemctl daemon-reload` afterward.
+
+```bash
+systemctl show <unit>
+```
+to list all properties for a unit.
 
