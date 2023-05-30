@@ -66,7 +66,7 @@ fi
 for i in {1..50}; do
     PASS=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1)
     deluser "user$i" &> /dev/null
-    useradd "user$i" --shell /bin/false
+    useradd "user$i" --shell /sbin/nologin
     echo "user$i:$PASS" | chpasswd
     echo "user$i,$PASS," >> users.csv
 done
