@@ -71,7 +71,7 @@ for i in {1..50}; do
     echo "user$i,$PASS," >> users.csv
 done
 ```
-to automatically add users. 
+to setup ssh for VPN use and automatically add users. 
 
 ```bash
 watch "ps aux | grep ssh | grep -Eo '^[^ ]+' | sort | uniq"
