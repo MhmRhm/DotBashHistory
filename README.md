@@ -47,6 +47,33 @@ man man > mypipe
 to create a named pipe and connect two processes through it.
 
 ```bash
+#!/bin/bash
+
+PORT=17456
+
+if [ ! -f /etc/ssh/sshd_config_bak ]; then
+    cp /etc/ssh/sshd_config /etc/ssh/sshd_config_bak
+fi
+
+sed -i 's/#Port 22/Port '"$PORT"'/' /etc/ssh/sshd_config
+sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+sed -i 's/#PermitTunnel no/PermitTunnel yes/' /etc/ssh/sshd_config
+
+if [ -f ./users.csv ]; then
+    rm ./users.csv
+fi
+
+for i in {1..50}; do
+    PASS=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1)
+    deluser "user$i" &> /dev/null
+    useradd "user$i" --shell /bin/false
+    echo "user$i:$PASS" | chpasswd
+    echo "user$i,$PASS," >> users.csv
+done
+```
+to automatically add users. 
+
+```bash
 watch "ps aux | grep ssh | grep -Eo '^[^ ]+' | sort | uniq"
 ```
 to list online users.
