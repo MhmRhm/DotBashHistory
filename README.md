@@ -49,27 +49,30 @@ to create a named pipe and connect two processes through it.
 ```bash
 #!/bin/bash
 
-PORT=17456
+PORT=17356
 
 if [ ! -f /etc/ssh/sshd_config_bak ]; then
-    cp /etc/ssh/sshd_config /etc/ssh/sshd_config_bak
+        cp /etc/ssh/sshd_config /etc/ssh/sshd_config_bak
 fi
 
 sed -i 's/#Port 22/Port '"$PORT"'/' /etc/ssh/sshd_config
 sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
 sed -i 's/#PermitTunnel no/PermitTunnel yes/' /etc/ssh/sshd_config
 
-if [ -f ./users.csv ]; then
-    rm ./users.csv
+if [ -f ./users.txt ]; then
+        rm ./users.txt
 fi
 
-for i in {1..50}; do
-    PASS=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1)
-    deluser "user$i" &> /dev/null
-    useradd "user$i" --shell /sbin/nologin
-    echo "user$i:$PASS" | chpasswd
-    echo "user$i,$PASS," >> users.csv
+MYIP=$(curl -s https://checkip.amazonaws.com)
+
+for i in {1..2}; do
+        PASS=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1)
+        deluser "user$i" &> /dev/null
+        useradd "user$i" --shell /sbin/nologin
+        echo "user$i:$PASS" | chpasswd
+        echo "ssh://user$i:$PASS@$MYIP:$PORT#Profile $i" >> users.txt
 done
+cat users.txt
 ```
 to setup ssh for VPN use and automatically add users. 
 
