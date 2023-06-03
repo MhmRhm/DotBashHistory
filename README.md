@@ -81,6 +81,24 @@ watch "ps aux | grep ssh | grep -Eo '^[^ ]+' | sort | uniq"
 ```
 to list online users.
 
+```bash
+ls -al /usr/share/zoneinfo/
+```
+to list available timezones.
+
+```bash
+TZ=Iran date
+```
+to show time in a timezone.
+
+```bash
+systemd-run --on-calendar='02-14 12:46:00' /bin/wall "Buy Chocolate!" # once a year
+systemd-run --on-active=1m /bin/wall "Wish you luck!" # a minute in future
+systemctl list-timers
+systemctl stop <UNIT>
+```
+to schedule a task using systemd.
+
 # Journal
 ```bash
 journalctl -r SYSLOG_IDENTIFIER=sudo
