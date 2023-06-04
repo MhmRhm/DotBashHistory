@@ -312,3 +312,9 @@ to add a new service to systemd. Create the service file at `/etc/systemd/system
 systemctl show <unit>
 ```
 to list all properties for a unit.
+
+# File Sharing
+```bash
+rsync --rsh='ssh -p<port> -i mainkey.pem' -avn --delete mydir <username>@<ipaddress>:/home/<username> | grep deleting
+```
+to list files that will be deleted after syncing two folders.
