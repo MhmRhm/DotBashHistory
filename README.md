@@ -315,6 +315,11 @@ to list all properties for a unit.
 
 # File Sharing
 ```bash
+python3 -m http.server
+```
+to share a directory over a secure network.
+
+```bash
 rsync --rsh='ssh -p<port> -i mainkey.pem' -avn --delete mydir <username>@<ipaddress>:/home/<username> | grep deleting
 ```
 to list files that will be deleted after syncing two folders.
