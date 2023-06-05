@@ -337,3 +337,9 @@ to list shared folders on a Windows server where <username> is the user name on 
 sudo mount -t cifs '\\<ip_address>\<share>' <mountpoint> -o user=<username>,pass=<password>
 ```
 to mount a shared Windows folder on Linux.
+
+```bash
+sshfs username@address:dir mountpoint
+fusermount -u mountpoint
+```
+to mount another Linux directory on the network using ssh.
