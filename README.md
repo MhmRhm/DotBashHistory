@@ -3,6 +3,10 @@ This file contains some useful Linux commands and configs.
 
 # General
 ```bash
+history -d -2
+```
+to remove the last executed command.
+```bash
 chsh
 ```
 to change the shell.
@@ -323,3 +327,8 @@ to share a directory over a secure network.
 rsync --rsh='ssh -p<port> -i mainkey.pem' -avn --delete mydir <username>@<ipaddress>:/home/<username> | grep deleting
 ```
 to list files that will be deleted after syncing two folders.
+
+```bash
+sudo mount -t cifs '\\<ip_address>\<share>' <mountpoint> -o user=<username>,pass=<password>
+```
+to mount a shared Windows folder on Linux.
