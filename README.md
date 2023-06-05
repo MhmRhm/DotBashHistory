@@ -339,7 +339,7 @@ sudo mount -t cifs '\\<ip_address>\<share>' <mountpoint> -o user=<username>,pass
 to mount a shared Windows folder on Linux.
 
 ```bash
-sshfs username@address:dir mountpoint
+sshfs username@address:dir mountpoint -p port
 fusermount -u mountpoint
 ```
 to mount another Linux directory on the network using ssh.
