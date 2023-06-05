@@ -329,6 +329,11 @@ rsync --rsh='ssh -p<port> -i mainkey.pem' -avn --delete mydir <username>@<ipaddr
 to list files that will be deleted after syncing two folders.
 
 ```bash
+smbclient -U <username> -L <server>
+```
+to list shared folders on a Windows server where <username> is the user name on the Windows machine and <server> is the IP address or Computer Name.
+
+```bash
 sudo mount -t cifs '\\<ip_address>\<share>' <mountpoint> -o user=<username>,pass=<password>
 ```
 to mount a shared Windows folder on Linux.
