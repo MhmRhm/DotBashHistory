@@ -109,6 +109,11 @@ systemctl stop <UNIT>
 ```
 to schedule a task using systemd.
 
+```bash
+/usr/bin/time command
+```
+to show CPU time and memory faults after running command.
+
 # Journal
 ```bash
 journalctl -r SYSLOG_IDENTIFIER=sudo
