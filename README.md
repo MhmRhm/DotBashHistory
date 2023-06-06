@@ -114,6 +114,11 @@ to schedule a task using systemd.
 ```
 to show CPU time and memory faults after running command.
 
+```bash
+pidstat -ru -p <PID> 1
+```
+to show memory and CPU usage of `<PID>` every second.
+
 # Journal
 ```bash
 journalctl -r SYSLOG_IDENTIFIER=sudo
