@@ -47,6 +47,7 @@ to add directories to the search path.
 mknod mypipe p
 tail -f mypipe &
 man man > mypipe
+unlink mypipe
 ```
 to create a named pipe and connect two processes through it.
 
@@ -84,6 +85,11 @@ to setup ssh for VPN use and automatically add users.
 watch "ps aux | grep ssh | grep -Eo '^[^ ]+' | sort | uniq"
 ```
 to list online users.
+
+```bash
+nload -U M -t 3000 eth0
+```
+to monitor network traffic.
 
 ```bash
 ls -al /usr/share/zoneinfo/
