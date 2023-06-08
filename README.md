@@ -119,6 +119,11 @@ pidstat -ru -p <PID> 1
 ```
 to show memory and CPU usage of `<PID>` every second.
 
+```bash
+netstat -nt
+```
+to list all TCP connections in use.
+
 # Journal
 ```bash
 journalctl -r SYSLOG_IDENTIFIER=sudo
