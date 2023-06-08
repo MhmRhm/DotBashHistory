@@ -120,7 +120,7 @@ pidstat -ru -p <PID> 1
 to show memory and CPU usage of `<PID>` every second.
 
 ```bash
-netstat -nt
+netstat -ntl
 ```
 to list all TCP connections in use.
 
