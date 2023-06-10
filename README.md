@@ -79,7 +79,7 @@ for i in {1..2}; do
 done
 cat users.txt
 ```
-to setup ssh for VPN use and automatically add users. 
+to setup SSH for VPN use and automatically add users. Later import profiles to NetMod Syna.
 
 ```bash
 watch "ps aux | grep ssh | grep -Eo '^[^ ]+' | sort | uniq"
@@ -364,3 +364,49 @@ sshfs username@address:dir mountpoint -p port
 fusermount -u mountpoint
 ```
 to mount another Linux directory on the network using ssh.
+
+# Networking
+```bash
+ip route show
+ip route del default
+ip route add default via 192.168.1.1 dev eth0
+```
+to replace the default route (0.0.0.0/0) with gateway at 192.168.1.1 for device eth0.
+
+```bash
+ip route add 10.23.2.0/24 via 192.168.1.100
+ip route del 10.23.2.0/24
+```
+to route traffic from 192.168.1.0/24 subnet to 10.23.2.0/24 subnet through gateway at 192.168.1.100.
+
+```bash
+host google.com
+host 216.239.38.120
+```
+to get the hostname or IP address for eighter of them.
+
+```bash
+cat /etc/services
+```
+to list predefined ports.
+
+```bash
+cat /var/lib/dhcp/dhclient.leases
+```
+to list IP address leases.
+
+```bash
+iptables -L
+```
+to list firewall rules.
+
+```bash
+ip neigh show
+```
+to list ARP cache.
+
+```bash
+iw dev wlan0 scan
+iw wlan0 connect '<network_name>'
+```
+to list wireless networks and connect to one.
