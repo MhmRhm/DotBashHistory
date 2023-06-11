@@ -102,14 +102,6 @@ TZ=Iran date
 to show time in a timezone.
 
 ```bash
-systemd-run --on-calendar='02-14 12:46:00' /bin/wall "Buy Chocolate!" # once a year
-systemd-run --on-active=1m /bin/wall "Wish you luck!" # a minute in future
-systemctl list-timers
-systemctl stop <UNIT>
-```
-to schedule a task using systemd.
-
-```bash
 /usr/bin/time command
 ```
 to show CPU time and memory faults after running command.
@@ -123,6 +115,11 @@ to show memory and CPU usage of `<PID>` every second.
 netstat -ntl
 ```
 to list all TCP connections in use.
+
+```bash
+sudo startx /usr/bin/gedit
+```
+to start a graphical application without a desktop manager.
 
 # Journal
 ```bash
@@ -314,6 +311,14 @@ to list control groups.
 systemctl list-units --all --full
 ```
 to list all systemd units.
+
+```bash
+systemd-run --on-calendar='02-14 12:46:00' /bin/wall "Buy Chocolate!" # once a year
+systemd-run --on-active=1m /bin/wall "Wish you luck!" # a minute in future
+systemctl list-timers
+systemctl stop <UNIT>
+```
+to schedule a task using systemd.
 
 ```
 [Unit]
