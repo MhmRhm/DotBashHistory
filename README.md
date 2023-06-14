@@ -415,3 +415,46 @@ iw dev wlan0 scan
 iw wlan0 connect '<network_name>'
 ```
 to list wireless networks and connect to one.
+
+```bash
+curl --trace-ascii - https://checkip.amazonaws.com
+```
+to print all data transferred during page requests.
+
+```bash
+tar zcvf - directory | ssh -i mainkey.pem -p 17456 remote_user@remote_address tar zxvf -
+```
+to copy a directory to a remote host.
+
+```bash
+scp -o Port=17456 -o IdentityFile=mainkey.pem remote_user@remote_address:file /local_directory
+```
+to copy a file from a remote host.
+
+```bash
+lsof -iTCP:17456 -n -P
+```
+to list processes connected to port 17456.
+
+```bash
+lsof -U -n -P
+```
+to list Unix Domain Sockets.
+
+```bash
+tcpdump -i wlan0 -nXXSs 0 port not 22 and ip
+```
+to show all traffic but SSH on IPv4.
+
+```bash
+netcat -l 17456
+```
+```bash
+netcat 192.168.1.100 17456
+```
+to open a communication channel between two computers.
+
+```bash
+nmap <ip_address> -p17450-17460,17000
+```
+to scan a host for open ports.
