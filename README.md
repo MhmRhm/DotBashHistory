@@ -362,14 +362,36 @@ python3 -m http.server
 to share a directory over a secure network.
 
 ```bash
-rsync --rsh='ssh -p<port> -i mainkey.pem' -avn --delete mydir <username>@<ipaddress>:/home/<username> | grep deleting
+tar zcvf - directory | ssh -i mainkey.pem -p 17456 remote_user@remote_address tar zxvf -
+```
+to copy a directory to a remote host.
+
+```bash
+scp -r src user@remote_host:dst
+scp -o Port=17456 -o IdentityFile=mainkey.pem remote_user@remote_address:file /local_directory
+```
+to copy a file or a directory structure from or to a remote host.
+
+```bash
+rsync --rsh='ssh -p<port> -i mainkey.pem' -avn --delete mydir <username>@<ipaddress>:/home/<username> | grep deleting #-a: all, -v: verbose, -n: dry run, -z: zip
 ```
 to list files that will be deleted after syncing two folders.
 
 ```bash
 smbclient -U <username> -L <server>
 ```
-to list shared folders on a Windows server where <username> is the user name on the Windows machine and <server> is the IP address or Computer Name.
+to list shared folders on a Windows server where `<username>` is the user name on the Windows machine and `<server>` is the IP address or Computer Name.
+
+```bash
+[ShareName]
+comment = Needs username and password to access
+path = /path/to/shared/dir
+valid users = root user1
+guest ok = no
+writable = yes
+browsable = yes
+```
+to setup a SMB share.
 
 ```bash
 sudo mount -t cifs '\\<ip_address>\<share>' <mountpoint> -o user=<username>,pass=<password>
@@ -432,16 +454,6 @@ to list wireless networks and connect to one.
 curl --trace-ascii - https://checkip.amazonaws.com
 ```
 to print all data transferred during page requests.
-
-```bash
-tar zcvf - directory | ssh -i mainkey.pem -p 17456 remote_user@remote_address tar zxvf -
-```
-to copy a directory to a remote host.
-
-```bash
-scp -o Port=17456 -o IdentityFile=mainkey.pem remote_user@remote_address:file /local_directory
-```
-to copy a file from a remote host.
 
 ```bash
 lsof -iTCP:17456 -n -P
