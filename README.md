@@ -30,6 +30,7 @@ to list all hidden files and directories not including `.` and `..`.
 tar -zcvf arch.tar.gz file dir
 tar -ztvf arch.tar.gz
 tar -zxpvf arch.tar.gz
+# tar xvpf arch.tar.xz # for tar.xz files.
 ```
 to create then show the table of contents for the archive then extract it.
 
@@ -458,3 +459,15 @@ to open a communication channel between two computers.
 nmap <ip_address> -p17450-17460,17000
 ```
 to scan a host for open ports.
+
+# Developnemt
+```bash
+sudo apt-get update
+apt-cache policy cmake
+```
+to check the repository version of a package.
+
+```bash
+apt-file search gl.h
+```
+to find packages that will install `*gl.h*` header file.
