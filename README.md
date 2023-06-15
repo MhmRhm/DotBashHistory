@@ -122,6 +122,17 @@ sudo startx /usr/bin/gedit
 ```
 to start a graphical application without a desktop manager.
 
+```bash
+FILE=$(mktemp)
+echo $FILE #/tmp/tmp.rvUW4WNN5H
+```
+to create a unique temp file.
+
+```bash
+tar cvf - src | (cd dst; tar xvf -)
+```
+to move a directory with a lot of files.
+
 # Journal
 ```bash
 journalctl -r SYSLOG_IDENTIFIER=sudo
