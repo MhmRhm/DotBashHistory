@@ -242,6 +242,11 @@ fsck -b 32768
 to replace the superblock with backup at 32768.
 
 ```bash
+mount
+```
+to list all mount points.
+
+```bash
 mount -t ext4 /dev/sdx mpoint/
 umount /dev/sdx
 ```
