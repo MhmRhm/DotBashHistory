@@ -529,3 +529,8 @@ to check the repository version of a package.
 apt-file search gl.h
 ```
 to find packages that will install `*gl.h*` header file.
+
+```bash
+ldconfig -v
+```
+to rebuild shared libraries cache.
