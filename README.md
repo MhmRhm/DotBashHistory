@@ -1,6 +1,15 @@
 # DotBashHistory
 This file contains some useful Linux commands and configs.
 
+- [General](#general)
+- [Journal](#journal)
+- [Disks and Partitions](#disks-and-partitions)
+- [Kernel Bootup](#kernel-bootup)
+- [Systemd](#systemd)
+- [File Sharing](#file-sharing)
+- [Networking](#networking)
+- [Development](#development)
+
 # General
 ```bash
 history -d -2
@@ -121,6 +130,32 @@ to list all TCP connections in use.
 sudo startx /usr/bin/gedit
 ```
 to start a graphical application without a desktop manager.
+
+```bash
+sudo apt-get install libinput-bin
+sudo libinput list-devices
+xinput --list
+xinput --list-props <id>
+```
+to list input devices and properties of a device.
+
+```bash
+sudo libinput debug-events --show-keycodes
+xwininfo
+xev
+```
+to capture and debug UI events.
+
+```bash
+dbus-monitor --system
+dbus-monitor --session
+```
+to monitor D-Bus events originated from system and session.
+
+```bash
+firefox localhost:631
+```
+to open CUPS setup page.
 
 ```bash
 FILE=$(mktemp)
@@ -483,7 +518,7 @@ nmap <ip_address> -p17450-17460,17000
 ```
 to scan a host for open ports.
 
-# Developnemt
+# Development
 ```bash
 sudo apt-get update
 apt-cache policy cmake
