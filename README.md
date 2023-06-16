@@ -556,5 +556,7 @@ to build an image with a tag name, list images, run a container in interactive m
 
 ```bash
 python3 -m venv .venv1
+. .venv/bin/activate
+deactivate
 ```
 to create a Python virtual environment.
