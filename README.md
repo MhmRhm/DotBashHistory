@@ -12,6 +12,11 @@ This file contains some useful Linux commands and configs.
 
 # General
 ```bash
+!! && !-2
+```
+to execute last and second-to-last commands.
+
+```bash
 history -d -2
 ```
 to remove the last executed command.
