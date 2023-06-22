@@ -431,7 +431,7 @@ to list shared folders on a Windows server where `<username>` is the user name o
 [ShareName]
 comment = Needs username and password to access
 path = /path/to/shared/dir
-valid users = root user1
+valid users = user1 @group2
 guest ok = no
 writable = yes
 browsable = yes
