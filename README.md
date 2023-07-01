@@ -565,3 +565,18 @@ python3 -m venv .venv1
 deactivate
 ```
 to create a Python virtual environment.
+
+```bash
+wget https://download.qt.io/official_releases/qt/6.5/6.5.1/single/qt-everywhere-src-6.5.1.tar.xz
+tar xvf qt-everywhere-src-6.5.1.tar.xz
+
+mkdir build-qt-everywhere-src-6.5.1
+cd build-qt-everywhere-src-6.5.1/
+
+sudo apt-get install ninja-build libgl-dev libegl-dev libfontconfig1-dev libinput-dev libfontconfig1-dev libfreetype6-dev libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-cursor-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxcb-util-dev libxcb-xinerama0-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev libatspi2.0-dev libclang-dev
+
+../qt-everywhere-src-6.5.1/configure -skip qtwayland -skip qtwebengine | tee ../build-qt.log
+cmake --build . --parallel 7 | tee -a ../build-qt.log
+sudo cmake --install .
+```
+to build Qt6 from source.
