@@ -528,6 +528,40 @@ nmap <ip_address> -p17450-17460,17000
 ```
 to scan a host for open ports.
 
+```bash
+#!/bin/bash
+
+# IP range (replace with your desired range)
+start_ip="192.168.1.1"
+end_ip="192.168.1.10"
+
+# Port to check
+port=80
+
+# Iterate through the IP range
+IFS='.' read -r -a start <<< "$start_ip"
+IFS='.' read -r -a end <<< "$end_ip"
+
+for ((i=${start[0]}; i<=${end[0]}; i++))
+do
+  for ((j=${start[1]}; j<=${end[1]}; j++))
+  do
+    for ((k=${start[2]}; k<=${end[2]}; k++))
+    do
+      for ((l=${start[3]}; l<=${end[3]}; l++))
+      do
+        ip="${i}.${j}.${k}.${l}"
+        echo "Checking $ip"
+        
+        # Check if the port is open
+        nc -z -v -w 1 "$ip" "$port" 2>&1 | grep "succeeded" && echo "Port $port is open on $ip"
+      done
+    done
+  done
+done
+```
+to scan an IP range for a port (AI generated.)
+
 # Development
 ```bash
 sudo apt-get update
