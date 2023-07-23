@@ -700,7 +700,7 @@ def periodic_task():
         if emailNewIP(ip):
             IP = ip
 
-schedule.every(10).seconds.do(periodic_task) # every minute
+schedule.every(60).seconds.do(periodic_task) # every minute
 
 def main() -> None:
     logging.basicConfig(filename="in_mail_ip.log", encoding='utf-8', level=logging.INFO)
