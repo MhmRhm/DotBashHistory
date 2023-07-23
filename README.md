@@ -28,7 +28,7 @@ to change the shell.
 ```bash
 nohup <my_command> &
 ```
-to run a command so it can continue after shell closed.
+to run a command so it can continue after shell is closed.
 
 ```bash
 ls -alhF .
