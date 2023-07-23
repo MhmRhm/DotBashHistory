@@ -26,6 +26,11 @@ chsh
 to change the shell.
 
 ```bash
+nohup <my_command> &
+```
+to run a command so it can continue after shell closed.
+
+```bash
 ls -alhF .
 ```
 to list all files and directories with inodes and readable size.
