@@ -594,7 +594,7 @@ sudo docker rmi <name>
 to build an image with a tag name, list images, run a container in interactive mode, list containers, and remove containers and images.
 
 ```bash
-python3 -m venv .venv1
+python3 -m venv .venv
 . .venv/bin/activate
 deactivate
 ```
