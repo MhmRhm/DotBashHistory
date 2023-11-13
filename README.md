@@ -8,6 +8,7 @@ This file contains some useful Linux commands and configs.
 - [Systemd](#systemd)
 - [File Sharing](#file-sharing)
 - [Networking](#networking)
+- [Version Controlling](#version-controlling)
 - [Development](#development)
 
 # General
@@ -566,6 +567,118 @@ do
 done
 ```
 to scan an IP range for a port (AI generated.)
+
+# Version Controlling
+```bash
+git config --list --show-origin
+git config --local user.email "account@mail.com" && git config --local user.name "Your Name"
+git config --global init.defaultBranch main
+git config --global pull.rebase true
+git config --global merge.tool vimdiff
+```
+to list all configs and set some.
+
+```bash
+git diff
+git diff --cached
+git difftool --staged
+git difftool abc123 def456 -- filename
+```
+to get the uncommitted changes or compare revisions.
+
+```bash
+git restore --staged filename
+git restore filename
+# or
+git checkout filename
+```
+to discard changes.
+
+```bash
+git rm --cached filename
+git rm filename
+git mv oldfilename newfilename
+```
+to move or remove files from git.
+
+```bash
+git log -1 --patch
+git log -S "piece of code"
+git log --no-merges -- filename
+git log --pretty=format:"%C(Yellow)%h %C(Cyan)%ch %C(Green)%cn %C(White)%s" --graph --since="one week ago"
+```
+to see commit history in different ways.
+
+```bash
+git commit --amend
+```
+to change last commit message.
+
+```bash
+git remote -v
+git remote show origin
+git remote add remotename https://github.com/MhmRhm/DotBashHistory.git
+git remote rename oldname newname
+git remote remove oldname
+```
+to add, rename and remove remotes.
+
+```bash
+git tag -a v2.0 abc123 -m "Version 2.0 LTS"
+git tag v2.1 456def
+git show v2.1
+gti push origin --tags
+git tag -d v2.1
+git push origin --delete v2.1
+```
+to manage annotated and lightweight tags.
+
+```bash
+git branch newbranch && git checkout newbranch
+git checkout -b newbranch
+git switch -c newbranch
+# delete branch
+git checkout main && git merge newbranch
+git branch -d newbranch
+```
+to create new branch and switch to it merge then delete it.
+
+```bash
+git branch --all
+
+git switch -c newname
+# or
+git branch --move oldname newname
+
+git push --set-upstream origin newname
+git push origin --delete oldname
+```
+to rename or create a local branch, push it to origin and remove the old branch.
+
+```bash
+git checkout -b localname origin/remotename
+# or
+git branch --set-upstream-to origin/remotename
+git push origin currentbranch:remotename
+```
+to checkout a remote branch or push a local branch with different name from or to origin.
+
+```bash
+git checkout feat
+git rebase main
+git checkout main
+git merge feat
+```
+to rebase instead of merge.
+
+```bash
+git checkout feat
+git rebase --onto main sprint feat
+git checkout main
+git merge feat
+git branch -d feat
+```
+to take the `feat`, figure out the patches since it diverged from the `sprint`, and replay these patches in the `feat` as if it was based directly off the `main`.
 
 # Development
 ```bash
