@@ -73,36 +73,6 @@ unlink mypipe
 to create a named pipe and connect two processes through it.
 
 ```bash
-#!/bin/bash
-
-PORT=17356
-
-if [ ! -f /etc/ssh/sshd_config_bak ]; then
-        cp /etc/ssh/sshd_config /etc/ssh/sshd_config_bak
-fi
-
-sed -i 's/#Port 22/Port '"$PORT"'/' /etc/ssh/sshd_config
-sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
-sed -i 's/#PermitTunnel no/PermitTunnel yes/' /etc/ssh/sshd_config
-
-if [ -f ./users.txt ]; then
-        rm ./users.txt
-fi
-
-MYIP=$(curl -s https://checkip.amazonaws.com)
-
-for i in {1..2}; do
-        PASS=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1)
-        deluser "user$i" &> /dev/null
-        useradd "user$i" --shell /sbin/nologin
-        echo "user$i:$PASS" | chpasswd
-        echo "ssh://user$i:$PASS@$MYIP:$PORT#Profile $i" >> users.txt
-done
-cat users.txt
-```
-to setup SSH for VPN use and automatically add users. Later import profiles to NetMod Syna.
-
-```bash
 watch "ps aux | grep ssh | grep -Eo '^[^ ]+' | sort | uniq"
 ```
 to list online users.
@@ -178,6 +148,134 @@ to create a unique temp file.
 tar cvf - src | (cd dst; tar xvf -)
 ```
 to move a directory with a lot of files.
+
+```bash
+#!/bin/bash
+
+PORT=17356
+
+if [ ! -f /etc/ssh/sshd_config_bak ]; then
+        cp /etc/ssh/sshd_config /etc/ssh/sshd_config_bak
+fi
+
+sed -i 's/#Port 22/Port '"$PORT"'/' /etc/ssh/sshd_config
+sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+sed -i 's/#PermitTunnel no/PermitTunnel yes/' /etc/ssh/sshd_config
+
+if [ -f ./users.txt ]; then
+        rm ./users.txt
+fi
+
+MYIP=$(curl -s https://checkip.amazonaws.com)
+
+for i in {1..2}; do
+        PASS=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1)
+        deluser "user$i" &> /dev/null
+        useradd "user$i" --shell /sbin/nologin
+        echo "user$i:$PASS" | chpasswd
+        echo "ssh://user$i:$PASS@$MYIP:$PORT#Profile $i" >> users.txt
+done
+cat users.txt
+```
+to setup SSH for VPN use and automatically add users. Later import profiles to NetMod Syna.
+
+```python
+# pip install python-telegram-bot --upgrade
+# pip install requests
+
+import logging, requests
+from telegram import (
+    Update
+)
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    ContextTypes
+)
+
+bot_father_token = "YOUR_TOKEN"
+your_username = "YOUR_ID"
+
+async def getCommand(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    logging.info(f"{update.effective_user}, {update.effective_chat}")
+    if update.effective_user.username != your_username:
+        return
+    await update.message.reply_text("...")
+    ip = requests.get('https://checkip.amazonaws.com').text.strip()
+    await update.message.reply_text(ip)
+
+def main() -> None:
+    logging.basicConfig(filename="ipbot.log", encoding='utf-8', level=logging.INFO)
+    application = Application.builder().token(bot_father_token).connect_timeout(30).build()
+    application.add_handler(CommandHandler("get", getCommand))
+    application.run_polling()
+
+if __name__ == "__main__":
+    main()
+```
+to run a Telegram bot for fetching dynamic IP.
+
+```python
+# pip install boto3
+# pip install schedule
+
+import logging, time, socket, requests, schedule, boto3
+from botocore.exceptions import ClientError
+
+IP = ''
+
+def getCurrentIP() -> str:
+    return requests.get('https://checkip.amazonaws.com').text.strip()
+
+def emailNewIP(ip: str) -> bool:
+    SENDER = "YOUR_NAME <YOUR_FROM_MAIL>" # keep < and >
+    RECIPIENT = "YOUR_TO_MAIL"
+    AWS_REGION = "ap-southeast-2" # can find it in server address
+    SUBJECT = "New IP Assignment"
+    BODY_TEXT = f"{ip} assigned to `{socket.gethostname()}`."
+    CHARSET = "UTF-8"
+    
+    client = boto3.client('ses',
+                          region_name=AWS_REGION,
+                          aws_access_key_id="YOUR_KEY",
+                          aws_secret_access_key="YOUR_SECRET"
+                          )
+    
+    try:
+        response = client.send_email(
+            Destination = {'ToAddresses': [RECIPIENT]},
+            Message = {
+                'Body': {'Text': {'Charset': CHARSET,'Data': BODY_TEXT}},
+                'Subject': {'Charset': CHARSET,'Data': SUBJECT},
+                },
+            Source = SENDER
+        )
+    except ClientError as e:
+        logging.critical(e.response['Error']['Message'])
+        return False
+    else:
+        logging.info(f"Email sent to {RECIPIENT} with new IP {ip}.")
+        logging.info(response['MessageId'])
+        return True
+
+def periodic_task():
+    global IP
+    if (ip := getCurrentIP()) != IP:
+        if emailNewIP(ip):
+            IP = ip
+
+schedule.every(60).seconds.do(periodic_task) # every minute
+
+def main() -> None:
+    logging.basicConfig(filename="in_mail_ip.log", encoding='utf-8', level=logging.INFO)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+if __name__ == "__main__":
+    main()
+```
+to run a task for notifying dynamic IP changes.
 
 # Journal
 ```bash
@@ -732,101 +830,3 @@ cmake --build . --parallel 7 | tee -a ../build-qt.log
 sudo cmake --install .
 ```
 to build Qt6 from source.
-
-```python
-# pip install python-telegram-bot --upgrade
-# pip install requests
-
-import logging, requests
-from telegram import (
-    Update
-)
-from telegram.ext import (
-    Application,
-    CommandHandler,
-    ContextTypes
-)
-
-bot_father_token = "YOUR_TOKEN"
-your_username = "YOUR_ID"
-
-async def getCommand(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    logging.info(f"{update.effective_user}, {update.effective_chat}")
-    if update.effective_user.username != your_username:
-        return
-    await update.message.reply_text("...")
-    ip = requests.get('https://checkip.amazonaws.com').text.strip()
-    await update.message.reply_text(ip)
-
-def main() -> None:
-    logging.basicConfig(filename="ipbot.log", encoding='utf-8', level=logging.INFO)
-    application = Application.builder().token(bot_father_token).connect_timeout(30).build()
-    application.add_handler(CommandHandler("get", getCommand))
-    application.run_polling()
-
-if __name__ == "__main__":
-    main()
-```
-to run a Telegram bot for fetching dynamic IP.
-
-```python
-# pip install boto3
-# pip install schedule
-
-import logging, time, socket, requests, schedule, boto3
-from botocore.exceptions import ClientError
-
-IP = ''
-
-def getCurrentIP() -> str:
-    return requests.get('https://checkip.amazonaws.com').text.strip()
-
-def emailNewIP(ip: str) -> bool:
-    SENDER = "YOUR_NAME <YOUR_FROM_MAIL>" # keep < and >
-    RECIPIENT = "YOUR_TO_MAIL"
-    AWS_REGION = "ap-southeast-2" # can find it in server address
-    SUBJECT = "New IP Assignment"
-    BODY_TEXT = f"{ip} assigned to `{socket.gethostname()}`."
-    CHARSET = "UTF-8"
-    
-    client = boto3.client('ses',
-                          region_name=AWS_REGION,
-                          aws_access_key_id="YOUR_KEY",
-                          aws_secret_access_key="YOUR_SECRET"
-                          )
-    
-    try:
-        response = client.send_email(
-            Destination = {'ToAddresses': [RECIPIENT]},
-            Message = {
-                'Body': {'Text': {'Charset': CHARSET,'Data': BODY_TEXT}},
-                'Subject': {'Charset': CHARSET,'Data': SUBJECT},
-                },
-            Source = SENDER
-        )
-    except ClientError as e:
-        logging.critical(e.response['Error']['Message'])
-        return False
-    else:
-        logging.info(f"Email sent to {RECIPIENT} with new IP {ip}.")
-        logging.info(response['MessageId'])
-        return True
-
-def periodic_task():
-    global IP
-    if (ip := getCurrentIP()) != IP:
-        if emailNewIP(ip):
-            IP = ip
-
-schedule.every(60).seconds.do(periodic_task) # every minute
-
-def main() -> None:
-    logging.basicConfig(filename="in_mail_ip.log", encoding='utf-8', level=logging.INFO)
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
-
-if __name__ == "__main__":
-    main()
-```
-to run a task for notifying dynamic IP changes.
