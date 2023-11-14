@@ -824,7 +824,7 @@ services:
     volumes:
       - ./postgres:/var/lib/postgresql/data
 ```
-to set up gitea behing reverse proxy. [Use duckdns.org to add SSL Certificates.](https://notthebe.ee/blog/easy-ssl-in-homelab-dns01/)
+to setup gitea behind reverse proxy. [Use duckdns.org to add SSL Certificates.](https://notthebe.ee/blog/easy-ssl-in-homelab-dns01/)
 
 # Development
 ```bash
