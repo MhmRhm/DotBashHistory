@@ -826,6 +826,14 @@ services:
 ```
 to setup gitea behind reverse proxy. [Use duckdns.org to add SSL Certificates.](https://notthebe.ee/blog/easy-ssl-in-homelab-dns01/)
 
+```bash
+sudo apt-get install lighttpd libcgi-pm-perl gamin
+cd repository
+git instaweb
+git instaweb --stop
+```
+to serve git repository in a simple web interface.
+
 # Development
 ```bash
 sudo apt-get update
