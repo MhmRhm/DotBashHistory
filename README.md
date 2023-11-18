@@ -704,6 +704,7 @@ to move or remove files from git.
 git log -1 --patch
 git log -S "piece of code"
 git log --no-merges -- filename
+git log feat..origin/feat
 git log --pretty=format:"%C(Yellow)%h %C(Cyan)%ch %C(Green)%cn %C(White)%s" --graph --since="one week ago"
 ```
 to see commit history in different ways.
