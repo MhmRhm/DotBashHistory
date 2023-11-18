@@ -678,6 +678,7 @@ to list all configs and set some.
 
 ```bash
 git diff
+git diff --check # for white spaces
 git diff --cached
 git difftool --staged
 git difftool abc123 def456 -- filename
