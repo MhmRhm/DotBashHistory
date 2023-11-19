@@ -772,6 +772,11 @@ git merge feat
 to rebase instead of merge.
 
 ```bash
+git merge --squash --no-commit feat
+```
+to merge changes on top of index without creating two parent commits and holding off the single commit.
+
+```bash
 git checkout feat
 git rebase --onto main sprint feat
 git checkout main
@@ -835,6 +840,13 @@ git instaweb
 git instaweb --stop
 ```
 to serve git repository in a simple web interface.
+
+```bash
+git switch feat
+git format-patch origin/main
+git request-pull origin/main fork
+```
+to prepare your work for integration.
 
 # Development
 ```bash
