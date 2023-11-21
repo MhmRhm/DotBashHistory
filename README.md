@@ -683,7 +683,8 @@ git diff --cached
 git difftool --staged
 git difftool abc123 def456 -- filename
 git diff $(git merge-base feat main)
-git diff main...feat
+git diff main..feat  # head to head
+git diff main...feat # head to common ancestor
 ```
 to get the uncommitted changes or compare revisions.
 
@@ -853,8 +854,9 @@ to prepare your work for integration.
 
 ```bash
 git am -i 0001-feat.patch
+git cherry-pick abc123
 ```
-to apply patch.
+to apply patch or cherry-pick.
 
 # Development
 ```bash
