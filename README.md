@@ -682,6 +682,8 @@ git diff --check # for white spaces
 git diff --cached
 git difftool --staged
 git difftool abc123 def456 -- filename
+git diff $(git merge-base feat main)
+git diff main...feat
 ```
 to get the uncommitted changes or compare revisions.
 
@@ -705,6 +707,7 @@ git log -1 --patch
 git log -S "piece of code"
 git log --no-merges -- filename
 git log feat..origin/feat
+git log feat --not main
 git log --pretty=format:"%C(Yellow)%h %C(Cyan)%ch %C(Green)%cn %C(White)%s" --graph --since="one week ago"
 ```
 to see commit history in different ways.
