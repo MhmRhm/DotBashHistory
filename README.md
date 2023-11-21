@@ -851,6 +851,11 @@ git request-pull origin/main fork
 ```
 to prepare your work for integration.
 
+```bash
+git am -i 0001-feat.patch
+```
+to apply patch.
+
 # Development
 ```bash
 sudo apt-get update
