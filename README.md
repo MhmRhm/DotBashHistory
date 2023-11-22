@@ -277,6 +277,27 @@ if __name__ == "__main__":
 ```
 to run a task for notifying dynamic IP changes.
 
+# Cryptography
+```bash
+gpg --gen-key
+gpg --list-secret-keys
+gpg --export --armor 'user@mail.com' > public.key
+# on recipient side
+gpg --import public.key
+```
+to generate a set of keys and export the public key.
+
+```bash
+gpg --default-key 'user@mail.com' --sign file
+```
+to encrypt and sign contents.
+
+```bash
+gpg --verify file.gpg
+gpg --output file --decrypt file.gpg
+```
+to verify and decrypt a signed content.
+
 # Journal
 ```bash
 journalctl -r SYSLOG_IDENTIFIER=sudo
