@@ -2,6 +2,7 @@
 This file contains some useful Linux commands and configs.
 
 - [General](#general)
+- [Cryptography](#cryptography)
 - [Journal](#journal)
 - [Disks and Partitions](#disks-and-partitions)
 - [Kernel Bootup](#kernel-bootup)
