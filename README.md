@@ -283,10 +283,13 @@ to run a task for notifying dynamic IP changes.
 gpg --gen-key
 gpg --list-secret-keys
 gpg --export --armor 'user@mail.com' > public.key
-# on recipient side
-gpg --import public.key
 ```
 to generate a set of keys and export the public key.
+
+```bash
+gpg --import public.key
+```
+to import someone else's key.
 
 ```bash
 gpg --default-key 'user@mail.com' --sign file
