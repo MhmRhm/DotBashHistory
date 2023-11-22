@@ -858,6 +858,12 @@ git cherry-pick abc123
 ```
 to apply patch or cherry-pick.
 
+```bash
+git archive main --prefix='project/' | gzip > $(git describe main).tar.gz
+git archive main --prefix='project/' --format=zip > $(git describe main).zip
+```
+to export latest code in an archive.
+
 # Development
 ```bash
 sudo apt-get update
