@@ -806,6 +806,11 @@ git merge --squash --no-commit feat
 to merge changes on top of index without creating two parent commits and holding off the single commit.
 
 ```bash
+git merge --no-ff
+```
+to prevent fast-forward and create an explicit merge.
+
+```bash
 git checkout feat
 git rebase --onto main sprint feat
 git checkout main
