@@ -739,6 +739,21 @@ git log --pretty=format:"%C(Yellow)%h %C(Cyan)%ch %C(Green)%cn %C(White)%s" --gr
 to see commit history in different ways.
 
 ```bash
+git reflog
+git log -g --oneline
+git reflog main
+git log -g --oneline main
+```
+to see where HEAD has been pointing to.
+
+```bash
+git show HEAD@{1}     # previously pointing to
+git show HEAD^ HEAD^2 # both parent if is a merge commit
+git show HEAD~ HEAD~2 # parent and grand parent
+```
+to show different commits relative to HEAD.
+
+```bash
 git commit --amend
 ```
 to change last commit message.
@@ -763,14 +778,22 @@ git push origin --delete v2.1
 to manage annotated and lightweight tags.
 
 ```bash
+# create branch
 git branch newbranch && git checkout newbranch
 git checkout -b newbranch
 git switch -c newbranch
-# delete branch
+# work on branch
+# merge branch
 git checkout main && git merge newbranch
+# delete branch
 git branch -d newbranch
 ```
-to create new branch and switch to it merge then delete it.
+to create new branch from HEAD and switch to it merge then delete it.
+
+```bash
+git branch feat2 123abc
+```
+to branch-out from a commit.
 
 ```bash
 git branch --all
