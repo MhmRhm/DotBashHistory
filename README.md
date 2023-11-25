@@ -714,26 +714,11 @@ git diff main...feat # head to common ancestor
 to get the uncommitted changes or compare revisions.
 
 ```bash
-git restore --staged filename
-git restore filename
-# or
-git checkout filename
-```
-to discard changes.
-
-```bash
-git rm --cached filename
-git rm filename
-git mv oldfilename newfilename
-```
-to move or remove files from git.
-
-```bash
 git log -1 --patch
 git log -S "piece of code"
 git log --no-merges -- filename
-git log feat..origin/feat
-git log feat --not main
+git log feat --not main # same as main..feat or feat ^main
+git log --left-right --oneline main...feat # on main and feat but not both
 git log --pretty=format:"%C(Yellow)%h %C(Cyan)%ch %C(Green)%cn %C(White)%s" --graph --since="one week ago"
 ```
 to see commit history in different ways.
@@ -752,6 +737,21 @@ git show HEAD^ HEAD^2 # both parent if is a merge commit
 git show HEAD~ HEAD~2 # parent and grand parent
 ```
 to show different commits relative to HEAD.
+
+```bash
+git restore --staged filename
+git restore filename
+# or
+git checkout filename
+```
+to discard changes.
+
+```bash
+git rm --cached filename
+git rm filename
+git mv oldfilename newfilename
+```
+to move or remove files from git.
 
 ```bash
 git commit --amend
