@@ -702,10 +702,10 @@ git config --global merge.tool vimdiff
 to list all configs and set some.
 
 ```bash
-git diff
+git diff # to see unstaged chanes
+git diff --staged # to see staged changes # same as --cached
+git diff HEAD # to see all changes
 git diff --check # for white spaces
-git diff --cached
-git difftool --staged
 git difftool abc123 def456 -- filename
 git diff $(git merge-base feat main)
 git diff main..feat  # head to head
