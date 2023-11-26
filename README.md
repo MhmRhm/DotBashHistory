@@ -753,6 +753,29 @@ git mv oldfilename newfilename
 ```
 to move or remove files from git.
 
+```git
+# save and apply with same staged condition
+git stash --keep-index
+git stash apply --index # or pop to apply and remove
+# save with untracked files
+git stash --include-untracked
+# save everything including ignored files
+git stash --all
+
+git stash list
+git stash drop stash@{0}
+
+# create branch from head when stashed and apply stash
+git stash branch test_feat
+```
+to work with stashes.
+
+```git
+git clean -ndx
+git clean -fdx
+```
+to safely clean a repository from all untracked and ignored file.
+
 ```bash
 git commit --amend
 ```
