@@ -772,7 +772,7 @@ to work with stashes.
 
 ```git
 git clean -ndx
-git clean -fdx
+git clean -fdx # use -ff for repos in repos
 ```
 to safely clean a repository from all untracked and ignored file.
 
