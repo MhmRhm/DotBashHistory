@@ -939,6 +939,14 @@ git cherry-pick abc123
 to apply patch or cherry-pick.
 
 ```bash
+git tag -s v1.0 -m 'a signed tag' # to sign tag
+git tag -v v1.0 # verify signed tag
+git commit -a -S -m 'Signed commit' # sign commit
+git merge --verify-signatures -S signed-branch # verify and sign merge commit
+```
+to include gpg signing in workflow.
+
+```bash
 git archive main --prefix='project/' | gzip > $(git describe main).tar.gz
 git archive main --prefix='project/' --format=zip > $(git describe main).zip
 ```
