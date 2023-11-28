@@ -698,6 +698,10 @@ git config --local user.email "account@mail.com" && git config --local user.name
 git config --global init.defaultBranch main
 git config --global pull.rebase true
 git config --global merge.tool vimdiff
+
+git config --global gpg.program gpg2
+git config --local user.signingkey <key_id>
+git config --local commit.gpgsign true
 ```
 to list all configs and set some.
 
