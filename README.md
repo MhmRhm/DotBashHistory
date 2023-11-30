@@ -719,7 +719,8 @@ to get the uncommitted changes or compare revisions.
 
 ```bash
 git log -1 --patch
-git log -S "piece of code"
+git log -S "expression" # commits that changed number of 'expression'
+git log -L :function:file # commits that changed inside 'function'
 git log --no-merges -- filename
 git log feat --not main # same as main..feat or feat ^main
 git log --left-right --oneline main...feat # on main and feat but not both
@@ -945,6 +946,12 @@ git commit -a -S -m 'Signed commit' # sign commit
 git merge --verify-signatures -S signed-branch # verify and sign merge commit
 ```
 to include gpg signing in workflow.
+
+```bash
+git grep --column --line-number --show-function '^\s*throw;$' abc123
+git grep --count 'throw' feat
+
+```
 
 ```bash
 git archive main --prefix='project/' | gzip > $(git describe main).tar.gz
