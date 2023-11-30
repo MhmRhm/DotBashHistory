@@ -950,8 +950,8 @@ to include gpg signing in workflow.
 ```bash
 git grep --column --line-number --show-function '^\s*throw;$' abc123
 git grep --count 'throw' feat
-
 ```
+to search for an expressions in a tree.
 
 ```bash
 git archive main --prefix='project/' | gzip > $(git describe main).tar.gz
