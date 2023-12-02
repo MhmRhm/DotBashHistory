@@ -783,8 +783,11 @@ to safely clean a repository from all untracked and ignored file.
 
 ```bash
 git commit --amend
+
+git add -A
+git commit --amend --no-edit
 ```
-to change last commit message.
+to change last commit message or just the content.
 
 ```bash
 git remote -v
