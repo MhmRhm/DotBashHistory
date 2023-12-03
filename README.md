@@ -752,6 +752,14 @@ git checkout filename
 to discard changes.
 
 ```bash
+git reset --soft  abc123 # move ref
+git reset --mixed abc123 # move ref, reset index
+git reset --hard  abc123 # move ref, reset index, discard working tree
+git reset --hard  abc123 file # have an old revision in your working tree
+```
+to reset three trees to different extent.
+
+```bash
 git rm --cached filename
 git rm filename
 git mv oldfilename newfilename
