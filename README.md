@@ -855,6 +855,13 @@ git merge feat
 to rebase instead of merge.
 
 ```bash
+git rebase -i HEAD~3
+git rebase --continue
+git rebase --abort
+```
+to interactively modify past three commits. Continue after making changes or abort.
+
+```bash
 git merge --squash --no-commit feat
 ```
 to merge changes on top of index without creating two parent commits and holding off the single commit.
@@ -955,6 +962,16 @@ git grep --column --line-number --show-function '^\s*throw;$' abc123
 git grep --count 'throw' feat
 ```
 to search for an expressions in a tree.
+
+```bash
+git filter-branch --tree-filter 'rm -f big_file.bin' HEAD
+git filter-branch --subdirectory-filter module HEAD
+git filter-branch --commit-filter '
+        GIT_AUTHOR_NAME="New User";
+        GIT_AUTHOR_EMAIL="new.user@mail.com";
+        git commit-tree "$@";' HEAD
+```
+to remove a file from every commit, export a sub directory as separate repository or change commiter name and email.
 
 ```bash
 git archive main --prefix='project/' | gzip > $(git describe main).tar.gz
