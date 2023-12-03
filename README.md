@@ -1,5 +1,5 @@
 # DotBashHistory
-This file contains some useful Linux commands and configs.
+This file contains some useful commands and configs.
 
 - [General](#general)
 - [Cryptography](#cryptography)
