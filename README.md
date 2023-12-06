@@ -731,7 +731,7 @@ git log --pretty=format:"%C(Yellow)%h %C(Cyan)%ch %C(Green)%cn %C(White)%s" --gr
 to see commit history in different ways.
 
 ```bash
-git log --oneline --left-right --merge
+git log --oneline --left-right --merge --patch
 
 git show :1:file # base
 git show :2:file # ours
