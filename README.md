@@ -698,6 +698,7 @@ git config --local user.email "account@mail.com" && git config --local user.name
 git config --global init.defaultBranch main
 git config --global pull.rebase true
 git config --global merge.tool vimdiff
+git config --global merge.conflictstyle diff3
 
 git config --global gpg.program gpg2
 git config --local user.signingkey <key_id>
@@ -722,11 +723,16 @@ to get the uncommitted changes or compare revisions.
 git show :1:file # base
 git show :2:file # ours
 git show :3:file # theirs
-git diff --base
 git diff --ours
+git diff --base
 git diff --theirs
+
+vim file
+git checkout --conflict=merge file # --conflict=diff3
+git checkout --ours file
+git checkout --theirs file
 ```
-to compare with different stages while in merge conflict mode.
+to compare with different stages while in merge conflict mode. Edit the file then restore the conflict markers or take one side.
 
 ```bash
 git log -1 --patch
