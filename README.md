@@ -720,6 +720,19 @@ git diff --ignore-space-change # same as -b
 to get the uncommitted changes or compare revisions.
 
 ```bash
+git log -1 --patch
+git log -S "expression" # commits that changed number of 'expression'
+git log -L :function:file # commits that changed inside 'function'
+git log --no-merges -- filename
+git log feat --not main # same as main..feat or feat ^main
+git log --left-right --oneline main...feat # on main and feat but not both
+git log --pretty=format:"%C(Yellow)%h %C(Cyan)%ch %C(Green)%cn %C(White)%s" --graph --since="one week ago"
+```
+to see commit history in different ways.
+
+```bash
+git log --oneline --left-right --merge
+
 git show :1:file # base
 git show :2:file # ours
 git show :3:file # theirs
@@ -732,18 +745,7 @@ git checkout --conflict=merge file # --conflict=diff3
 git checkout --ours file
 git checkout --theirs file
 ```
-to compare with different stages while in merge conflict mode. Edit the file then restore the conflict markers or take one side.
-
-```bash
-git log -1 --patch
-git log -S "expression" # commits that changed number of 'expression'
-git log -L :function:file # commits that changed inside 'function'
-git log --no-merges -- filename
-git log feat --not main # same as main..feat or feat ^main
-git log --left-right --oneline main...feat # on main and feat but not both
-git log --pretty=format:"%C(Yellow)%h %C(Cyan)%ch %C(Green)%cn %C(White)%s" --graph --since="one week ago"
-```
-to see commit history in different ways.
+to list commits causing the conflict and compare with different stages while in merge conflict mode. Edit the file then restore the conflict markers or take one side.
 
 ```bash
 git reflog
