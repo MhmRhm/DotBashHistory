@@ -714,8 +714,19 @@ git difftool abc123 def456 -- filename
 git diff $(git merge-base feat main)
 git diff main..feat  # head to head
 git diff main...feat # head to common ancestor
+git diff --ignore-space-change # same as -b
 ```
 to get the uncommitted changes or compare revisions.
+
+```bash
+git show :1:file # base
+git show :2:file # ours
+git show :3:file # theirs
+git diff --base
+git diff --ours
+git diff --theirs
+```
+to compare with different stages while in merge conflict mode.
 
 ```bash
 git log -1 --patch
