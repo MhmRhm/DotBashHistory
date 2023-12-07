@@ -749,6 +749,11 @@ git checkout --theirs file
 to list commits causing the conflict and compare with different stages while in merge conflict mode. Edit the file then restore the conflict markers or take one side.
 
 ```bash
+git merge --strategy=recursive -Xours feat
+```
+to merge with recursive strategy but favouring ours for conflicts.
+
+```bash
 git reflog
 git log -g --oneline
 git reflog main
