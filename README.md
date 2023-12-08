@@ -699,6 +699,7 @@ git config --global init.defaultBranch main
 git config --global pull.rebase true
 git config --global merge.tool vimdiff
 git config --global merge.conflictstyle diff3
+git config --global rerere.enabled true
 
 git config --global gpg.program gpg2
 git config --local user.signingkey <key_id>
@@ -752,6 +753,13 @@ to list commits causing the conflict and compare with different stages while in 
 git merge --strategy=recursive -Xours feat
 ```
 to merge with recursive strategy but favouring ours for conflicts.
+
+```bash
+git rerere status
+git rerere diff
+git rerere
+```
+to see what rerere recorded and apply it.
 
 ```bash
 git reflog
