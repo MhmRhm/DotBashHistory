@@ -1020,6 +1020,26 @@ git archive main --prefix='project/' --format=zip > $(git describe main).zip
 ```
 to export latest code in an archive.
 
+```bash
+git bisect start HEAD v1.1 # bad then good commit
+
+git bisect bad
+git bisect good
+git show
+git bisect reset
+
+# or
+
+git bisect run tests # tests returns 0 on success
+```
+to search for when a bug was first introduced.
+
+```bash
+git blame -L:function file --color-by-age
+git blame -C -L 20,35 file # -C to detect moved code
+```
+to see which commit changed each line.
+
 # Development
 ```bash
 sudo apt-get update
