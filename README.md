@@ -926,11 +926,18 @@ to take the `feat`, figure out the patches since it diverged from the `sprint`, 
 git submodule add https://project.git
 git diff --cached --submodule
 
+# to update a submodule
+cd module_name && git pull # or change and commit
+cd .. && git add module_name # then commit
+
+# to push a repo without missing work in submodules
+git push --recurse-submodules=check
+
 # to clone a repo with submodule(s)
 git clone https://project.with.submodule.git
 git submodule update --init --recursive
 ```
-to add or clone submodules.
+to add, update, push and clone with submodules.
 
 ```bash
 git filter-branch --tree-filter 'rm -f big_file.bin' HEAD
