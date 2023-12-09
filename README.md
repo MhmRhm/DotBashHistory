@@ -921,6 +921,88 @@ git branch -d feat
 ```
 to take the `feat`, figure out the patches since it diverged from the `sprint`, and replay these patches in the `feat` as if it was based directly off the `main`.
 
+```bash
+# to add a submodule to a repo
+git submodule add https://project.git
+git diff --cached --submodule
+
+# to clone a repo with submodule(s)
+git clone https://project.with.submodule.git
+git submodule update --init --recursive
+```
+to add or clone submodules.
+
+```bash
+git filter-branch --tree-filter 'rm -f big_file.bin' HEAD
+git filter-branch --subdirectory-filter module HEAD
+git filter-branch --commit-filter '
+        GIT_AUTHOR_NAME="New User";
+        GIT_AUTHOR_EMAIL="new.user@mail.com";
+        git commit-tree "$@";' HEAD
+```
+to remove a file from every commit, export a sub directory as separate repository or change commiter name and email.
+
+```bash
+git grep --column --line-number --show-function '^\s*throw;$' abc123
+git grep --count 'throw' feat
+```
+to search for an expressions in a tree.
+
+```bash
+git bisect start HEAD v1.1 # bad then good commit
+
+git bisect bad
+git bisect good
+git show
+git bisect reset
+
+# or
+
+git bisect run tests # tests returns 0 on success
+```
+to search for when a bug was first introduced.
+
+```bash
+git blame -L:function file --color-by-age
+git blame -C -L 20,35 file # -C to detect moved code
+```
+to see which commit changed each line.
+
+```bash
+git tag -s v1.0 -m 'a signed tag' # to sign tag
+git tag -v v1.0 # verify signed tag
+git commit -a -S -m 'Signed commit' # sign commit
+git merge --verify-signatures -S signed-branch # verify and sign merge commit
+```
+to include gpg signing in workflow.
+
+```bash
+git switch feat
+git format-patch origin/main
+git request-pull origin/main fork
+```
+to prepare your work for integration.
+
+```bash
+git am -i 0001-feat.patch
+git cherry-pick abc123
+```
+to apply patch or cherry-pick.
+
+```bash
+git archive main --prefix='project/' | gzip > $(git describe main).tar.gz
+git archive main --prefix='project/' --format=zip > $(git describe main).zip
+```
+to export latest code in an archive.
+
+```bash
+sudo apt-get install lighttpd libcgi-pm-perl gamin
+cd repository
+git instaweb
+git instaweb --stop
+```
+to serve git repository in a simple web interface.
+
 ```yaml
 version: '3.8'
 services:
@@ -968,77 +1050,6 @@ services:
       - ./postgres:/var/lib/postgresql/data
 ```
 to setup gitea behind reverse proxy. [Use duckdns.org to add SSL Certificates.](https://notthebe.ee/blog/easy-ssl-in-homelab-dns01/)
-
-```bash
-sudo apt-get install lighttpd libcgi-pm-perl gamin
-cd repository
-git instaweb
-git instaweb --stop
-```
-to serve git repository in a simple web interface.
-
-```bash
-git switch feat
-git format-patch origin/main
-git request-pull origin/main fork
-```
-to prepare your work for integration.
-
-```bash
-git am -i 0001-feat.patch
-git cherry-pick abc123
-```
-to apply patch or cherry-pick.
-
-```bash
-git tag -s v1.0 -m 'a signed tag' # to sign tag
-git tag -v v1.0 # verify signed tag
-git commit -a -S -m 'Signed commit' # sign commit
-git merge --verify-signatures -S signed-branch # verify and sign merge commit
-```
-to include gpg signing in workflow.
-
-```bash
-git grep --column --line-number --show-function '^\s*throw;$' abc123
-git grep --count 'throw' feat
-```
-to search for an expressions in a tree.
-
-```bash
-git filter-branch --tree-filter 'rm -f big_file.bin' HEAD
-git filter-branch --subdirectory-filter module HEAD
-git filter-branch --commit-filter '
-        GIT_AUTHOR_NAME="New User";
-        GIT_AUTHOR_EMAIL="new.user@mail.com";
-        git commit-tree "$@";' HEAD
-```
-to remove a file from every commit, export a sub directory as separate repository or change commiter name and email.
-
-```bash
-git archive main --prefix='project/' | gzip > $(git describe main).tar.gz
-git archive main --prefix='project/' --format=zip > $(git describe main).zip
-```
-to export latest code in an archive.
-
-```bash
-git bisect start HEAD v1.1 # bad then good commit
-
-git bisect bad
-git bisect good
-git show
-git bisect reset
-
-# or
-
-git bisect run tests # tests returns 0 on success
-```
-to search for when a bug was first introduced.
-
-```bash
-git blame -L:function file --color-by-age
-git blame -C -L 20,35 file # -C to detect moved code
-```
-to see which commit changed each line.
 
 # Development
 ```bash
