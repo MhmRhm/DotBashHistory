@@ -700,6 +700,7 @@ git config --global pull.rebase true
 git config --global merge.tool vimdiff
 git config --global merge.conflictstyle diff3
 git config --global rerere.enabled true
+git config --local submodule.recurse true
 
 git config --global gpg.program gpg2
 git config --local user.signingkey <key_id>
@@ -935,7 +936,10 @@ git push --recurse-submodules=check
 
 # to clone a repo with submodule(s)
 git clone https://project.with.submodule.git
-git submodule update --init --recursive
+git submodule update --init --recursive # --remote --merge if WIP
+
+# to switch branches
+git checkout --recurse-submodules feat
 ```
 to add, update, push and clone with submodules.
 
