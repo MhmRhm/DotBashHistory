@@ -1007,6 +1007,18 @@ git archive main --prefix='project/' --format=zip > $(git describe main).zip
 to export latest code in an archive.
 
 ```bash
+# producer
+git bundle create ../repo.bundle HEAD main # all commits
+git bundle create ../my_commits.bundle main --not origin/main # local commits
+
+# consumer
+git bundle verify ../repo.bundle
+git pull ../repo.bundle main
+git fetch ../repo.bundle feat:other-feat
+```
+to share work when offline.
+
+```bash
 sudo apt-get install lighttpd libcgi-pm-perl gamin
 cd repository
 git instaweb
