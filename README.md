@@ -1001,6 +1001,16 @@ git cherry-pick abc123
 to apply patch or cherry-pick.
 
 ```bash
+git log --oneline --graph
+# choose commit
+git commit-tree -m 'fake init comit' abc123^{tree}
+# def456
+git rebase --onto=def456 abc123
+git log --oneline --graph
+```
+to trim your history.
+
+```bash
 git archive main --prefix='project/' | gzip > $(git describe main).tar.gz
 git archive main --prefix='project/' --format=zip > $(git describe main).zip
 ```
