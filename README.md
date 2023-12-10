@@ -701,6 +701,7 @@ git config --global merge.tool vimdiff
 git config --global merge.conflictstyle diff3
 git config --global rerere.enabled true
 git config --local submodule.recurse true
+git config --global credential.helper 'cache --timeout 900'
 
 git config --global gpg.program gpg2
 git config --local user.signingkey <key_id>
