@@ -702,6 +702,8 @@ git config --global merge.conflictstyle diff3
 git config --global rerere.enabled true
 git config --local submodule.recurse true
 git config --global credential.helper 'cache --timeout 900'
+git config --global core.autocrlf true
+git config --local core.whitespace indent-with-non-tab # tab-in-indent to treat tabs as error
 
 git config --global gpg.program gpg2
 git config --local user.signingkey <key_id>
@@ -903,6 +905,12 @@ git rebase --continue
 git rebase --abort
 ```
 to interactively modify past three commits. Continue after making changes or abort.
+
+```bash
+git apply --whitespace=fix patch
+git rebase --whitespace=fix HEAD~
+```
+to fix whitespaces.
 
 ```bash
 git merge --squash --no-commit feat
