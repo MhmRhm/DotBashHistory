@@ -714,6 +714,7 @@ to list all configs and set some.
 ```bash
 git diff # to see unstaged chanes
 git diff --staged # to see staged changes # same as --cached
+git diff --name-only
 git diff HEAD # to see all changes
 git diff --check # for white spaces
 git difftool abc123 def456 -- filename
