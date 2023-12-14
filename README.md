@@ -729,6 +729,7 @@ git log -1 --patch
 git log -S "expression" # commits that changed number of 'expression'
 git log -L :function:file # commits that changed inside 'function'
 git log --no-merges -- filename
+git log --name-only --oneline
 git log feat --not main # same as main..feat or feat ^main
 git log --left-right --oneline main...feat # on main and feat but not both
 git log --left-right --oneline HEAD...MERGE_HEAD # while in merge conflict
