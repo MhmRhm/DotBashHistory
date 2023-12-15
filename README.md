@@ -722,6 +722,7 @@ git diff $(git merge-base feat main)
 git diff main..feat  # head to head
 git diff main...feat # head to common ancestor
 git diff --ignore-space-change # same as -b
+git rev-list HEAD # to get all parents hashes
 ```
 to get the uncommitted changes or compare revisions.
 
@@ -1094,6 +1095,11 @@ services:
       - ./postgres:/var/lib/postgresql/data
 ```
 to setup gitea behind reverse proxy. [Use duckdns.org to add SSL Certificates.](https://notthebe.ee/blog/easy-ssl-in-homelab-dns01/)
+
+```bash
+git rev-list --objects --all
+```
+to list every referenced object in git.
 
 # Development
 ```bash
