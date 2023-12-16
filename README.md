@@ -957,13 +957,14 @@ to add, update, push and clone with submodules.
 
 ```bash
 git filter-branch --tree-filter 'rm -f big_file.bin' HEAD
+git filter-branch --index-filter 'git rm --ignore-unmatch --cached file.big' -- abc123^.. # faster than --tree-filter
 git filter-branch --subdirectory-filter module HEAD
 git filter-branch --commit-filter '
         GIT_AUTHOR_NAME="New User";
         GIT_AUTHOR_EMAIL="new.user@mail.com";
         git commit-tree "$@";' HEAD
 ```
-to remove a file from every commit, export a sub directory as separate repository or change commiter name and email.
+to remove a file from every commit or a specific commit, export a sub directory as separate repository or change commiter name and email.
 
 ```bash
 git grep --column --line-number --show-function '^\s*throw;$' abc123
@@ -1097,9 +1098,27 @@ services:
 to setup gitea behind reverse proxy. [Use duckdns.org to add SSL Certificates.](https://notthebe.ee/blog/easy-ssl-in-homelab-dns01/)
 
 ```bash
-git rev-list --objects --all
+git cat-file -p HEAD # to show commit object
+git ls-tree HEAD # to show commit tree object
+git rev-list --objects --all # to list every referenced object
+
+git hash-object file # to get the sha1 of file, use -w to write to git
+git cat-file -p abc123 # to get content of object, use -t to get type
+
+git write-tree # to write index into a tree object
+git read-tree --prefix=bak abc123 # to write tree in bak directory
+
+git commit-tree def456 -p abc123 -m 'message' # to create a commit object
+
+git update-ref refs/heads/feat abc123 # to create a branch
+
+git count-objects -vH # to get stats on objects
+
+git prune -vn --expire=now # to see loose objects that will be removed
+
+GIT_TRACE_PACK_ACCESS=true GIT_TRACE_PACKET=true GIT_TRACE_SETUP=true git fetch # to debug git
 ```
-to list every referenced object in git.
+to work with git internals.
 
 # Development
 ```bash
