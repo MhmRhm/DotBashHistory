@@ -14,6 +14,10 @@ This file contains some useful commands and configs.
 
 # General
 ```bash
+man 5 passwd
+```
+to search man pages for `passwd` in section 5.
+```bash
 !! && !-2
 ```
 to execute last and second-to-last commands.
