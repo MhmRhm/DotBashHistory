@@ -418,9 +418,9 @@ mount -t tmpfs -o size=10M tmpfs mpoint/
 ```
 to create a filesystem on RAM.
 ```bash
-du -sh *
+du -sh * | sort -h -r
 ```
-to get folder and file sizes in a directory.
+to get sorted folder and file sizes in a directory.
 
 ```bash
 df
@@ -1177,3 +1177,111 @@ cmake --build . --parallel 7 | tee -a ../build-qt.log
 sudo cmake --install .
 ```
 to build Qt6 from source.
+
+```bash
+sudo su -
+export LFS=/mnt/lfs
+cd $LFS
+
+sudo apt-get -y install rsync
+sudo apt-get -y install cvs
+sudo apt-get -y install mercurial
+sudo apt-get -y install bzr
+
+git clone --depth=1 --recurse-submodules https://git.savannah.nongnu.org/git/acl.git
+git clone --depth=1 --recurse-submodules https://git.savannah.nongnu.org/git/attr.git
+git clone --depth=1 --recurse-submodules git://git.sv.gnu.org/autoconf
+git clone --depth=1 --recurse-submodules https://git.savannah.gnu.org/git/automake.git
+git clone --depth=1 --recurse-submodules https://git.savannah.gnu.org/git/bash.git
+git clone --depth=1 --recurse-submodules https://git.gavinhoward.com/gavin/bc.git
+git clone --depth=1 --recurse-submodules git://sourceware.org/git/binutils-gdb.git
+git clone --depth=1 --recurse-submodules https://git.savannah.gnu.org/git/bison.git
+git clone --depth=1 --recurse-submodules git://sourceware.org/git/bzip2.git
+git clone --depth=1 --recurse-submodules https://github.com/libcheck/check.git
+git clone --depth=1 --recurse-submodules git://git.sv.gnu.org/coreutils
+git clone --depth=1 --recurse-submodules git://git.sv.gnu.org/dejagnu.git
+git clone --depth=1 --recurse-submodules https://git.savannah.gnu.org/git/diffutils.git
+git clone --depth=1 --recurse-submodules https://git.kernel.org/pub/scm/fs/ext2/e2fsprogs.git
+git clone --depth=1 --recurse-submodules git://sourceware.org/git/elfutils.git
+git clone --depth=1 --recurse-submodules https://github.com/libexpat/libexpat.git
+rsync -ai a.cvs.sourceforge.net::cvsroot/expect/ expect-cvsroot/
+rm -rf expect-cvsroot/CVSROOT/#cvs.history.lock/
+CVSROOT=$LFS/sources/expect-cvsroot/ cvs checkout expect
+git clone --depth=1 --recurse-submodules https://github.com/file/file.git
+git clone --depth=1 --recurse-submodules https://git.savannah.gnu.org/git/findutils.git
+git clone --depth=1 --recurse-submodules https://github.com/westes/flex.git
+git clone --depth=1 --recurse-submodules https://github.com/pypa/flit.git
+git clone --depth=1 --recurse-submodules https://git.savannah.gnu.org/git/gawk.git
+git clone --depth=1 --recurse-submodules git://gcc.gnu.org/git/gcc.git
+git clone --depth=1 --recurse-submodules git://git.gnu.org.ua/gdbm.git
+git clone --depth=1 --recurse-submodules https://git.savannah.gnu.org/git/gettext.git
+git clone --depth=1 --recurse-submodules https://sourceware.org/git/glibc.git
+git clone --depth=1 --recurse-submodules https://git.savannah.gnu.org/git/gperf.git
+git clone --depth=1 --recurse-submodules https://git.savannah.gnu.org/git/grep.git
+git clone --depth=1 --recurse-submodules https://git.savannah.gnu.org/git/groff.git
+git clone --depth=1 --recurse-submodules https://git.savannah.gnu.org/git/grub.git
+git clone --depth=1 --recurse-submodules https://git.savannah.gnu.org/git/gzip.git
+git clone --depth=1 --recurse-submodules https://github.com/Mic92/iana-etc.git
+git clone --depth=1 --recurse-submodules https://git.savannah.gnu.org/git/inetutils.git
+bzr branch lp:intltool
+git clone --depth=1 --recurse-submodules https://git.kernel.org/pub/scm/network/iproute2/iproute2.git
+git clone --depth=1 --recurse-submodules https://github.com/pallets/jinja.git
+git clone --depth=1 --recurse-submodules git://git.kernel.org/pub/scm/linux/kernel/git/legion/kbd.git
+git clone --depth=1 --recurse-submodules https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git
+git clone --depth=1 --recurse-submodules https://github.com/gwsw/less.git
+git clone --depth=1 --recurse-submodules https://git.kernel.org/pub/scm/libs/libcap/libcap.git
+git clone --depth=1 --recurse-submodules git://github.com/libffi/libffi.git
+git clone --depth=1 --recurse-submodules https://github.com/libffi/libffi.git
+git clone --depth=1 --recurse-submodules https://git.savannah.nongnu.org/git/libpipeline.git
+git clone --depth=1 --recurse-submodules git://git.savannah.gnu.org/libtool.git
+git clone --depth=1 --recurse-submodules https://github.com/besser82/libxcrypt.git
+git clone --depth=1 --recurse-submodules https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+git clone --depth=1 --recurse-submodules git://git.sv.gnu.org/m4
+git clone --depth=1 --recurse-submodules https://git.savannah.gnu.org/git/make.git
+git clone --depth=1 --recurse-submodules https://gitlab.com/man-db/man-db.git
+git clone --depth=1 --recurse-submodules https://git.kernel.org/pub/scm/docs/man-pages/man-pages.git
+git clone --depth=1 --recurse-submodules https://github.com/pallets/markupsafe.git
+git clone --depth=1 --recurse-submodules https://github.com/mesonbuild/meson.git
+git clone --depth=1 --recurse-submodules https://gitlab.inria.fr/mpc/mpc.git
+git clone --depth=1 --recurse-submodules https://gitlab.inria.fr/mpfr/mpfr.git
+git clone --depth=1 --recurse-submodules https://github.com/ThomasDickey/ncurses-snapshots.git
+git clone --depth=1 --recurse-submodules https://github.com/ninja-build/ninja.git
+git clone --depth=1 --recurse-submodules git://git.openssl.org/openssl.git
+git clone --depth=1 --recurse-submodules https://git.savannah.gnu.org/git/patch.git
+git clone --depth=1 --recurse-submodules https://github.com/Perl/perl5.git perl
+git clone --depth=1 --recurse-submodules https://github.com/pkgconf/pkgconf.git
+git clone --depth=1 --recurse-submodules https://gitlab.com/procps-ng/procps.git
+git clone --depth=1 --recurse-submodules https://gitlab.com/psmisc/psmisc.git
+git clone --depth=1 --recurse-submodules https://github.com/python/cpython.git
+git clone --depth=1 --recurse-submodules https://git.savannah.gnu.org/git/readline.git
+git clone --depth=1 --recurse-submodules git://git.sv.gnu.org/sed
+git clone --depth=1 --recurse-submodules https://github.com/shadow-maint/shadow.git
+git clone --depth=1 --recurse-submodules git://git.infodrom.org/infodrom/sysklogd
+git clone --depth=1 --recurse-submodules https://github.com/systemd/systemd.git
+git clone --depth=1 --recurse-submodules https://github.com/slicer69/sysvinit.git
+git clone --depth=1 --recurse-submodules https://git.savannah.gnu.org/git/tar.git
+git clone --depth=1 --recurse-submodules https://github.com/tcltk/tcl.git
+git clone --depth=1 --recurse-submodules https://git.savannah.gnu.org/git/texinfo.git
+git clone --depth=1 --recurse-submodules https://github.com/eggert/tz.git
+wget https://anduin.linuxfromscratch.org/LFS/udev-lfs-20230818.tar.xz
+git clone --depth=1 --recurse-submodules https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git
+git clone --depth=1 --recurse-submodules https://github.com/vim/vim.git
+git clone --depth=1 --recurse-submodules https://github.com/pypa/wheel.git
+git clone --depth=1 --recurse-submodules https://github.com/chorny/XML-Parser.git
+git clone --depth=1 --recurse-submodules https://git.tukaani.org/xz.git
+git clone --depth=1 --recurse-submodules https://github.com/madler/zlib.git
+git clone --depth=1 --recurse-submodules https://github.com/facebook/zstd.git
+
+mkdir patches && cd patches
+wget https://www.linuxfromscratch.org/patches/lfs/12.0/bzip2-1.0.8-install_docs-1.patch
+wget https://www.linuxfromscratch.org/patches/lfs/12.0/coreutils-9.3-i18n-1.patch
+wget https://www.linuxfromscratch.org/patches/lfs/12.0/glibc-2.38-memalign_fix-1.patch
+wget https://www.linuxfromscratch.org/patches/lfs/12.0/glibc-2.38-fhs-1.patch
+wget https://www.linuxfromscratch.org/patches/lfs/12.0/grub-2.06-upstream_fixes-1.patch
+wget https://www.linuxfromscratch.org/patches/lfs/12.0/kbd-2.6.1-backspace-1.patch
+wget https://www.linuxfromscratch.org/patches/lfs/12.0/readline-8.2-upstream_fix-1.patch
+wget https://www.linuxfromscratch.org/patches/lfs/12.0/sysvinit-3.07-consolidated-1.patch
+
+chown root:root $LFS/sources/*
+```
+to build linux from scratch (in progress.)
