@@ -1183,10 +1183,7 @@ sudo su -
 export LFS=/mnt/lfs
 cd $LFS
 
-sudo apt-get -y install rsync
-sudo apt-get -y install cvs
-sudo apt-get -y install mercurial
-sudo apt-get -y install bzr
+sudo apt-get -y install git rsync cvs mercurial bzr
 
 git clone --depth=1 --recurse-submodules https://git.savannah.nongnu.org/git/acl.git
 git clone --depth=1 --recurse-submodules https://git.savannah.nongnu.org/git/attr.git
