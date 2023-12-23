@@ -55,7 +55,7 @@ to list all hidden files and directories not including `.` and `..`.
 tar -zcvf arch.tar.gz file dir
 tar -ztvf arch.tar.gz
 tar -zxpvf arch.tar.gz -C ./outdir
-tar -xvpf arch.tar.xz # for tar.xz files.
+tar -xpvf arch.tar.xz # for tar.xz files.
 ```
 to create then show the table of contents for the archive then extract it.
 
