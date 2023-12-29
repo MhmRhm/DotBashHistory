@@ -535,9 +535,9 @@ to list all properties for a unit.
 
 # File Sharing
 ```bash
-python3 -m http.server
+python3 -m http.server 8127 -d /home/user/
 ```
-to share a directory over a secure network.
+to share a directory on a host over a secured network on port 8127.
 
 ```bash
 tar zcvf - directory | ssh -i mainkey.pem -p 17456 remote_user@remote_address tar zxvf -
