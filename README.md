@@ -70,6 +70,11 @@ PATH=first:$PATH:last
 to add directories to the search path.
 
 ```bash
+sed -i.bak 's/#VERBOSE_FSCK=no/VERBOSE_FSCK=yes/' /etc/sysconfig/rc.site
+```
+to change a line in a file and keep a backup.
+
+```bash
 mknod mypipe p
 tail -f mypipe &
 man man > mypipe
@@ -99,6 +104,7 @@ to show time in a timezone.
 
 ```bash
 /usr/bin/time command
+time { tar -xf repo.tar.xz && rm -rf repo; }
 ```
 to show CPU time and memory faults after running command.
 
@@ -418,7 +424,7 @@ mount -t tmpfs -o size=10M tmpfs mpoint/
 ```
 to create a filesystem on RAM.
 ```bash
-du -sh * | sort -h -r
+du -sh $(ls -A) | sort -hr
 ```
 to get sorted folder and file sizes in a directory.
 
