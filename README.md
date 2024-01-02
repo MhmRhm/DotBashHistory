@@ -746,6 +746,7 @@ git log feat --not main # same as main..feat or feat ^main
 git log --left-right --oneline main...feat # on main and feat but not both
 git log --left-right --oneline HEAD...MERGE_HEAD # while in merge conflict
 git log --pretty=format:"%C(Red)%d %C(Yellow)%h %C(Cyan)%ch %C(Green)%cn %C(White)%s" --graph --all --since="one week ago"
+git log --grep 'text' --grep 'word' --all-match # commits mentioning 'text' and 'word'
 git shortlog -sne --all # to get a list of contributors on all branches
 ```
 to see commit history in different ways.
