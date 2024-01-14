@@ -305,6 +305,7 @@ gpg --import public.key
 to import someone else's public key or your private key.
 
 ```bash
+# export GPG_TTY=$(tty)
 gpg --default-key 'user@mail.com' --sign file
 ```
 to encrypt and sign contents.
@@ -1010,7 +1011,7 @@ to see which commit changed each line.
 ```bash
 git tag -s v1.0 -m 'a signed tag' # to sign tag
 git tag -v v1.0 # verify signed tag
-git commit -a -S -m 'Signed commit' # sign commit
+git commit -a -s -m 'Signed commit' # sign commit
 git merge --verify-signatures -S signed-branch # verify and sign merge commit
 ```
 to include gpg signing in workflow.
