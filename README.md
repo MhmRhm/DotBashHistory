@@ -1019,8 +1019,9 @@ to include gpg signing in workflow.
 git switch feat
 git format-patch origin/main
 git request-pull origin/main fork
+git send-email /tmp/0001-feat.patch --to=maintainer@mail.com --cc=reviewer@mail.com # use --compose to add a cover letter
 ```
-to prepare your work for integration.
+to prepare your work for integration and create a pull request or send patch to maintainer.
 
 ```bash
 git am -i 0001-feat.patch
