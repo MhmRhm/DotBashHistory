@@ -291,15 +291,18 @@ to run a task for notifying dynamic IP changes.
 # Cryptography
 ```bash
 gpg --gen-key
+gpg --list-keys
 gpg --list-secret-keys
+gpg --list-public-keys
 gpg --export --armor 'user@mail.com' > public.key
+gpg --export-secret-keys --armor 'user@mail.com' > private.key
 ```
-to generate a set of keys and export the public key.
+to generate a set of keys and export the public and private keys.
 
 ```bash
 gpg --import public.key
 ```
-to import someone else's key.
+to import someone else's public key or your private key.
 
 ```bash
 gpg --default-key 'user@mail.com' --sign file
