@@ -1059,6 +1059,16 @@ git fetch ../repo.bundle feat:other-feat
 to share work when offline.
 
 ```bash
+git commit # commit your changes in a feature branch
+git commit --amend -s # sign your commit
+git format-patch origin/master -o /tmp/ # create patch file relative to master
+./scripts/checkpatch.pl /tmp/0001-Fix.patch # check the patch file for issues
+./scripts/get_maintainer.pl /tmp/0001-Fix.patch # find maintainers responsible for fix
+git send-email /tmp/0001-Fix.patch --to=user1@mail.com --cc=user2@mail.com # email them the patch file
+```
+to contribute to linux source code.
+
+```bash
 sudo apt-get install lighttpd libcgi-pm-perl gamin
 cd repository
 git instaweb
