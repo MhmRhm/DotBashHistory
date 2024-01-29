@@ -1063,7 +1063,7 @@ git commit # commit your changes in a feature branch
 git commit --amend -s # sign your commit
 git format-patch origin/master -o /tmp/ # create patch file relative to master
 ./scripts/checkpatch.pl /tmp/0001-Fix.patch # check the patch file for issues
-./scripts/get_maintainer.pl /tmp/0001-Fix.patch # find maintainers responsible for fix
+./scripts/get_maintainer.pl /tmp/0001-Fix.patch # find maintainers responsible for the fix
 git send-email /tmp/0001-Fix.patch --to=user1@mail.com --cc=user2@mail.com # email them the patch file
 ```
 to contribute to linux source code.
