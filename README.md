@@ -1199,3 +1199,17 @@ cmake --build . --parallel $(nproc) | tee -a ../build-qt.log
 sudo cmake --install .
 ```
 to build Qt6 from source.
+
+```bash
+git clone --recurse-submodules https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+cd linux
+cp /boot/config-release .config # copy distribution config file to source tree
+make menuconfig # save then exit to apply default new features
+make -j$(nproc)
+sudo make modules_install
+sudo make install
+uname --kernel-release # old kernel version
+sudo reboot
+uname --kernel-release # new kernel version
+```
+to update kernel from source.
