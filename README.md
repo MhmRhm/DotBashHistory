@@ -1150,12 +1150,12 @@ to work with git internals.
 # Building
 ```bash
 cmake --help
-cmake -B ./build -S ./source
-cmake -B ./build -S ./source -G Ninja
-cmake -B ./build -S ./source -L
-cmake -B ./build -S ./source -L -D CMAKE_BUILD_TYPE=Release
-cmake -B ./build -S ./source -L -U CMAKE_BUILD_TYPE
-cmake -B ./build -S ./source -LAH # with advance and help strings
+cmake -B ./build_dir -S ./source_dir
+cmake -B ./build_dir -S ./source_dir -G Ninja
+cmake -B ./build_dir -S ./source_dir -L
+cmake -B ./build_dir -S ./source_dir -L -D CMAKE_BUILD_TYPE=Release
+cmake -B ./build_dir -S ./source_dir -L -U CMAKE_BUILD_TYPE
+cmake -B ./build_dir -S ./source_dir -LAH # with advance and help strings
 cmake --list-presets
 cmake --preset=WinRelease
 ```
@@ -1168,11 +1168,19 @@ to configure a project.
 #     message(DEBUG "dependency included")
 # endfunction()
 
-cmake -B ./build -S ./source --log-level=DEBUG
-cmake -B ./build -S ./source --log-context
-cmake -B ./build -S ./source --trace
+cmake -B ./build_dir -S ./source_dir --log-level=DEBUG
+cmake -B ./build_dir -S ./source_dir --log-context
+cmake -B ./build_dir -S ./source_dir --trace
 ```
 to debug the configuration process.
+
+```bash
+cmake --build ./build_dir -j $(nproc)
+cmake --build ./build_dir --target clean
+cmake --build ./build_dir --clean-first
+cmake --build ./build_dir --config release
+```
+to build a project and targets.
 
 # Development
 ```bash
