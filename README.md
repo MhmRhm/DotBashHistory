@@ -1182,6 +1182,17 @@ cmake --build ./build_dir --config release
 ```
 to build a project and targets.
 
+```bash
+cmake --install ./build_dir --config release --prefix /opt/prj/
+```
+to install a project and components.
+
+```bash
+cmake -E # to list commands
+cmake -E make_directory dir
+```
+to run some commands in a platform-independent way.
+
 # Development
 ```bash
 sudo apt-get update
