@@ -10,6 +10,7 @@ This file contains some useful commands and configs.
 - [File Sharing](#file-sharing)
 - [Networking](#networking)
 - [Version Controlling](#version-controlling)
+- [Building](#building)
 - [Development](#development)
 
 # General
