@@ -1147,6 +1147,33 @@ GIT_TRACE_PACK_ACCESS=true GIT_TRACE_PACKET=true GIT_TRACE_SETUP=true git fetch 
 ```
 to work with git internals.
 
+# Building
+```bash
+cmake --help
+cmake -B ./build -S ./source
+cmake -B ./build -S ./source -G Ninja
+cmake -B ./build -S ./source -L
+cmake -B ./build -S ./source -L -D CMAKE_BUILD_TYPE=Release
+cmake -B ./build -S ./source -L -U CMAKE_BUILD_TYPE
+cmake -B ./build -S ./source -LAH # with advance and help strings
+cmake --list-presets
+cmake --preset=WinRelease
+```
+to configure a project.
+
+```bash
+# in CMakeLists.txt:
+# function(addDependency)
+#     list(APPEND CMAKE_MESSAGE_CONTEXT "addDep")
+#     message(DEBUG "dependency included")
+# endfunction()
+
+cmake -B ./build -S ./source --log-level=DEBUG
+cmake -B ./build -S ./source --log-context
+cmake -B ./build -S ./source --trace
+```
+to debug the configuration process.
+
 # Development
 ```bash
 sudo apt-get update
