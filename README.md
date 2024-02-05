@@ -727,6 +727,22 @@ git config --local commit.gpgsign true
 to list all configs and set some.
 
 ```bash
+git log -1 --patch
+git log -S "expression" # commits that changed number of 'expression'
+git log -L :function:file # commits that changed inside 'function'
+git log --no-merges -- filename
+git log --name-only --oneline
+git log --oneline --stat filename
+git log feat --not main # same as main..feat or feat ^main
+git log --left-right --oneline main...feat # on main and feat but not both
+git log --left-right --oneline HEAD...MERGE_HEAD # while in merge conflict
+git log --pretty=format:"%C(Red)%d %C(Yellow)%h %C(Cyan)%ch %C(Green)%cn %C(White)%s" --graph --all --since="one week ago"
+git log --grep 'text' --grep 'word' --all-match # commits mentioning 'text' and 'word'
+git shortlog -sne --all # to get a list of contributors on all branches
+```
+to see commit history in different ways.
+
+```bash
 git diff # to see unstaged chanes
 git diff --staged # to see staged changes # same as --cached
 git diff --name-only
@@ -740,21 +756,6 @@ git diff --ignore-space-change # same as -b
 git rev-list HEAD # to get all parents hashes
 ```
 to get the uncommitted changes or compare revisions.
-
-```bash
-git log -1 --patch
-git log -S "expression" # commits that changed number of 'expression'
-git log -L :function:file # commits that changed inside 'function'
-git log --no-merges -- filename
-git log --name-only --oneline
-git log feat --not main # same as main..feat or feat ^main
-git log --left-right --oneline main...feat # on main and feat but not both
-git log --left-right --oneline HEAD...MERGE_HEAD # while in merge conflict
-git log --pretty=format:"%C(Red)%d %C(Yellow)%h %C(Cyan)%ch %C(Green)%cn %C(White)%s" --graph --all --since="one week ago"
-git log --grep 'text' --grep 'word' --all-match # commits mentioning 'text' and 'word'
-git shortlog -sne --all # to get a list of contributors on all branches
-```
-to see commit history in different ways.
 
 ```bash
 git log --oneline --left-right --merge --patch
