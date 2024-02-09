@@ -353,6 +353,11 @@ journalctl --unit=ssh.service
 ```
 to list logs related to a service.
 
+```bash
+dmesg --follow --human --level debug
+```
+to see debug messages by drivers.
+
 # Disks and Partitions
 ```bash
 lsblk
