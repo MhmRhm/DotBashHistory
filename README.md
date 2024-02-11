@@ -1239,6 +1239,7 @@ deactivate
 to create a Python virtual environment.
 
 ```bash
+tar -xvpf cmake-3.28.3.tar.gz
 mkdir build && cd build
 sudo apt-get install libssl-dev
 ../configure
