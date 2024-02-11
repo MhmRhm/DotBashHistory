@@ -1239,6 +1239,16 @@ deactivate
 to create a Python virtual environment.
 
 ```bash
+mkdir build && cd build
+sudo apt-get install libssl-dev
+../configure
+gmake -j $(nproc)
+sudo gmake install
+ctest --rerun-failed --output-on-failure
+```
+to install latest cmake from source.
+
+```bash
 wget https://download.qt.io/official_releases/qt/6.5/6.6.1/single/qt-everywhere-src-6.6.1.tar.xz
 tar xvf qt-everywhere-src-6.6.1.tar.xz
 
