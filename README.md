@@ -1218,6 +1218,11 @@ ldconfig -v
 to rebuild shared libraries cache.
 
 ```bash
+valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose ./executable
+```
+to find memory leaks.
+
+```bash
 nano Dockerfile
 #FROM alpine:latest
 #RUN apk add bash
