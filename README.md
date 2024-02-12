@@ -1011,7 +1011,7 @@ to search for when a bug was first introduced.
 
 ```bash
 git blame -L:function file --color-by-age
-git blame -C -L 20,35 file # -C to detect moved code
+git blame -C -C -C -L 20,35 file # -C to detect moved code -C from commit that create file -C from every commit
 ```
 to see which commit changed each line.
 
