@@ -104,6 +104,13 @@ TZ=Iran date
 to show time in a timezone.
 
 ```bash
+cat /etc/locale.gen
+locale -a
+sudo locale-gen ms_MY.UTF-8
+```
+to list all available or generated locales and generate one.
+
+```bash
 /usr/bin/time command
 time { tar -xf repo.tar.xz && rm -rf repo; }
 ```
