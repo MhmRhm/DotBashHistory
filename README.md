@@ -770,6 +770,22 @@ git rev-list HEAD # to get all parents hashes
 to get the uncommitted changes or compare revisions.
 
 ```bash
+# see all branches and trackings
+git branch -vv
+
+# checkout remote into local and set tracking
+git checkout -b new_branch origin/main
+
+# checkout in detached head
+git checkout origin/main
+# create branch from detached head
+git switch -c new_branch
+# set tracking
+git branch --set-upstream-to=origin/main
+```
+to show branches and bring frome remote to local.
+
+```bash
 git log --oneline --left-right --merge --patch
 
 git show :1:file # base
