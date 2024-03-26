@@ -775,6 +775,8 @@ git branch -vv
 
 # checkout remote into local and set tracking
 git checkout -b new_branch origin/main
+# to remove tracking
+git branch --unset-upstream
 
 # checkout in detached head
 git checkout origin/main
