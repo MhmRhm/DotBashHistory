@@ -1134,9 +1134,9 @@ services:
       - GITEA__database__NAME=gitea
       - GITEA__database__USER=gitea
       - GITEA__database__PASSWD=gitea
-      - GITEA__service__DISABLE_REGISTRATION=true
-      - GITEA__admin__DISABLE_REGULAR_ORG_CREATION=true
-      - GITEA__openid__ENABLE_OPENID_SIGNUP=false
+      #- GITEA__service__DISABLE_REGISTRATION=true
+      #- GITEA__admin__DISABLE_REGULAR_ORG_CREATION=true
+      #- GITEA__openid__ENABLE_OPENID_SIGNUP=false
     restart: always
     ports:
       - '2222:22'
