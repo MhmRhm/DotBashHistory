@@ -1108,34 +1108,36 @@ git instaweb --stop
 ```
 to serve git repository in a simple web interface.
 
-```yaml
+```yaml                                                       
 version: '3.8'
+
 services:
   nginxproxymanager:
     image: 'jc21/nginx-proxy-manager:latest'
-    restart: unless-stopped
+    container_name: nginxproxymanager
+    restart: always
     ports:
       - '80:80'
       - '81:81'
       - '443:443'
-      - '3000:3000'
     volumes:
-      - ./nginxproxymanager/data:/data
-      - ./nginxproxymanager/letsencrypt:/etc/letsencrypt
+      - ./nginx/data:/data
+      - ./nginx/letsencrypt:/etc/letsencrypt
   gitea:
-    image: gitea/gitea:1.20.5
+    image: 'gitea/gitea:latest'
+    container_name: gitea
     environment:
       - USER_UID=1000
       - USER_GID=1000
       - GITEA__database__DB_TYPE=postgres
-      - GITEA__database__HOST=db:5432
+      - GITEA__database__HOST=postgres:5432
       - GITEA__database__NAME=gitea
       - GITEA__database__USER=gitea
       - GITEA__database__PASSWD=gitea
-      #- GITEA__service__DISABLE_REGISTRATION=true
-      #- GITEA__admin__DISABLE_REGULAR_ORG_CREATION=true
-      #- GITEA__openid__ENABLE_OPENID_SIGNUP=false
-    restart: unless-stopped
+      - GITEA__service__DISABLE_REGISTRATION=true
+      - GITEA__admin__DISABLE_REGULAR_ORG_CREATION=true
+      - GITEA__openid__ENABLE_OPENID_SIGNUP=false
+    restart: always
     ports:
       - '2222:22'
     volumes:
@@ -1143,10 +1145,12 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     depends_on:
-      - db
-  db:
-    image: postgres:14
-    restart: unless-stopped
+      - postgres
+
+  postgres:
+    image: 'postgres:latest'
+    container_name: postgres
+    restart: always
     environment:
       - POSTGRES_USER=gitea
       - POSTGRES_PASSWORD=gitea
