@@ -1194,6 +1194,7 @@ sudo docker build -t <name> .
 sudo docker images
 sudo docker run -it <name>
 sudo docker ps -a
+sudo docker stop <id>
 sudo docker rm <id>
 sudo docker rmi <name>
 ```
