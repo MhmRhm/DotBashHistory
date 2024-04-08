@@ -10,6 +10,7 @@ This file contains some useful commands and configs.
 - [File Sharing](#file-sharing)
 - [Networking](#networking)
 - [Version Controlling](#version-controlling)
+- [Docker](#docker)
 - [Building](#building)
 - [Development](#development)
 
@@ -1183,6 +1184,21 @@ GIT_TRACE_PACK_ACCESS=true GIT_TRACE_PACKET=true GIT_TRACE_SETUP=true git fetch 
 ```
 to work with git internals.
 
+# Docker
+```bash
+nano Dockerfile
+#FROM alpine:latest
+#RUN apk add bash
+#CMD ["/bin/bash"]
+sudo docker build -t <name> .
+sudo docker images
+sudo docker run -it <name>
+sudo docker ps -a
+sudo docker rm <id>
+sudo docker rmi <name>
+```
+to build an image with a tag name, list images, run a container in interactive mode, list containers, and remove containers and images.
+
 # Building
 ```bash
 cmake --help
@@ -1250,20 +1266,6 @@ to rebuild shared libraries cache.
 valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose ./executable
 ```
 to find memory leaks.
-
-```bash
-nano Dockerfile
-#FROM alpine:latest
-#RUN apk add bash
-#CMD ["/bin/bash"]
-sudo docker build -t <name> .
-sudo docker images
-sudo docker run -it <name>
-sudo docker ps -a
-sudo docker rm <id>
-sudo docker rmi <name>
-```
-to build an image with a tag name, list images, run a container in interactive mode, list containers, and remove containers and images.
 
 ```bash
 python3 -m venv .venv
