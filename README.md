@@ -1195,15 +1195,23 @@ nano Dockerfile
 #FROM alpine:latest
 #RUN apk add bash
 #CMD ["/bin/bash"]
+
 sudo docker build -t <name> .
 sudo docker images
+
 sudo docker run -it <name>
 sudo docker ps -a
 sudo docker stop <id>
+
 sudo docker rm <id>
 sudo docker rmi <name>
 ```
 to build an image with a tag name, list images, run a container in interactive mode, list containers, and remove containers and images.
+
+```bash
+docker system prune --volumes
+```
+to clean everything not running.
 
 # CMake
 ```bash
