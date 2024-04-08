@@ -85,6 +85,11 @@ unlink mypipe
 to create a named pipe and connect two processes through it.
 
 ```bash
+sudo usermod -aG <group_name> $USER
+```
+to add user to a group.
+
+```bash
 watch "ps aux | grep ssh | grep -Eo '^[^ ]+' | sort | uniq"
 ```
 to list online users.
