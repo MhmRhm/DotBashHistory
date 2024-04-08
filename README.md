@@ -11,7 +11,7 @@ This file contains some useful commands and configs.
 - [Networking](#networking)
 - [Version Controlling](#version-controlling)
 - [Docker](#docker)
-- [Building](#building)
+- [CMake](#cmake)
 - [Development](#development)
 
 # General
@@ -1199,7 +1199,7 @@ sudo docker rmi <name>
 ```
 to build an image with a tag name, list images, run a container in interactive mode, list containers, and remove containers and images.
 
-# Building
+# CMake
 ```bash
 cmake --help
 cmake -B ./build_dir -S ./source_dir
