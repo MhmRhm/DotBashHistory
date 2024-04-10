@@ -1209,9 +1209,18 @@ sudo docker rmi <name>
 to build an image with a tag name, list images, run a container in interactive mode, list containers, and remove containers and images.
 
 ```bash
-docker system prune --volumes
+docker system prune --all --volumes
+docker builder prune --all
+docker image prune --all
+docker container prune
+
 ```
-to clean everything not running.
+to clean everything not running or just buld cache or images or containers not running.
+
+```bash
+docker search alpine --filter is-official=true --no-trunc --limit 100
+```
+to search docker registries from CLI.
 
 # CMake
 ```bash
