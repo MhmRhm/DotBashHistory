@@ -1196,31 +1196,59 @@ nano Dockerfile
 #RUN apk add bash
 #CMD ["/bin/bash"]
 
-sudo docker build -t <name> .
+sudo docker build -t <image> .
 sudo docker images
 
-sudo docker run -it <name>
+sudo docker run -it <image>
+# go back to host's terminal without
+# exiting container with Ctrl+PQ
 sudo docker ps -a
-sudo docker stop <id>
+sudo docker stop <container>
 
-sudo docker rm <id>
-sudo docker rmi <name>
+sudo docker rm <container>
+sudo docker rmi <image>
 ```
 to build an image with a tag name, list images, run a container in interactive mode, list containers, and remove containers and images.
 
 ```bash
-docker system prune --all --volumes
-docker builder prune --all
-docker image prune --all
-docker container prune
-
+sudo docker run --rm -it <image>
 ```
-to clean everything not running or just buld cache or images or containers not running.
+to run and remove the container afterwards.
 
 ```bash
-docker search alpine --filter is-official=true --no-trunc --limit 100
+docker stop $(docker ps --all --quiet)
+docker rm $(docker ps --all --quiet)
+docker rmi $(docker images --quiet)
+```
+to stop and remove containers and images.
+
+```bash
+docker system prune --all --volumes
+
+# to clean build cache
+docker builder prune --all
+
+# to clean containers and images
+docker image prune --all
+docker container prune
+```
+to clean everything not running.
+
+```bash
+docker search <image> --filter is-official=true --no-trunc --limit 100
 ```
 to search docker registries from CLI.
+
+```bash
+docker manifest inspect <image>
+```
+to inspect supported platforms and architectures for an image on registries.
+
+```bash
+docker history <image>
+docker inspect <image>
+```
+to see how an image is created, layer sizes and manifest.
 
 # CMake
 ```bash
