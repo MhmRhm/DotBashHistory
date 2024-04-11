@@ -1250,6 +1250,19 @@ docker inspect <image>
 ```
 to see how an image is created, layer sizes and manifest.
 
+```bash
+# to run interactively
+docker run --interactive --tty <image> /bin/sh
+exit
+
+# to start interactively only if run interactively
+docker start --interactive <container>
+
+# to keep running without terminal interactions
+docker start <container>
+```
+to start a stopped container in interactive mode.
+
 # CMake
 ```bash
 cmake --help
