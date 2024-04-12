@@ -1246,7 +1246,7 @@ to inspect supported platforms and architectures for an image on registries.
 
 ```bash
 docker history <image>
-docker inspect <image>
+docker inspect <image/container>
 ```
 to see how an image is created, layer sizes and manifest.
 
@@ -1262,6 +1262,23 @@ docker start --interactive <container>
 docker start <container>
 ```
 to start a stopped container in interactive mode.
+
+```bash
+# create the image
+vim Dockerfile
+docker build -t <user_name>/<image>:<tag> .
+
+# inspect the image
+docker history <image>
+
+# add another tag
+docker tag <user_name>/<image>:<tag> <user_name>/<image>:latest
+
+# push the image
+cat pass.text | docker login --username mhmrhm --password-stdin
+docker push <user_name>/<image>:<tag>
+```
+to publish an image on docker hub.
 
 # CMake
 ```bash
@@ -1339,13 +1356,12 @@ deactivate
 to create a Python virtual environment.
 
 ```bash
-tar -xvpf cmake-3.28.3.tar.gz
-mkdir build && cd build
-sudo apt-get install libssl-dev
-../configure
-gmake -j $(nproc)
-sudo gmake install
+git clone --depth=1 --recurse-submodules https://gitlab.kitware.com/cmake/cmake.git
+mkdir cmake-build
+cd cmake-build
+../cmake/bootstrap --parallel=$(nproc) && make && sudo make install
 ctest --rerun-failed --output-on-failure
+cd .. && rm -rf cmake/ cmake-build/
 ```
 to install latest cmake from source.
 
