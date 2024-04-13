@@ -1313,6 +1313,20 @@ docker build -t mhmrhm/cmake:3.29.2_1d31a00e --target prod_img .
 ```
 to build multiple images from a single Dockerfile.
 
+```bash
+docker buildx create --driver docker-container --name container
+
+docker buildx build --builder container \
+--platform linux/amd64,linux/arm64/v8,linux/s390x,linux/arm/v7 \
+-t mhmrhm/cmake:3.29.2_1d31a00e --target prod_img \
+--file Dockerfile --push .
+
+docker buildx prune --builder container
+docker buildx rm container
+docker system prune -af --volumes 
+```
+to build for multiple platforms, push and clean after.
+
 # CMake
 ```bash
 cmake --help
