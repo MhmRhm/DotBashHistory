@@ -1196,7 +1196,7 @@ nano Dockerfile
 #RUN apk add bash
 #CMD ["/bin/bash"]
 
-sudo docker build -t <image> .
+sudo docker build --no-cache -t <image> .
 sudo docker images
 
 sudo docker run -it <image>
@@ -1284,7 +1284,7 @@ to publish an image on docker hub.
 FROM ubuntu:rolling as dvel_img
 
 RUN apt-get update && apt-get -y upgrade
-RUN apt-get -y install build-essential git libssl-dev
+RUN apt-get -y install --no-install-recommends build-essential git libssl-dev
 RUN apt-get -y remove cmake || echo 'cmake not installed'
 RUN apt-get -y autoremove
 
