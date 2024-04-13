@@ -1280,6 +1280,39 @@ docker push <user_name>/<image>:<tag>
 ```
 to publish an image on docker hub.
 
+```Dockerfile
+FROM ubuntu:rolling as dvel_img
+
+RUN apt-get update && apt-get -y upgrade
+RUN apt-get -y install build-essential git libssl-dev
+RUN apt-get -y remove cmake || echo 'cmake not installed'
+RUN apt-get -y autoremove
+
+WORKDIR /src
+RUN git clone --depth=1 --recurse-submodules https://gitlab.kitware.com/cmake/cmake.git
+RUN mkdir cmake-build
+
+WORKDIR /src/cmake-build
+RUN ../cmake/bootstrap --parallel=$(nproc) --prefix=/src/usr/local && make && make install
+
+FROM ubuntu:rolling as prod_img
+COPY --from=dvel_img /usr/lib/aarch64-linux-gnu/libssl.so /usr/lib/aarch64-linux-gnu/libssl.so
+COPY --from=dvel_img /usr/lib/aarch64-linux-gnu/libssl.so.3 /usr/lib/aarch64-linux-gnu/libssl.so.3
+COPY --from=dvel_img /usr/lib/aarch64-linux-gnu/libcrypto.so /usr/lib/aarch64-linux-gnu/libcrypto.so
+COPY --from=dvel_img /usr/lib/aarch64-linux-gnu/libcrypto.so.3 /usr/lib/aarch64-linux-gnu/libcrypto.so.3
+COPY --from=dvel_img /src/usr/local /usr/local
+
+WORKDIR /
+ENTRYPOINT ["cmake", "--version"]
+```
+```bash
+docker build -t mhmrhm/dvel_cmake:3.29.2_1d31a00e --target dvel_img .
+
+docker build -t mhmrhm/cmake:3.29.2_1d31a00e . # or
+docker build -t mhmrhm/cmake:3.29.2_1d31a00e --target prod_img .
+```
+to build multiple images from a single Dockerfile.
+
 # CMake
 ```bash
 cmake --help
