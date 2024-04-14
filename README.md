@@ -1396,6 +1396,24 @@ services:
 ```
 to setup gitea, nexcloud and more behind reverse proxy. [Use duckdns.org to add SSL Certificates.](https://notthebe.ee/blog/easy-ssl-in-homelab-dns01/)
 
+```bash
+# to run services
+docker compose --file compose.yml up --detach
+
+# to list containers
+docker compose --file compose.yml ps --all
+# to list processes
+docker compose --file compose.yml top
+
+# to stop and restart (faster than down and up)
+docker compose --file compose.yml stop
+docker compose --file compose.yml restart
+
+# to remove everything
+docker compose --file compose.yml down --volumes --rmi all
+```
+to work with compose.
+
 # CMake
 ```bash
 cmake --help
