@@ -1275,9 +1275,7 @@ docker system prune -af --volumes
 ```
 to build for multiple platforms, push and clean after.
 
-```yaml                                                       
-version: '3.8'
-
+```yaml
 services:
   nginxproxymanager:
     image: 'jc21/nginx-proxy-manager:latest'
@@ -1336,7 +1334,7 @@ services:
     container_name: nextcloud
     restart: always
     volumes:
-      - ./nextcloud:/var/www/html
+      - ./nextcloud:/var/www/html:z
     environment:
       - POSTGRES_HOST=postgres_nextcloud
       - REDIS_HOST=redis_nextcloud
@@ -1344,19 +1342,23 @@ services:
       - POSTGRES_PASSWORD=nextcloud
       - POSTGRES_DB=nextcloud
     depends_on:
-      - postgres_nextcloud
-      - redis_nextcloud
+      redis_nextcloud:
+        condition: service_started
+      postgres_nextcloud:
+        condition: service_healthy
 
   cron_nextcloud:
     image: 'nextcloud:latest'
     restart: always
     container_name: cron_nextcloud
     volumes:
-      - ./nextcloud:/var/www/html
+      - ./nextcloud:/var/www/html:z
     entrypoint: /cron.sh
     depends_on:
-      - postgres_nextcloud
-      - redis_nextcloud
+      redis_nextcloud:
+        condition: service_started
+      postgres_nextcloud:
+        condition: service_healthy
 
   redis_nextcloud:
     image: 'redis:latest'
@@ -1372,7 +1374,7 @@ services:
       - POSTGRES_PASSWORD=nextcloud
       - POSTGRES_DB=nextcloud
     volumes:
-      - ./nextcloud/postgres:/var/lib/postgresql/data
+      - ./nextcloud/postgres:/var/lib/postgresql/data:Z
     healthcheck:
       test: ["CMD", "pg_isready"]
       interval: 30s
