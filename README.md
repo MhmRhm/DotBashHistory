@@ -1114,58 +1114,6 @@ git instaweb --stop
 ```
 to serve git repository in a simple web interface.
 
-```yaml                                                       
-version: '3.8'
-
-services:
-  nginxproxymanager:
-    image: 'jc21/nginx-proxy-manager:latest'
-    container_name: nginxproxymanager
-    restart: always
-    ports:
-      - '80:80'
-      - '81:81'
-      - '443:443'
-    volumes:
-      - ./nginx/data:/data
-      - ./nginx/letsencrypt:/etc/letsencrypt
-  gitea:
-    image: 'gitea/gitea:latest'
-    container_name: gitea
-    environment:
-      - USER_UID=1000
-      - USER_GID=1000
-      - GITEA__database__DB_TYPE=postgres
-      - GITEA__database__HOST=postgres:5432
-      - GITEA__database__NAME=gitea
-      - GITEA__database__USER=gitea
-      - GITEA__database__PASSWD=gitea
-      #- GITEA__service__DISABLE_REGISTRATION=true
-      #- GITEA__admin__DISABLE_REGULAR_ORG_CREATION=true
-      #- GITEA__openid__ENABLE_OPENID_SIGNUP=false
-    restart: always
-    ports:
-      - '2222:22'
-    volumes:
-      - ./gitea:/data
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
-    depends_on:
-      - postgres
-
-  postgres:
-    image: 'postgres:latest'
-    container_name: postgres
-    restart: always
-    environment:
-      - POSTGRES_USER=gitea
-      - POSTGRES_PASSWORD=gitea
-      - POSTGRES_DB=gitea
-    volumes:
-      - ./postgres:/var/lib/postgresql/data
-```
-to setup gitea behind reverse proxy. [Use duckdns.org to add SSL Certificates.](https://notthebe.ee/blog/easy-ssl-in-homelab-dns01/)
-
 ```bash
 git cat-file -p HEAD # to show commit object
 git ls-tree HEAD # to show commit tree object
@@ -1326,6 +1274,125 @@ docker buildx rm container
 docker system prune -af --volumes 
 ```
 to build for multiple platforms, push and clean after.
+
+```yaml                                                       
+version: '3.8'
+
+services:
+  nginxproxymanager:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginxproxymanager
+    restart: always
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    volumes:
+      - ./nginx/data:/data
+      - ./nginx/letsencrypt:/etc/letsencrypt
+  gitea:
+    image: 'gitea/gitea:latest'
+    container_name: gitea
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - GITEA__database__DB_TYPE=postgres
+      - GITEA__database__HOST=postgres_gitea:5432
+      - GITEA__database__NAME=gitea
+      - GITEA__database__USER=gitea
+      - GITEA__database__PASSWD=gitea
+      - GITEA__service__DISABLE_REGISTRATION=true
+      - GITEA__admin__DISABLE_REGULAR_ORG_CREATION=true
+      - GITEA__openid__ENABLE_OPENID_SIGNUP=false
+    restart: always
+    ports:
+      - '2222:22'
+    volumes:
+      - ./gitea:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      postgres_gitea:
+        condition: service_healthy
+
+  postgres_gitea:
+    image: 'postgres:latest'
+    container_name: postgres_gitea
+    restart: always
+    environment:
+      - POSTGRES_USER=gitea
+      - POSTGRES_PASSWORD=gitea
+      - POSTGRES_DB=gitea
+    volumes:
+      - ./gitea/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  nextcloud:
+    image: 'nextcloud:latest'
+    container_name: nextcloud
+    restart: always
+    volumes:
+      - ./nextcloud:/var/www/html
+    environment:
+      - POSTGRES_HOST=postgres_nextcloud
+      - REDIS_HOST=redis_nextcloud
+      - POSTGRES_USER=nextcloud
+      - POSTGRES_PASSWORD=nextcloud
+      - POSTGRES_DB=nextcloud
+    depends_on:
+      - postgres_nextcloud
+      - redis_nextcloud
+
+  cron_nextcloud:
+    image: 'nextcloud:latest'
+    restart: always
+    container_name: cron_nextcloud
+    volumes:
+      - ./nextcloud:/var/www/html
+    entrypoint: /cron.sh
+    depends_on:
+      - postgres_nextcloud
+      - redis_nextcloud
+
+  redis_nextcloud:
+    image: 'redis:latest'
+    restart: always
+    container_name: redis_nextcloud
+
+  postgres_nextcloud:
+    image: 'postgres:latest'
+    restart: always
+    container_name: postgres_nextcloud
+    environment:
+      - POSTGRES_USER=nextcloud
+      - POSTGRES_PASSWORD=nextcloud
+      - POSTGRES_DB=nextcloud
+    volumes:
+      - ./nextcloud/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  emulatorjs:
+    image: lscr.io/linuxserver/emulatorjs:latest
+    container_name: emulatorjs
+    restart: always
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Singapore
+      - SUBFOLDER=/
+    volumes:
+      - ./emulatorjs/config:/config
+      - ./emulatorjs/data:/data
+```
+to setup gitea, nexcloud and more behind reverse proxy. [Use duckdns.org to add SSL Certificates.](https://notthebe.ee/blog/easy-ssl-in-homelab-dns01/)
 
 # CMake
 ```bash
