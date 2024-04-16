@@ -1414,6 +1414,32 @@ docker compose --file compose.yml down --volumes --rmi all
 ```
 to work with compose.
 
+```bash
+# to create a swarm on host_1
+docker swarm init --advertise-addr <IP>:2377 --listen-addr <IP>:2377
+
+# to list joining keys
+docker swarm join-token manager
+docker swarm join-token worker
+
+# to watch nodes on a swarm on a manager
+watch --interval 0.5 'docker node ls'
+
+# to remove a worker node from a manager
+docker node rm <ID>
+
+# to prevent managers from rejoining after leaving
+docker swarm update --autolock=true
+# to get the unlock key from a joined manager
+docker swarm unlock-key
+# to join a manager after restart
+docker swarm unlock
+
+# to prevent node from accepting work and exit existing ones
+docker node update --availability drain <ID>
+```
+to work with Swarm.
+
 # CMake
 ```bash
 cmake --help
