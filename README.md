@@ -1426,7 +1426,7 @@ docker swarm join-token worker
 watch --interval 0.5 'docker node ls'
 
 # to remove a worker node from a manager
-docker node rm <ID>
+docker node rm <node_id>
 
 # to prevent managers from rejoining after leaving
 docker swarm update --autolock=true
@@ -1436,9 +1436,31 @@ docker swarm unlock-key
 docker swarm unlock
 
 # to prevent node from accepting work and exit existing ones
-docker node update --availability drain <ID>
+docker node update --availability drain <node_id>
 ```
-to work with Swarm.
+to config a Swarm.
+
+```bash
+# to create 3 containers of an image in a swarm
+docker service create --replicas 3  <image> <entry_cmd>
+
+# to monitor services in a swarm
+docker service ls
+docker service ps <service_id>
+docker service inspect <service_id>
+
+# to add or remove containers
+docker service scale <service_id>=5
+
+# to update a service
+docker service update \
+--image <new_image> --entrypoint <cmd> --args '<arg1 arg2 arg3>' \
+--update-parallelism 2 --update-delay 10s <service_id>
+
+# to remove the service and containers
+docker service rm <service_id>
+```
+to manage services in a swarm.
 
 # CMake
 ```bash
