@@ -1471,16 +1471,12 @@ to manage services in a swarm.
 # backup a swarm with at least 3 managers
 # save unlock key
 docker swarm unlock-key
-
 # stop docker
 sudo service docker stop
-
 # create backup
 tar -zcvf swarm_backup_<node>_<ip>.tar.gz /var/lib/docker/swarm
-
 # restart docker
 sudo service docker start
-
 # unlock swarm
 docker swarm unlock
 
