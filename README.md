@@ -1194,7 +1194,7 @@ to inspect supported platforms and architectures for an image on registries.
 
 ```bash
 docker history <image>
-docker inspect <image/container>
+docker inspect <image_or_container>
 ```
 to see how an image is created, layer sizes and manifest.
 
@@ -1426,7 +1426,11 @@ docker swarm join-token worker
 watch --interval 0.5 'docker node ls'
 
 # to remove a worker node from a manager
-docker node rm <node_id>
+docker node rm <node>
+
+# to promote or demote nodes
+docker node promote <node>
+docker node demote <node>
 
 # to prevent managers from rejoining after leaving
 docker swarm update --autolock=true
@@ -1436,31 +1440,71 @@ docker swarm unlock-key
 docker swarm unlock
 
 # to prevent node from accepting work and exit existing ones
-docker node update --availability drain <node_id>
+docker node update --availability drain <node>
 ```
 to config a Swarm.
 
 ```bash
 # to create 3 containers of an image in a swarm
-docker service create --replicas 3  <image> <entry_cmd>
+docker service create --replicas 3 --publish 80:80 <image> <entry_cmd>
 
 # to monitor services in a swarm
 docker service ls
-docker service ps <service_id>
-docker service inspect <service_id>
+docker service ps <service>
+docker service inspect <service>
+docker service logs <service_or_node> --follow --details --timestamps
 
 # to add or remove containers
-docker service scale <service_id>=5
+docker service scale <service>=5
 
 # to update a service
 docker service update \
 --image <new_image> --entrypoint <cmd> --args '<arg1 arg2 arg3>' \
---update-parallelism 2 --update-delay 10s <service_id>
+--update-parallelism 2 --update-delay 10s <service>
 
 # to remove the service and containers
-docker service rm <service_id>
+docker service rm <service>
 ```
 to manage services in a swarm.
+
+```bash
+# backup a swarm with at least 3 managers
+# save unlock key
+docker swarm unlock-key
+
+# stop docker
+sudo service docker stop
+
+# create backup
+tar -zcvf swarm_backup_<node>_<ip>.tar.gz /var/lib/docker/swarm
+
+# restart docker
+sudo service docker start
+
+# unlock swarm
+docker swarm unlock
+
+
+# restore on same node that was backed up with same IP
+sudo service docker stop
+sudo rm -rf /var/lib/docker/swarm
+tar -zxpvf swarm_backup_<node>_<ip>.tar.gz -C /
+sudo service docker start
+docker swarm unlock
+docker swarm init --force-new-cluster --advertise-addr <IP>:2377 --listen-addr <IP>:2377
+```
+to backup and restore a swarm from a manager and non-leader node.
+
+```bash
+docker system prune -af
+sudo service docker stop
+sudo vim /etc/docker/daemon.json
+# {
+#   "bip": "192.168.2.0/8"
+# }
+sudo service docker restart
+```
+to change dockerd default configuration.
 
 # CMake
 ```bash
