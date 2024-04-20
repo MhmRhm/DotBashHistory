@@ -54,10 +54,14 @@ ls .[^.]*
 to list all hidden files and directories not including `.` and `..`.
 
 ```bash
+# to create
 tar -zcvf arch.tar.gz file dir
+# to list TOC
 tar -ztvf arch.tar.gz
+# to extract .tar.gz
 tar -zxpvf arch.tar.gz -C ./outdir
-tar -xpvf arch.tar.xz # for tar.xz files.
+# to extract .tar.xz
+tar -xpvf arch.tar.xz
 ```
 to create then show the table of contents for the archive then extract it.
 
@@ -1194,7 +1198,7 @@ to inspect supported platforms and architectures for an image on registries.
 
 ```bash
 docker history <image>
-docker inspect <image_or_container>
+docker inspect <image|container>
 ```
 to see how an image is created, layer sizes and manifest.
 
@@ -1394,7 +1398,7 @@ services:
       - ./emulatorjs/config:/config
       - ./emulatorjs/data:/data
 ```
-to setup gitea, nexcloud and more behind reverse proxy. [Use duckdns.org to add SSL Certificates.](https://notthebe.ee/blog/easy-ssl-in-homelab-dns01/)
+to setup gitea, nexcloud and more behind a reverse proxy. [Use duckdns.org to add SSL Certificates.](https://notthebe.ee/blog/easy-ssl-in-homelab-dns01/)
 
 ```bash
 # to run services
@@ -1452,7 +1456,7 @@ docker service create --replicas 3 --publish 80:80 <image> <entry_cmd>
 docker service ls
 docker service ps <service>
 docker service inspect <service>
-docker service logs <service_or_node> --follow --details --timestamps
+docker service logs <service|node> --follow --details --timestamps
 
 # to add or remove containers
 docker service scale <service>=5
@@ -1500,7 +1504,19 @@ sudo vim /etc/docker/daemon.json
 # }
 sudo service docker restart
 ```
-to change dockerd default configuration.
+to change docker default network address.
+
+```bash
+# to list all networks
+docker network ls
+# to list containers using a network
+docker inspect bridge --format '{{json .IPAM.Config}}{{json .Containers}}' | jq
+# to create a network
+docker network create --driver <bridge|overlay|macvlan|...> <name>
+# to run an image attached to a network
+docker run --tty --interactive --network <name> --publish 80:80 <image> <cmd>
+```
+to manage docker bridge networks.
 
 # CMake
 ```bash
