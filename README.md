@@ -1187,6 +1187,20 @@ docker container prune
 to clean everything not running.
 
 ```bash
+sudo vim /etc/docker/daemon.json
+# {
+#   "log-driver": "journald"
+#   "debug":true,
+#   "log-level":"debug"
+# }
+docker logs --follow --details <container>
+
+# to see docker engine logs
+journalctl --follow --unit docker.service
+```
+to change logging level and view docker logs.
+
+```bash
 docker search <image> --filter is-official=true --no-trunc --limit 100
 ```
 to search docker registries from CLI.
