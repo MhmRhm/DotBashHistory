@@ -1529,8 +1529,10 @@ docker inspect bridge --format '{{json .IPAM.Config}}{{json .Containers}}' | jq
 docker network create --driver <bridge|overlay|macvlan|...> <name>
 # to run an image attached to a network
 docker run --tty --interactive --network <name> --publish 80:80 <image> <cmd>
+# to remove a network
+docker network rm <network>
 ```
-to manage docker bridge networks.
+to manage docker networks.
 
 # CMake
 ```bash
