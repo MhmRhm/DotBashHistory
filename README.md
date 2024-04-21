@@ -1534,6 +1534,24 @@ docker network rm <network>
 ```
 to manage docker networks.
 
+```bash
+# to mount existing directory into container
+docker run --volume <host_abs_path>:<container_abs_path> <image> <cmd>
+# to create a local volume
+docker volume create --driver local <name>
+# to list volumes
+docker volume ls
+# to inspect a volume
+docker inspect <volume>
+# to mount a volume into container
+docker run --volume <volume>:<container_abs_path> <image> <cmd>
+# to remove a volume
+docker volume rm <volume>
+# to remove all volumes
+docker volume prune -af
+```
+to mount and work with volumes.
+
 # CMake
 ```bash
 cmake --help
