@@ -1440,6 +1440,9 @@ docker swarm init --advertise-addr <IP>:2377 --listen-addr <IP>:2377
 docker swarm join-token manager
 docker swarm join-token worker
 
+# to change join tokens
+docker swarm join-token --rotate manager 
+
 # to watch nodes on a swarm on a manager
 watch --interval 0.5 'docker node ls'
 
@@ -1551,6 +1554,22 @@ docker volume rm <volume>
 docker volume prune -af
 ```
 to mount and work with volumes.
+
+```bash
+echo "p@$$w0rd" | docker secret create my_secret1 -
+cat | docker secret create my_secret2 - # type secret then press ctrl+d twice
+docker secret create my_secret3 ./.env
+
+docker secret ls
+docker inspect my_secret3
+
+docker service create --secret my_secret1 <image>
+docker service update --secret-add my_secret2 --secret-add my_secret3 <service>
+
+docker exec -it <container> bash
+echo "|$(cat /run/secrets/my_secret1)|"
+```
+to add secrets to swarm and use in services.
 
 # CMake
 ```bash
