@@ -29,6 +29,8 @@ github_username: MhmRhm
 
 # Build settings
 theme: minima
+minima:
+  skin: auto
 plugins:
   - jekyll-feed
 
