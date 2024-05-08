@@ -6,7 +6,7 @@ author:
 - Mohammad Rahimi
 ---
 
-# Eat Git
+## Preface
 
 This tutorial on Git has six parts, and this is the first one.
 
