@@ -18,10 +18,10 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: Eat Git
+title: DotBashHistory
 email: rahimi.mhmmd@outlook.com
 description: >- # this means to ignore newlines until "baseurl:"
-  The most essential tutorial on Git which gives you all the insight you need to use Git effectively.
+  Handy tutorials on programming and related technologies.
 baseurl: "/DotBashHistory" # the subpath of your site, e.g. /blog
 url: "mhmrhm.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: MhmRhm1
