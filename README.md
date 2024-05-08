@@ -49,6 +49,11 @@ find / -regex .*initrd.img.* -print
 to find all paths containing `initrd.img`.
 
 ```bash
+grep -Rn <path/to/search> -e '<text_to_search>'
+```
+to search all files in a path for an expression.
+
+```bash
 ls .[^.]*
 ```
 to list all hidden files and directories not including `.` and `..`.
