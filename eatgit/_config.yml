@@ -30,7 +30,7 @@ github_username: MhmRhm
 # Build settings
 theme: minima
 minima:
-  skin: auto
+  skin: dark
 plugins:
   - jekyll-feed
 
