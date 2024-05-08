@@ -207,7 +207,7 @@ for i in {1..2}; do
         deluser "user$i" &> /dev/null
         useradd "user$i" --shell /sbin/nologin
         echo "user$i:$PASS" | chpasswd
-        echo "ssh://user$i:$PASS@$MYIP:$PORT#Profile $i" >> users.txt
+        echo "ssh://user$i:$PASS@$MYIP:$PORT#Profile$i" >> users.txt
 done
 cat users.txt
 ```
