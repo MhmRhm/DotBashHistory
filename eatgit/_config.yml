@@ -19,28 +19,27 @@
 # in the templates via {{ site.myvariable }}.
 
 title: DotBashHistory
-email: rahimi.mhmmd@outlook.com
 description: >- # this means to ignore newlines until "baseurl:"
   Handy tutorials on programming and related technologies.
+
 baseurl: "/DotBashHistory" # the subpath of your site, e.g. /blog
 url: "mhmrhm.github.io" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: MhmRhm1
-github_username: MhmRhm
 
-# Build settings
+email: rahimi.mhmmd@outlook.com
+
 theme: minima
+
+minima:
+  social_links:
+    - { platform: github,  user_url: "https://github.com/MhmRhm" }
+    - { platform: linkedin, user_url: "https://linkedin.com/in/mhmrhm" }
+
 minima:
   skin: dark
+
 plugins:
   - jekyll-feed
-
-lsi: false
-safe: true
-source: .
-incremental: false
-highlighter: rouge
-gist:
-  noscript: false
+  
 kramdown:
   math_engine: mathjax
   syntax_highlighter: rouge
