@@ -4,6 +4,8 @@ title: About
 permalink: /about/
 ---
 
+![profile](https://gravatar.com/avatar/3a648617ab98198334f03c560bfbdf5e4923ab08c60132fa9f6da5f2048ebeb0?s=200){: style="float: left"}
+
 Hey there, I'm Mohammad Rahimi, a Senior C++ Developer. I've been coding for over 10 years, mainly focusing on real-time high-throughput and distributed applications in the communication industry. Currently, I'm working on protocol analyzers and the upcoming USB4 Gen4.
 
 My background? I studied Electrical Engineering and hold a Master's degree in Control and Instrumentation. I'm really passionate about robotics and programming.
@@ -14,10 +16,14 @@ Oh, and if you happen to be in Kuala Lumpur and fancy a game of pool 🎱, let's
 
 You may want to checkout these repositories:
 
-1. [DotBashHistory][dot-bash-history-repo]
-2. [CPPLab][cpp-lab-repo]
-3. [CMakeProjectTemplate][cmake-project-template-repo]
-4. [FTowerX][ftowerx-repo]
+- [DotBashHistory][dot-bash-history-repo]
+- [CPPLab][cpp-lab-repo]
+- [CMakeProjectTemplate][cmake-project-template-repo]
+- [FTowerX][ftowerx-repo]
+
+Or these tutorials:
+
+- [Eat Git]({% link _posts/2024-05-08-eat-git-part-1.md %})
 
 [dot-bash-history-repo]: https://github.com/MhmRhm/DotBashHistory
 [cpp-lab-repo]: https://github.com/MhmRhm/cpplab
