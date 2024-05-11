@@ -117,10 +117,12 @@ To build and install Git:
 
 ```bash
 # install all the dependencies
-# to get this list:
+# In Ubuntu 22.04 to get this list:
 #   sudo nano /etc/apt/sources.list
 # uncomment lines starting with `deb-src`, then:
 #   sudo apt-get build-dep git
+# In Ubuntu 24.04 see Update 1
+
 sudo apt-get install apache2-dev asciidoc asciidoc-base asciidoc-common\
  autoconf automake autopoint autotools-dev binutils binutils-aarch64-linux-gnu\
  binutils-common build-essential cvs cvsps debhelper debugedit dh-autoreconf\
@@ -158,6 +160,21 @@ sudo make install install-doc install-html install-info
 git --version
 ```
 
+#### Update 1
+
+The *sources.list* file's location and format have changed in Ubuntu 24.04. To
+get the list for all dependencies:
+
+```bash
+sudo nano /etc/apt/sources.list.d/ubuntu.sources
+
+# after copying and pasting every entry, update
+# `Types: deb` to `Types: deb-src` for the copied text
+
+sudo apt-get update
+sudo apt-get build-dep git
+```
+
 Now we are ready to learn Git.
 
 ## Repositories
@@ -176,7 +193,6 @@ Now, let's create a project and start working on it. In this initial example,
 I'll create something meaningful.
 
 ```bash
-
 ```
 
 [download-for-windows]: https://git-scm.com/download/win
