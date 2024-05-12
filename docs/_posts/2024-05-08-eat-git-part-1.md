@@ -105,7 +105,8 @@ sudo apt-get install git
 To install on Mac:
 
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+/bin/bash -c "$(curl -fsSL\
+ https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
 The above command will ask you for your password and install the Xcode command
@@ -167,7 +168,8 @@ cd git-<version>/
 # if building from Git's Git repository
 sudo apt-get install git
 git --version
-git clone --recurse-submodules --depth=1 https://git.kernel.org/pub/scm/git/git.git
+git clone --recurse-submodules --depth=1\
+ https://git.kernel.org/pub/scm/git/git.git
 cd git/
 
 make configure
@@ -353,7 +355,7 @@ the file becomes part of the history, and others may need to contact that person
 
 ```bash
 git config --local user.name 'Mohammad Rahimi'
-git config --local user.email 'rahimi.mhmmd@yahoo.com'
+git config --local user.email 'rahimi.mhmmd@outlook.com'
 ```
 
 The `--local` option sets this information for only this repository.
@@ -432,13 +434,14 @@ git status
 git restore --staged .
 ```
 
-To undo changes in the Working Tree:
+The command above does not alter the Working Tree. To undo changes in the
+Working Tree:
 
 ```bash
 git restore employees.md
 git status
 
-# to remove everything
+# to undo everything
 git restore .
 ```
 
