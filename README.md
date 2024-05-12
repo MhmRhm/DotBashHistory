@@ -1,5 +1,7 @@
 # DotBashHistory
-For tutorials, I'd like you to please take a look at my [DotBashHistory](https://mhmrhm.github.io/DotBashHistory/) webpage. This file contains some useful commands and configs as a day-to-day reference.
+For tutorials, please take a look at my [DotBashHistory](https://mhmrhm.github.io/DotBashHistory/) webpage.
+
+The following contains some useful commands and configs as a day-to-day reference.
 
 - [General](#general)
 - [Cryptography](#cryptography)
