@@ -14,8 +14,8 @@ discussed material in each part:
 1. Getting to Know Git
     - Creating Repositories
     - Working Tree and Index
-    - Commits History
-    - Search and Compare Tools
+    - Commits
+    - History
 2. Behind the Scene
     - Git Internals
 3. Local Workflows
@@ -57,7 +57,7 @@ positions, I introduced my colleagues to Git, and then we started using it in
 our day-to-day development. This part sums up the mistakes that me and my
 colleagues used to make and show how to fix things when something goes wrong.
 
-### Why another Git tutorial?
+### Why Another Git Tutorial?
 
 I wanted to make a guide to Git that I wish I had when I first started learning.
 If you have time to read the [Pro Git][pro-git-book] Book, please do so—it's a
@@ -72,6 +72,24 @@ Ubuntu in a Virtual Machine to keep things organized. While not essential, it's
 a good practice I follow for most of my development work. Using VMs helps keep
 my main computer clean and fast, and if anything goes wrong, I can quickly
 revert to a clean state by cloning the base image.
+
+### Why Command Line?
+
+There are some great graphical tools and addons for Git out there, like the
+[GitLens][git-lens] addon for VSCode, which I personally use often. However,
+these tools aren't always available, and they might not provide the depth of
+insight you need when working with Git. Plus, using the command line is usually
+faster, and it provides useful information in its output.
+
+Whenever my colleagues encounter issues with Git, I find that the command line
+is the most reliable tool for solving them cleanly and safely. It also offers a
+consistent experience regardless of your development environment. So, my advice
+is to give the command line a try and use Git in that way.
+
+For Linux and Mac, simply use the Terminal application. Ensure that
+auto-complete is set up for your terminal. On Windows, use Git Bash. To set up
+auto-complete on Mac, add `autoload -Uz compinit && compinit` to your
+*~/.zprofile* file. For Linux, run `sudo apt-get install bash-completion`.
 
 ## Installation
 
@@ -102,7 +120,7 @@ brew install git
 To install on Windows, choose one of the installers from
 [Download for Windows][download-for-windows].
 
-### Build from Source (Optional)
+### Build from Source (for Later)
 
 To build the latest Git on Ubuntu, you need to get the Git source code. There
 are many ways to achieve that. Git is maintained in a Git repository! The
@@ -190,12 +208,245 @@ A Git repository consists of this *.git* directory. Additionally, a repository
 can have a specific time-point, checked out.
 
 Now, let's create a project and start working on it. In this initial example,
-I'll create something meaningful.
+I'll create a list of anchors currently working at CNN.
 
 ```bash
+mkdir cnn && cd cnn
+touch employees.md
+
+# you can use Vim, Nano or any other text editors
+echo 'John Berman' >> employees.md
+echo 'Dana Bash' >> employees.md
+ls -al
 ```
+
+Before running any Git commands, for consistency, let's set the default branch
+name to *main* by executing the following command:
+
+```bash
+git config --global init.defaultBranch 'main'
+```
+
+Branches in Git are like timelines. We'll explore them in detail in Part 4.
+We'll also cover `git config` shortly.
+
+Before we delve deeper, it's a good idea to set the default editor that Git
+uses. For this tutorial, Nano is more than enough. To set Nano as the
+default editor for Git:
+
+```bash
+git config --global core.editor "nano"
+```
+
+You can also set Notepad++ as the default editor by providing the command above
+with the path to the Notepad++ executable. Now, let's begin version controlling
+in this directory. To initialize a Git repository:
+
+```bash
+git init
+
+# to list all files in a directory
+ls -al
+```
+
+Note the *.git* directory. Git always keeps the status of the repository. To see
+the current status:
+
+```bash
+git status
+```
+
+The following displays the output of the last command:
+
+```bash
+On branch main
+
+No commits yet
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        employees.md
+
+nothing added to commit but untracked files present (use "git add" to track)
+```
+
+This includes several important pieces of information. For now, focus on the
+*Untracked files* section. These are files that Git doesn't care about. Any
+changes you make to these files won't appear in the history. To let Git know
+about the presence of the *employees.md* file:
+
+```bash
+git add employees.md
+git status
+```
+
+The following displays the output of the last command:
+
+```bash
+On branch main
+
+No commits yet
+
+Changes to be committed:
+  (use "git rm --cached <file>..." to unstage)
+        new file:   employees.md
+
+```
+
+The section named *Changes to be committed* lists files that will be included in
+the next time-point. These time-points are referred to as *commits*. The phrase
+*No commits yet* indicates that the repository is new and nothing has been
+committed to it yet. The first line always indicates the current branch you are
+on.
+
+## Working Tree and Index
+
+The Working Tree refers to your directory under version control. It's called a
+"tree" because the structure of a directory and its sub-directories can be
+represented as a tree. The Index or Staging area is similar to a waiting hall
+before your flight takes off (commits being created).
+
+If you've made changes to multiple files but only a few of them are relevant to
+a task, you can add only those files to the Index and create a commit. To add
+all files to the staging area:
+
+```bash
+git add --all
+# or
+git add -A
+# or
+git add .
+```
+
+Caution! Always use git status before running this command. Many applications
+generate supporting cache files, and we don't want to version control them
+because they hold no value and can be recreated.
+
+If you add a *.gitignore* file to a directory under Git version control, Git
+will ignore any files or directories listed in the *.gitignore* file. You can
+place this file next to the *.git* directory. You can find *.gitignore* files
+tailored for various development environments in this
+[GitHub][git-ignore-collection] repository.
+
+## Commits
+
+Each commit in Git contains six pieces of information:
+1. **Files and Changes**: This includes the files and the changes made to them
+that we want to commit.
+2. **Author**: The name and email address of the person who made the changes in
+the files.
+3. **Committer**: The person who made the commit. You can make changes to files
+and send your modifications to someone with the authority to perform the commit
+on your behalf. This individual is referred to as the Committer. Typically, the
+Author and Committer are the same person.
+4. **Time**: The timestamp of when the commit was made.
+5. **Commit ID**: The ID of the commit before the one we are creating. This
+becomes important when explaining Rebasing in Part 4.
+6. **Message**: An explanation of why and how some changes were made. This
+message is crucial for understanding the purpose of the commit, and it can be
+read later by you and others instead of inspecting each file to figure out what
+was done in a commit.
+
+Git needs to know your name and email address because the person who has changed
+the file becomes part of the history, and others may need to contact that person
+. To inform Git about your information:
+
+```bash
+git config --local user.name 'Mohammad Rahimi'
+git config --local user.email 'rahimi.mhmmd@yahoo.com'
+```
+
+The `--local` option sets this information for only this repository.
+Alternatively, you have the option to use `--global`. The downside of using
+`--local` is that you may forget to set it before making a commit. I suggest to
+use `--local` when you are working on different projects and using different
+email addresses for them, which for me is always.
+
+To commit our changes with a single-line message:
+
+```bash
+git commit -m 'Add Barman and Bash'
+```
+
+To commit our changes with a multi-line message:
+
+```bash
+git commit
+```
+
+The command above opens a text editor, which can be Vim or Nano. If you exit the
+editor without saving, the commit is canceled.
+
+To exit Nano without saving, press *Ctrl+x*, then the *N* key.
+
+To exit Vim without saving, press *Esc*, then type `:q!`, and confirm with the
+*Enter* or *return* key. Don't forget the `:` in `:q!`.
+
+To save and exit in Nano, press *Ctrl+x*, then *Y*, and confirm the file name
+with the *Enter* or *return* key.
+
+In Vim, press *Esc*, then type `:wq`, and confirm with the *Enter* or *return*
+key.
+
+Multi-line messages are preferred. In your editor, on the first line, type a
+short explanation. Add an empty line, and on the third line, you can explain as
+much as you want. You can have paragraphs of text! Just keep the first line
+short. The first line is the part that will be shown later when we see the
+history with the `git log --oneline` command.
+
+You should take commit messages seriously, as they reflect your professionalism
+to others. Refer to [How to Write a Git Commit Message][commit-message-guide]
+for a detailed explanation on effective commit messages.
+
+Let's take a look at the status now:
+
+```bash
+git status
+```
+
+The following displays the output of this command:
+
+```
+On branch main
+nothing to commit, working tree clean
+```
+
+Congratulations! We've made our first commit.
+
+Let's explore a few other useful commands related to the Working Tree and Index.
+We'll make some changes and stage them before committing:
+
+```bash
+echo 'Wolf Blitzer' >> employees.md
+git add -A
+git status
+```
+
+To remove files from the staging area:
+
+```bash
+git restore --staged employees.md
+git status
+
+# to remove everything
+git restore --staged .
+```
+
+To undo changes in the Working Tree:
+
+```bash
+git restore employees.md
+git status
+
+# to remove everything
+git restore .
+```
+
 
 [download-for-windows]: https://git-scm.com/download/win
 [main-git-repo]: https://git.kernel.org/pub/scm/git/git.git/
 [github-git-repo]: https://github.com/git/git
 [pro-git-book]: https://git-scm.com/book/en/v2
+[commit-message-guide]: https://cbea.ms/git-commit/
+[git-lens]: https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens
+[git-ignore-collection]: https://github.com/github/gitignore
