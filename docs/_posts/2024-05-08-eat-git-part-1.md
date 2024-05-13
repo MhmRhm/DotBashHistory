@@ -86,8 +86,9 @@ faster, and it provides useful information in its output.
 
 Whenever my colleagues encounter issues with Git, I find that the command line
 is the most reliable tool for solving them cleanly and safely. It also offers a
-consistent experience regardless of your development environment. So, my advice
-is to give the command line a try and use Git in that way.
+consistent experience regardless of your development environment. The
+[Git Reference][git-reference] covers the command line extensively. So, my
+advice is to give the command line a try and use Git in that way.
 
 For Linux and Mac, simply use the Terminal application. Ensure that
 auto-complete is set up for your terminal. On Windows, use Git Bash. To set up
@@ -422,6 +423,36 @@ nothing to commit, working tree clean
 
 Congratulations! We've made our first commit.
 
+If you take a closer look at the commit message, you will notice there is a
+typo. In situations like this, when you forget something or there is a mistake
+in your previous changes, you don't need to create another commit to fix it. You
+can simply amend the last commit. To change the last commit:
+
+```bash
+git status
+
+git commit --amend
+
+git status
+```
+
+This will open an editor, allowing you to change the commit message. Note that
+the commit hash is changed. This can have consequences. If you have already
+published your work and others have based their changes on your commits, you
+cannot go back and change the history. These hashes are an important part of the
+history. As a rule of thumb, never change what has been published. We'll learn
+about publishing our work in Part 4.
+
+It happens quite often that I forget to set my name and email in a fresh
+repository. To change the author information for the last commit:
+
+```bash
+# git config --local user.name 'Mohammad Rahimi'
+# git config --local user.email 'rahimi.mhmmd@outlook.com'
+
+git commit --amend --reset-author
+```
+
 Let's explore a few other useful commands related to the Working Tree and Index.
 We'll make some changes and stage them before committing:
 
@@ -631,3 +662,4 @@ directory.
 [commit-message-guide]: https://cbea.ms/git-commit/
 [git-lens]: https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens
 [git-ignore-collection]: https://github.com/github/gitignore
+[git-reference]: https://git-scm.com/docs
