@@ -6,6 +6,9 @@ author:
 - Mohammad Rahimi
 ---
 
+* Table of Contents
+{:toc}
+
 ## Preface
 
 This tutorial on Git has five parts, and this is the first. The following shows
