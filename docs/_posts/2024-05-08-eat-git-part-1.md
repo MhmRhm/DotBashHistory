@@ -342,7 +342,7 @@ and send your modifications to someone with the authority to perform the commit
 on your behalf. This individual is referred to as the Committer. Typically, the
 Author and Committer are the same person.
 4. **Time**: The timestamp of when the commit was made.
-5. **Commit ID**: The ID of the commit before the one we are creating. This
+5. **Parent Commit**: The ID of the commit before the one we are creating. This
 becomes important when explaining Rebasing in Part 4.
 6. **Message**: An explanation of why and how some changes were made. This
 message is crucial for understanding the purpose of the commit, and it can be
@@ -375,6 +375,10 @@ To commit our changes with a multi-line message:
 ```bash
 git commit
 ```
+
+Git combines all the mentioned pieces and creates a hash. If even a single bit
+changes, the entire hash will change. Every object in Git has its own unique
+hash. That's why you should not change anything in the *.git* directory.
 
 The command above opens a text editor, which can be Vim or Nano. If you exit the
 editor without saving, the commit is canceled.
@@ -445,6 +449,177 @@ git status
 git restore .
 ```
 
+You can undo a commit, and I'll cover that in Part 5.
+
+For now, let's make another change to the *employees.md*:
+
+```bash
+echo 'Anderson Cooper' >> employees.md
+git add -A
+echo 'John King' >> employees.md
+```
+
+To view the difference between the Working Tree and the Index:
+
+```bash
+git diff
+```
+
+To see the difference between the Working Tree and the last commit:
+
+```bash
+git diff HEAD
+```
+
+HEAD typically points to a branch, and a branch is also a pointer to a commit.
+We'll delve into this further in Part 2.
+
+To see the difference between the Index and the last commit:
+
+```bash
+git diff --staged
+```
+
+## History
+
+The main purpose of version controlling a directory is to maintain a history,
+serving as a reference, documentation, and even a debugging tool. This history
+helps you pinpoint the exact changes that caused an anomaly, aiding in
+understanding and resolving issues effectively.
+
+The command to access the history in Git is `git log`. To demonstrate the full
+potential of this command, we need a project with a rich history. To download
+such a project, or in Git terms, to clone a project:
+
+```bash
+git clone https://github.com/CorentinTh/it-tools.git
+cd it-tools
+```
+
+The basic form of `git log` lists commit hashes, authors, timestamps, and full
+commit messages. However, sometimes you only need a quick overview. In such
+cases, you can use `git log --oneline`, which displays abbreviated commit hashes
+and short commit messages. Alternatively, if you want to see the history
+including the changes themselves, you can use `git log --patch`.
+
+
+This command is a powerful tool. To customize the output of `git log`:
+
+```bash
+# to limit the output to last 10 commits
+git log -10
+
+# to list files that were changed by commits
+git log --name-only
+
+# to list commits that changed some files
+git log -- filename1 filename2
+
+# to search among commit messages
+git log --grep 'keyword'
+
+# to list commits that changed occurrences of an expression
+git log -S 'expression'
+
+# to list commits that changed inside a function
+git log -L :function:file
+
+# to include all branches
+git log --all --graph --oneline
+
+# to list commits since last week
+git log --since="one week ago"
+```
+
+I frequently use the following command:
+
+```bash
+git log\
+ --pretty=format:"%C(Red)%d %C(Yellow)%h %C(Cyan)%ch %C(Green)%cn %C(White)%s"\
+ --graph --all
+```
+
+However, it's quite lengthy, so I've added an alias for it in Git. To add
+aliases to Git commands:
+
+```bash
+git config --global alias.clog 'log --pretty=format:"%C(Red)%d %C(Yellow)%h %C(Cyan)%ch %C(Green)%cn %C(White)%s" --graph --all'
+```
+
+Now we can run the following command to get a colorful history:
+
+```bash
+git clog
+```
+
+Let me wrap this part up with a revisit to `git diff` command:
+
+```bash
+# to diff against any commit
+git diff abc123
+
+# to list files that were changed between two commits
+git diff 2059f01 df6bb31 --name-only
+
+# to diff two branches
+git diff main feat
+```
+
+You can instruct Git to use an external difftool for comparing files. Some
+options include Meld, Vimdiff, and P4Merge. Here is the original `git diff`
+output:
+
+```diff
+diff --git a/.github/workflows/docker-nightly-release.yml b/.github/workflows/docker-nightly-release.yml
+index 81a0898..41dbb15 100644
+--- a/.github/workflows/docker-nightly-release.yml
++++ b/.github/workflows/docker-nightly-release.yml
+@@ -32,7 +32,7 @@ jobs:
+       - run: corepack enable
+       - uses: actions/setup-node@v3
+         with:
+-          node-version: 16
++          node-version: 20
+           cache: 'pnpm'
+ 
+       - name: Install dependencies
+```
+
+In a diff, the first few lines determine the sides being compared. When you use
+`git diff abc123 def456`, you're comparing *def456* against *abc123*. On the "a"
+side, you'll have *abc123*, and on the "b" side, you'll have *def456*.
+
+If a file was deleted, you would see:
+
+```diff
+diff --git a/filename b/filename
+index 81a0898..41dbb15 100644
+--- a/filename
++++ /dev/null
+```
+
+If a file was renamed, you would see the new name. The `@@ -32,7 +32,7 @@ jobs:`
+part indicates the location of the change in the file. Here, it means at line 32
+, starting with `- run: corepack enable`, we had 7 lines of code. After the
+change, also at the same location, we still have 7 lines of code. The lines
+containing the "+" and "-" symbols show what is removed and what is added.
+
+You can create a patch file by redirecting the output of `git diff` into a file.
+These patch files become important in Part 3 of this tutorial.
+
+```bash
+# creating a patch file from the Working Tree
+git diff HEAD > changes.patch
+```
+
+## Summary
+
+In this part, we created a directory, performed some work in it, initiated
+version control, learned how to stage files, and create commits. We also learned
+how to review the history of a project and observe changes in each step. These
+are the basics of Git. In the next part, we'll delve into the inner workings and
+explore Git data structures to understand what you can find inside a *.git*
+directory.
 
 [download-for-windows]: https://git-scm.com/download/win
 [main-git-repo]: https://git.kernel.org/pub/scm/git/git.git/
