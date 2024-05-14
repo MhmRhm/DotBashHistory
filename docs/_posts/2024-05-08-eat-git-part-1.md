@@ -38,27 +38,28 @@ discussed material in each part:
     - Checkouts While There is Work in Index
     - Commit Before Configuring User Name and Email
 
-In the first part, we get to know Git and become comfortable using it. If you
-are curious and want to know why everyone is talking about Git, this part should
-be enough.
+In Part 1, we get to know Git and become comfortable using it. If you're
+curious and want to understand what everyone is talking about, this part should
+be enough for you.
 
-In the second part, I will explain how Git creates and stores the data
-structures that enable it to do what it does. This part, in my opinion, is
-necessary to become confident at using other tools introduced later.
+In [Part 2]({{ site.baseurl }}{% link _posts/2024-05-15-eat-git-part-2.md %}), I
+will explain how Git creates and stores the data structures that enable it to do
+what it does. This part, in my opinion, is necessary to become confident at
+using other tools introduced later.
 
 In part 3, I will wrap up most of the things you need to know to use Git
 effectively. Although Branches are useful even in a solo developer setting,
 their introduction deferred to the next part.
 
-In part 4, I will introduce Branches. They are essential if you are part of a
+In Part 4, I will introduce Branches. They are essential if you are part of a
 team working on a shared code-base. If you have been working with Git but want
 to understand the utilization of what you know in a collaborative environment,
 this is the part you need to read.
 
-The last part is where I share my experience with you. In my previous two
-positions, I introduced my colleagues to Git, and then we started using it in
-our day-to-day development. This part sums up the mistakes that me and my
-colleagues used to make and show how to fix things when something goes wrong.
+In Part 5 I share my experience with you. In my previous two positions, I
+introduced my colleagues to Git, and then we started using it in our day-to-day
+development. This part sums up the mistakes that me and my colleagues used to
+make and show how to fix things when something goes wrong.
 
 ### Why Another Git Tutorial?
 
@@ -635,8 +636,11 @@ index 81a0898..41dbb15 100644
 If a file was renamed, you would see the new name. The `@@ -32,7 +32,7 @@ jobs:`
 part indicates the location of the change in the file. Here, it means at line 32
 , starting with `- run: corepack enable`, we had 7 lines of code. After the
-change, also at the same location, we still have 7 lines of code. The lines
-containing the "+" and "-" symbols show what is removed and what is added.
+change, also at the same location, we still have 7 lines of code. The `jobs:` in
+`@@ -32,7 +32,7 @@ jobs:` is intended to be the name of the function to which
+the changes belong and can span many lines before the `- run: corepack enable`.
+Git guesses this part based on indentation, and it is not always accurate. The
+lines containing the "+" and "-" symbols show what is removed and what is added.
 
 You can create a patch file by redirecting the output of `git diff` into a file.
 These patch files become important in Part 3 of this tutorial.
@@ -651,9 +655,10 @@ git diff HEAD > changes.patch
 In this part, we created a directory, performed some work in it, initiated
 version control, learned how to stage files, and create commits. We also learned
 how to review the history of a project and observe changes in each step. These
-are the basics of Git. In the next part, we'll delve into the inner workings and
-explore Git data structures to understand what you can find inside a *.git*
-directory.
+are the basics of Git. In
+[Part 2]({{ site.baseurl }}{% link _posts/2024-05-15-eat-git-part-2.md %}),
+we'll delve into the inner workings and explore Git data structures to
+understand what you can find inside a *.git* directory.
 
 [download-for-windows]: https://git-scm.com/download/win
 [main-git-repo]: https://git.kernel.org/pub/scm/git/git.git/
