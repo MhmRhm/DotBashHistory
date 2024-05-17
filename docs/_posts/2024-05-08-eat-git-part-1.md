@@ -310,12 +310,13 @@ on.
 
 The Working Tree refers to your directory under version control. It's called a
 "tree" because the structure of a directory and its sub-directories can be
-represented as a tree. The Index or Staging area is similar to a waiting hall
-before your flight takes off (commits being created).
+represented as a tree. You put files from Working Tree into Index. The Index or
+Staging area is similar to a waiting hall before your flight takes off (commits
+being created).
 
 If you've made changes to multiple files but only a few of them are relevant to
 a task, you can add only those files to the Index and create a commit. To add
-all files to the staging area:
+all changed files from the Working Tree to the Staging area:
 
 ```bash
 git add --all
@@ -463,7 +464,7 @@ git add -A
 git status
 ```
 
-To remove files from the staging area:
+To remove files from the Staging area:
 
 ```bash
 git restore --staged employees.md
