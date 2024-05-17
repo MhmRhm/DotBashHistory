@@ -14,9 +14,9 @@ author:
 In [Part 1]({{ site.baseurl }}{% link _posts/2024-05-08-eat-git-part-1.md %}),
 we covered the main commands of Git, so now we know how to make a commit. In
 this part, we’ll take a look behind the scenes and create a commit using Git
-plumbing commands. Git commands are divided into two sets: Porcelain and
-Plumbing. Porcelain commands are the ones you use for everyday tasks, while
-Plumbing commands are the lower-level commands that Git combines to perform
+*Plumbing* commands. Git commands are divided into two sets: *Porcelain* and
+*Plumbing*. *Porcelain* commands are the ones you use for everyday tasks, while
+*Plumbing* commands are the lower-level commands that Git combines to perform
 higher-level tasks.
 
 ## Objects
@@ -82,7 +82,7 @@ sudo apt-get install tree
 
 Git distributes objects into subdirectories named after the first two characters
 of their hash. This helps speed up finding objects. Our commit is in the
-*.git/objects/18* directory. Git provides a plumbing command for inspecting
+*.git/objects/18* directory. Git provides a *Plumbing* command for inspecting
 objects. To inspect type of an object:
 
 ```bash
@@ -90,7 +90,7 @@ git cat-file -t 1815
 ```
 
 You don't need to use the entire hash, just enough characters for Git to
-uniquely identify the object. Note that auto-complete does not work for plumbing
+uniquely identify the object. Note that auto-complete does not work for *Plumbing*
 commands because they are not intended for end users. The command above will
 confirm that the object is indeed a commit. To pretty-print the content of an
 object:
@@ -192,12 +192,12 @@ $ git cat-file -p fed1
 # Add Blitzer
 ```
 
-You can see that the parent has our previous commit hash. If you change
+You can see that the *parent* has our previous commit hash. If you change
 something in the first commit, the file hash changes. Consequently, the commit
 hash changes as well, and the parent commit in the following commits also
 changes. Thus, every commit hash in your repository will change. If your
 colleagues or other open-source contributors based their work on your commit,
-meaning they have a parent commit somewhere that refers to a commit you made,
+meaning they have a *parent* commit somewhere that refers to a commit you made,
 and you change something in the history, all your commit hashes will change.
 Those who have your commit hash in their repository will be left disconnected
 from your changes, and you will no longer share the same past. Furthermore,
