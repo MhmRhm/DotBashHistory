@@ -18,9 +18,13 @@ discussed material in each part:
     - Creating Repositories
     - Working Tree and Index
     - Commits
+    - Branches
     - History
 2. Behind the Scene
     - Git Internals
+        - Objects
+        - Branches
+        - Hand-made Commit
 3. Local Workflows
     - Debugging with Git
     - Patch Files
@@ -47,14 +51,12 @@ will explain how Git creates and stores the data structures that enable it to do
 what it does. This part, in my opinion, is necessary to become confident at
 using other tools introduced later.
 
-In part 3, I will wrap up most of the things you need to know to use Git
-effectively. Although Branches are useful even in a solo developer setting,
-their introduction deferred to the next part.
+In Part 3, I will wrap up most of the things you need to know to use Git
+effectively as a solo developer. 
 
-In Part 4, I will introduce Branches. They are essential if you are part of a
-team working on a shared code-base. If you have been working with Git but want
-to understand the utilization of what you know in a collaborative environment,
-this is the part you need to read.
+In Part 4, you will find essential information if you have been using Git and
+want to learn how to apply your knowledge in a collaborative environment. I will
+introduce three workflows that I have successfully used with my colleagues.
 
 In Part 5 I share my experience with you. In my previous two positions, I
 introduced my colleagues to Git, and then we started using it in our day-to-day
@@ -86,10 +88,11 @@ insight you need when working with Git. Plus, using the command line is usually
 faster, and it provides useful information in its output.
 
 Whenever my colleagues encounter issues with Git, I find that the command line
-is the most reliable tool for solving them cleanly and safely. It also offers a
+is the most reliable tool for solving those cleanly and safely. It also offers a
 consistent experience regardless of your development environment. The
 [Git Reference][git-reference] covers the command line extensively. So, my
-advice is to give the command line a try and use Git in that way.
+advice is to give the command line a try and use Git in that way. People often
+resist learning to use the command line, but they don't regret it once they do.
 
 For Linux and Mac, simply use the Terminal application. Ensure that
 auto-complete is set up for your terminal. On Windows, use Git Bash. To set up
@@ -212,7 +215,7 @@ a directory called *.git*. While you can explore these files, it's important not
 to modify them directly without Git's knowledge.
 
 A Git repository consists of this *.git* directory. Additionally, a repository
-can have a specific time-point, checked out.
+can have a specific time-point, checked out and visible.
 
 Now, let's create a project and start working on it. In this initial example,
 I'll create a list of anchors currently working at CNN.
@@ -234,8 +237,8 @@ name to *main* by executing the following command:
 git config --global init.defaultBranch 'main'
 ```
 
-Branches in Git are like timelines. We'll explore them in detail in Part 4.
-We'll also cover `git config` shortly.
+Branches in Git are like timelines. We will explore this concept and the
+`git config` command shortly.
 
 Before we delve deeper, it's a good idea to set the default editor that Git
 uses. For this tutorial, Nano is more than enough. To set Nano as the
@@ -261,20 +264,15 @@ the current status:
 
 ```bash
 git status
-```
-
-The following displays the output of the last command:
-
-```bash
-On branch main
-
-No commits yet
-
-Untracked files:
-  (use "git add <file>..." to include in what will be committed)
-        employees.md
-
-nothing added to commit but untracked files present (use "git add" to track)
+# On branch main
+#
+# No commits yet
+#
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+#         employees.md
+#
+# nothing added to commit but untracked files present (use "git add" to track)
 ```
 
 This includes several important pieces of information. For now, focus on the
@@ -285,19 +283,14 @@ about the presence of the *employees.md* file:
 ```bash
 git add employees.md
 git status
-```
-
-The following displays the output of the last command:
-
-```bash
-On branch main
-
-No commits yet
-
-Changes to be committed:
-  (use "git rm --cached <file>..." to unstage)
-        new file:   employees.md
-
+# On branch main
+#
+# No commits yet
+#
+# Changes to be committed:
+#   (use "git rm --cached <file>..." to unstage)
+#         new file:   employees.md
+#
 ```
 
 The section named *Changes to be committed* lists files that will be included in
@@ -308,15 +301,15 @@ on.
 
 ## Working Tree and Index
 
-The Working Tree refers to your directory under version control. It's called a
+The *Working Tree* refers to your directory under version control. It's called a
 "tree" because the structure of a directory and its sub-directories can be
-represented as a tree. You put files from Working Tree into Index. The Index or
-Staging area is similar to a waiting hall before your flight takes off (commits
-being created).
+represented as a tree. You put files from *Working Tree* into the *Index*. The
+*Index* or *Staging area* is similar to a waiting hall before your flight takes
+off (commits being created).
 
 If you've made changes to multiple files but only a few of them are relevant to
-a task, you can add only those files to the Index and create a commit. To add
-all changed files from the Working Tree to the Staging area:
+a task, you can add only those files to the *Index* and create a commit. To add
+all changed files from the *Working Tree* to the *Staging area*:
 
 ```bash
 git add --all
@@ -326,7 +319,7 @@ git add -A
 git add .
 ```
 
-Caution! Always use git status before running this command. Many applications
+Caution! Always use `git status` before running this command. Many applications
 generate supporting cache files, and we don't want to version control them
 because they hold no value and can be recreated.
 
@@ -339,17 +332,17 @@ tailored for various development environments in this
 ## Commits
 
 Each commit in Git contains six pieces of information:
-1. **Files and Changes**: This includes the files and the changes made to them
-that we want to commit.
+1. **Changes**: This includes the files and the changes made to them that we
+want to commit.
 2. **Author**: The name and email address of the person who made the changes in
 the files.
 3. **Committer**: The person who made the commit. You can make changes to files
 and send your modifications to someone with the authority to perform the commit
-on your behalf. This individual is referred to as the Committer. Typically, the
-Author and Committer are the same person.
-4. **Time**: The timestamp of when the commit was made.
-5. **Parent Commit**: The ID of the commit before the one we are creating. This
-becomes important when explaining Rebasing in Part 4.
+on your behalf. This individual is referred to as the *Committer*. Typically,
+the *Author* and *Committer* are the same person.
+4. **Time**: The timestamp of when the changes were authored and committed.
+5. **Parent**: The ID of the commit before the one we are creating. This becomes
+important when explaining Rebasing in Part 4.
 6. **Message**: An explanation of why and how some changes were made. This
 message is crucial for understanding the purpose of the commit, and it can be
 read later by you and others instead of inspecting each file to figure out what
@@ -414,13 +407,8 @@ Let's take a look at the status now:
 
 ```bash
 git status
-```
-
-The following displays the output of this command:
-
-```
-On branch main
-nothing to commit, working tree clean
+# On branch main
+# nothing to commit, working tree clean
 ```
 
 Congratulations! We've made our first commit.
@@ -455,8 +443,8 @@ repository. To change the author information for the last commit:
 git commit --amend --reset-author
 ```
 
-Let's explore a few other useful commands related to the Working Tree and Index.
-We'll make some changes and stage them before committing:
+Let's explore a few other useful commands related to the *Working Tree* and
+*Index*. We'll make some changes and stage them before committing:
 
 ```bash
 echo 'Wolf Blitzer' >> employees.md
@@ -474,8 +462,8 @@ git status
 git restore --staged .
 ```
 
-The command above does not alter the Working Tree. To undo changes in the
-Working Tree:
+The command above does not alter the *Working Tree*. To undo changes in the
+*Working Tree*:
 
 ```bash
 git restore employees.md
@@ -495,19 +483,19 @@ git add -A
 echo 'John King' >> employees.md
 ```
 
-To view the difference between the Working Tree and the Index:
+To view the difference between the *Working Tree* and the *Index*:
 
 ```bash
 git diff
 ```
 
-To see the difference between the Working Tree and the last commit:
+To see the difference between the *Working Tree* and the last commit:
 
 ```bash
 git diff HEAD
 ```
 
-HEAD typically points to a branch, and a branch is also a pointer to a commit.
+*HEAD* typically points to a branch, and a branch is also a pointer to a commit.
 We'll delve into this further in Part 2.
 
 To see the difference between the Index and the last commit:
@@ -516,12 +504,101 @@ To see the difference between the Index and the last commit:
 git diff --staged
 ```
 
+## Branches
+
+Imagine your work is in a stable state and customers are happy with it. However,
+you have some ideas about improving certain parts of your work. You don't want
+to compromise the stable code. In Git, you can create a branch from a commit and
+continue committing your changes in that branch. This new branch is usually
+called a feature branch.
+
+Each branch is created from a commit or another branch. To properly demonstrate
+branches, let's make more commits to our project.
+
+```bash
+echo 'Anderson Cooper' >> employees.md
+git add -A
+git commit -m 'Add Cooper'
+
+echo 'John King' >> employees.md
+git add -A
+git commit -m 'Add King'
+
+git log --oneline --all --graph
+# * 6139f8f (HEAD -> main) Add King
+# * 68d9628 Add Cooper
+# * 8c61dd6 Add Berman and Bash
+```
+
+To create a branch from another branch:
+
+```bash
+# to create feat1 from main
+git checkout -b feat1 main
+```
+
+To create a branch from a commit:
+
+```bash
+# to create feat2 from second commit
+git checkout -b feat2 68d9628
+```
+
+Lets make a commit on each:
+
+```bash
+git checkout feat1
+echo 'Abby Phillip' >> employees.md
+git add -A
+git commit -m 'Add Phillip'
+# dc51eef474daf310773d6a4181f14dee34db0444
+
+git checkout feat2
+echo 'Jake Tapper' >> employees.md
+git add -A
+git commit -m 'Add Tapper'
+# a37e3d4bcbf80a3a00a450385b804d3bb610de48
+```
+
+Let's take a look at the history:
+
+```bash
+git log --oneline --all --graph
+# * a37e3d4 (HEAD -> feat2) Add Tapper
+# | * dc51eef (feat1) Add Phillip
+# | * 6139f8f (main) Add King
+# |/  
+# * 68d9628 Add Cooper
+# * 8c61dd6 Add Berman and Bash
+```
+
+If we run `git diff feat2 feat1`, we can see the changes required to go from the
+*feat2* branch to the *feat1* branch, indicating the differences between them.
+
+```diff
+diff --git a/employees.md b/employees.md
+index 1785192..7659b36 100644
+--- a/employees.md
++++ b/employees.md
+@@ -1,4 +1,5 @@
+ John Berman
+ Dana Bash
+ Anderson Cooper
+-Jake Tapper
++John King
++Abby Phillip
+```
+
+In Part 3 and Part 4, we will explore how to share work from one branch to
+another branch within the same Git repository or in someone else's repository.
+For now, we have learned how to create branches, commit on them, switch between
+them, and compare them.
+
 ## History
 
 The main purpose of version controlling a directory is to maintain a history,
 serving as a reference, documentation, and even a debugging tool. This history
-helps you pinpoint the exact changes that caused an anomaly, aiding in
-understanding and resolving issues effectively.
+helps you pinpoint the exact changes that caused an anomaly.
 
 The command to access the history in Git is `git log`. To demonstrate the full
 potential of this command, we need a project with a rich history. To download
@@ -595,10 +672,10 @@ Let me wrap this part up with a revisit to `git diff` command:
 git diff abc123
 
 # to list files that were changed between two commits
-git diff 2059f01 df6bb31 --name-only
+git diff abc123 def456 --name-only
 
-# to diff two branches
-git diff main feat
+# to diff the feat branch against its common base on main
+git diff main...feat
 ```
 
 You can instruct Git to use an external difftool for comparing files. Some
@@ -628,20 +705,19 @@ side, you'll have *abc123*, and on the "b" side, you'll have *def456*.
 If a file was deleted, you would see:
 
 ```diff
-diff --git a/filename b/filename
-index 81a0898..41dbb15 100644
 --- a/filename
 +++ /dev/null
 ```
 
 If a file was renamed, you would see the new name. The `@@ -32,7 +32,7 @@ jobs:`
 part indicates the location of the change in the file. Here, it means at line 32
-, starting with `- run: corepack enable`, we had 7 lines of code. After the
-change, also at the same location, we still have 7 lines of code. The `jobs:` in
-`@@ -32,7 +32,7 @@ jobs:` is intended to be the name of the function to which
-the changes belong and can span many lines before the `- run: corepack enable`.
-Git guesses this part based on indentation, and it is not always accurate. The
-lines containing the "+" and "-" symbols show what is removed and what is added.
+, in the `jobs:` block, starting with `- run: corepack enable`, we had 7 lines
+of code. After the change, also at the same location, we still have 7 lines of
+code. The `jobs:` in `@@ -32,7 +32,7 @@ jobs:` is intended to be the name of the
+function or block to which the changes belong and can span many lines before the
+`- run: corepack enable`. Git guesses this part based on indentation, and it is
+not always accurate. The lines containing the "+" and "-" symbols show what is
+removed and what is added.
 
 You can create a patch file by redirecting the output of `git diff` into a file.
 These patch files become important in Part 3 of this tutorial.
@@ -654,9 +730,9 @@ git diff HEAD > changes.patch
 ## Summary
 
 In this part, we created a directory, performed some work in it, initiated
-version control, learned how to stage files, and create commits. We also learned
-how to review the history of a project and observe changes in each step. These
-are the basics of Git. In
+version control, learned how to stage files, and create commits and work on
+branches. We also learned how to review the history of a project and observe
+changes in each step. These are the basics of Git. In
 [Part 2]({{ site.baseurl }}{% link _posts/2024-05-15-eat-git-part-2.md %}),
 we'll delve into the inner workings and explore Git data structures to
 understand what you can find inside a *.git* directory.
