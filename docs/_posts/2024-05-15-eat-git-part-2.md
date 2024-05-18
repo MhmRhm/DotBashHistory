@@ -90,10 +90,10 @@ git cat-file -t 1815
 ```
 
 You don't need to use the entire hash, just enough characters for Git to
-uniquely identify the object. Note that auto-complete does not work for *Plumbing*
-commands because they are not intended for end users. The command above will
-confirm that the object is indeed a commit. To pretty-print the content of an
-object:
+uniquely identify the object. Note that auto-complete does not work for
+*Plumbing* commands because they are not intended for end users. The command
+above will confirm that the object is indeed a commit. To pretty-print the
+content of an object:
 
 ```bash
 git cat-file -p 1815
@@ -206,6 +206,221 @@ So, you cannot go back either. This can cause a divergence that's very difficult
 , if not impossible, to fix. That's why it's advised not to change what you have
 published. Git heavily relies on commit hashes to track changes in a repository
 and determine what actions need to be taken.
+
+## Branches
+
+Here, I intend to show you how branches are represented internally in Git. To
+understand that, I'll provide a very brief introduction. We will become
+accustomed to using branches in Part 4.
+
+Imagine your work is in a stable state and customers are happy with it. However,
+you have some ideas about improving certain parts of your work. You don't want
+to compromise the stable code. In Git, you can create a branch from a commit and
+continue committing your changes in that branch. This is called a feature
+branch.
+
+We already have a branch called *main*. Let's create another branch and add a
+commit to it. You don't need to understand these commands at the moment. To
+create a branch called *feat* from *HEAD*:
+
+```bash
+git checkout -b feat HEAD
+git log --oneline --all --graph
+```
+
+*HEAD* is a pointer to a commit or a branch. We will see that shortly. To create
+a commit on the current branch:
+
+```bash
+echo 'Jamie Gangel' >> employees.md
+git add employees.md
+
+git commit -m 'Add Gangel'
+git log --oneline --all --graph
+# * 8975de0 (HEAD -> feat) Add Gangel
+# * fed16ca (main) Add Blitzer
+# * 181590f Add Berman and Bash
+```
+
+Now we have two branches that differ by one commit. First things first, what is
+*HEAD*?
+
+```bash
+cat .git/HEAD
+# ref: refs/heads/feat
+```
+
+The content of the file *.git/HEAD* is *ref: refs/heads/feat*. This means that
+you are currently on the last commit of a branch called *feat*. If you make any
+changes, stage them, and create a commit, the *parent* of that commit will be
+what *refs/heads/feat* points to. Let's see where *refs/heads/feat* is pointing
+to:
+
+```bash
+cat .git/refs/heads/feat
+# 8975de012dc27004ec8bf33667a11c03ac251611
+```
+
+It should be familiar to you. It is the last commit we made after switching to
+the *feat* branch. Let's see where *.git/refs/heads/main* is pointing to:
+
+```bash
+cat .git/refs/heads/main
+# fed16ca7c469dcfcc1daeffa8b7255f87d61c026
+```
+
+It points to the second commit that we made in this repository. At that time, we
+were on the *main* branch.
+
+As you can see, branches are nothing but pointers to commits. Since each commit
+also points to its parent(s), you can have multiple lines of work in your
+repository simultaneously and switch between them. To switch back to the main
+branch:
+
+```bash
+git checkout main
+```
+
+We can also check out a commit without creating a new branch. This state is
+called a *detached HEAD* because *HEAD* is not pointing to a branch.
+Occasionally, you may need to check out a specific commit to investigate if it
+contains an issue. To check out a commit, use the following command:
+
+```bash
+git checkout 8975de0
+# Note: switching to '8975de0'.
+#
+# You are in 'detached HEAD' state. You can look around, make experimental
+# changes and commit them, and you can discard any commits you make in this
+# state without impacting any branches by switching back to a branch.
+#
+# If you want to create a new branch to retain commits you create, you may
+# do so (now or later) by using -c with the switch command. Example:
+#
+#   git switch -c <new-branch-name>
+#
+# Or undo this operation with:
+#
+#   git switch -
+#
+# Turn off this advice by setting config variable advice.detachedHead to false
+#
+# HEAD is now at 8975de0 Add Gangel
+
+cat .git/HEAD
+# 8975de012dc27004ec8bf33667a11c03ac251611
+```
+
+The purpose of this section was to help you understand that branches are nothing
+but pointers to commits. This fact becomes important when, in Part 5, I explain
+how to fix common issues that arise when working with Git.
+
+## A Hand-made Commit
+
+To create a commit using *Plumbing* commands, ensure that nothing is staged.
+First, let's add a change:
+
+```bash
+echo 'Brianna Keilar' >> employees.md
+```
+
+Then, we add this change to the *index*. The *index* is a binary file located at
+*.git/index*.
+
+```bash
+git update-index employees.md
+
+git status
+git diff --staged
+```
+
+We need our directory structure to be recorded in the commit. Let's create a
+tree object from the *index*:
+
+```bash
+cat employees.md
+# John Berman
+# Dana Bash
+# Wolf Blitzer
+# Jamie Gangel
+# Brianna Keilar
+
+git hash-object employees.md
+# c91fe675c5c094ff6437a8dc9f5e41bf362e93d4
+
+git write-tree
+# 63bce7388bfb114345c99b0af9cd44b7b7b3b148
+
+git cat-file -p 63bc
+# c91fe675c5c094ff6437a8dc9f5e41bf362e93d4
+```
+
+First, I printed the content of *employees.md*. Then, I calculated its SHA256
+hash. This hash, with the same content, should always be the same. If you use
+the `-w` flag with `git hash-object`, Git will actually write the object into
+its internal files. Then, I created a tree object. This tree object will be
+associated with our commit. Your tree object should also have the same hash as
+mine.
+
+Now is the time to create the actual commit:
+
+```bash
+git commit-tree 63bce7 -p 181590f -m 'Add Keilar'
+# 7cbf3e032cfdce489a4fcfd8d2e486990b6460f3
+
+git log --oneline --all --graph
+```
+
+We will not see our commit in the `git log` output because our commit has no
+reference pointing to it. In other words, it is not on any branch. In the
+`git commit-tree` command, I used my first commit as the *parent*, so it cannot
+be associated with any existing branches, as its history is divergent. To create
+a new branch from that commit:
+
+```bash
+git update-ref refs/heads/new-feat 7cbf3e
+
+git log --oneline --all --graph
+# * 7cbf3e0 (new-feat) Add Keilar
+# | * 8975de0 (HEAD -> feat) Add Gangel
+# | * fed16ca (main) Add Blitzer
+# |/  
+# * 181590f Add Berman and Bash
+
+git show new-feat
+# commit 7cbf3e032cfdce489a4fcfd8d2e486990b6460f3 (new-feat)
+# Author: Mohammad Rahimi <rahimi.mhmmd@outlook.com>
+# Date:   Sat May 18 12:05:29 2024 +0800
+#
+#     Add Keilar
+#
+# diff --git a/employees.md b/employees.md
+# index 745b5ef..c91fe67 100644
+# --- a/employees.md
+# +++ b/employees.md
+# @@ -1,2 +1,5 @@
+#  John Berman
+#  Dana Bash
+# +Wolf Blitzer
+# +Jamie Gangel
+# +Brianna Keilar
+```
+
+You can also open a text editor and put the commit hash in *refs/heads/new-feat*
+. However, this is not recommended because we should not alter any file in the
+*.git* directory without Git's knowledge.
+
+## Summary
+
+In this part, we explored Git's *Plumbing* commands, inspected the *.git*
+directory, created blob, tree, and commit objects, and gained an understanding
+of how branches are represented internally in Git. At this point, we should have
+the confidence required to tackle more advanced topics in Git.
+
+In Part 3, I will introduce you to more useful tools that Git has to offer.
+After Part 3, we will be able to continue our journey in Git at a higher
+altitude and learn more about concepts that involve Git, rather than being stuck
+with low-level everyday commands.
 
 
 [pro-git-book]: https://git-scm.com/book/en/v2
