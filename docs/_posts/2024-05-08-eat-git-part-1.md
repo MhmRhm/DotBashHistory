@@ -1,6 +1,8 @@
 ---
 layout: post
-title: "Eat Git - Part 1"
+title: "EatGit - Part 1"
+excerpt: Part 1 of a quick Git tutorial to teach you everything you need to know.
+seo_description: Part 1 of Git tutorial - Learn about Working Tree, Index, Commits, Branches and History.
 categories: git
 author:
 - Mohammad Rahimi
@@ -26,10 +28,10 @@ discussed material in each part:
         - Branches
         - Hand-made Commit
 3. Local Workflows
-    - Debugging with Git
     - Patch Files
     - Cherry Picking
     - Interactive Rebase
+    - Debugging with Git
 4. Remote Workflows
     - Remotes
     - Branch Management
@@ -51,8 +53,9 @@ will explain how Git creates and stores the data structures that enable it to do
 what it does. This part, in my opinion, is necessary to become confident at
 using other tools introduced later.
 
-In Part 3, I will wrap up most of the things you need to know to use Git
-effectively as a solo developer. 
+In [Part 3]({{ site.baseurl }}{% link _posts/2024-05-19-eat-git-part-3.md %}), I
+will wrap up most of the things you need to know to use Git effectively as a
+solo developer.
 
 In Part 4, you will find essential information if you have been using Git and
 want to learn how to apply your knowledge in a collaborative environment. I will
@@ -496,7 +499,8 @@ git diff HEAD
 ```
 
 *HEAD* typically points to a branch, and a branch is also a pointer to a commit.
-We'll delve into this further in Part 2.
+We'll delve into this further in
+[Part 2]({{ site.baseurl }}{% link _posts/2024-05-15-eat-git-part-2.md %}).
 
 To see the difference between the Index and the last commit:
 
@@ -589,10 +593,11 @@ index 1785192..7659b36 100644
 +Abby Phillip
 ```
 
-In Part 3 and Part 4, we will explore how to share work from one branch to
-another branch within the same Git repository or in someone else's repository.
-For now, we have learned how to create branches, commit on them, switch between
-them, and compare them.
+In [Part 3]({{ site.baseurl }}{% link _posts/2024-05-19-eat-git-part-3.md %})
+and Part 4, we will explore how to share work from one branch to another branch
+within the same Git repository or in someone else's repository. For now, we have
+learned how to create branches, commit on them, switch between them, and compare
+them.
 
 ## History
 
@@ -720,7 +725,9 @@ not always accurate. The lines containing the "+" and "-" symbols show what is
 removed and what is added.
 
 You can create a patch file by redirecting the output of `git diff` into a file.
-These patch files become important in Part 3 of this tutorial.
+These patch files become important in
+[Part 3]({{ site.baseurl }}{% link _posts/2024-05-19-eat-git-part-3.md %}) of
+this tutorial.
 
 ```bash
 # creating a patch file from the Working Tree
