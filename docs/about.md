@@ -4,7 +4,7 @@ title: About
 permalink: /about/
 ---
 
-![profile](https://gravatar.com/avatar/3a648617ab98198334f03c560bfbdf5e4923ab08c60132fa9f6da5f2048ebeb0?s=200){: style="float: left; border-radius: 10%; padding-right: 20px"}
+![profile](https://gravatar.com/avatar/3a648617ab98198334f03c560bfbdf5e4923ab08c60132fa9f6da5f2048ebeb0?s=200){: style="float: left; border-radius: 5%; margin-right: 15px"}
 
 Hey there, I'm Mohammad Rahimi, a Senior C++ Developer. I've been coding for
 over 10 years, mainly focusing on real-time high-throughput and distributed
