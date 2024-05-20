@@ -593,8 +593,10 @@ index 1785192..7659b36 100644
 +Abby Phillip
 ```
 
-In [Part 3]({{ site.baseurl }}{% link _posts/2024-05-19-eat-git-part-3.md %})
-and Part 4, we will explore how to share work from one branch to another branch
+You can transfer the work done in one branch to another branch or merge branches
+together. In
+[Part 3]({{ site.baseurl }}{% link _posts/2024-05-19-eat-git-part-3.md %}) and
+Part 4, we will explore how to share work from one branch to another branch
 within the same Git repository or in someone else's repository. For now, we have
 learned how to create branches, commit on them, switch between them, and compare
 them.
