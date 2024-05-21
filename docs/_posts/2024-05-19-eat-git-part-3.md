@@ -119,15 +119,13 @@ you can create a patch file by storing the output of git diff in a file:
 
 ```bash
 # equivalent to 0002-Add-Cornish-and-Asher.patch
-git diff 6bc2c0a 2dcbac8 > hand-made-patch.txt
+git diff 6bc2c0a 2dcbac8 > hand-made-patch
 ```
-
-Here, I used the *.txt* extension, but it can be any file extension.
 
 The `format-patch` command, in addition to the diff, includes the corresponding
 commit hash, author's name, and timestamp of the modifications. You can email
 these patch files to repository maintainers. If they're accepted, the
-maintainers will incorporate the changes into the main repository by committing
+maintainers will incorporate the changes into the *main* branch by committing
 them.
 
 To apply a patch file onto a branch:
@@ -148,7 +146,7 @@ git status
 #   (use "git add <file>..." to include in what will be committed)
 #         0001-Add-Phillip.patch
 #         0002-Add-Cornish-and-Asher.patch
-#         hand-made-patch.txt
+#         hand-made-patch
 #
 # no changes added to commit (use "git add" and/or "git commit -a")
 ```
@@ -187,12 +185,12 @@ git cat-file -p 548e193
 # Add Phillip
 ```
 
-To apply the second commit on the *woke* branch, useing the *.txt* file:
+To apply the second commit on the *woke* branch, useing the *hand-made-patch* file:
 
 ```bash
 git checkout main
 
-git apply hand-made-patch.txt
+git apply hand-made-patch
 
 git add employees.md
 git commit -m 'Add Cornish and Asher'
@@ -209,7 +207,7 @@ error message and won't apply any of the patches.
 # error: <file>: patch does not apply
 ```
 
-To solve this problem, you need to update your patch file. Switch back to your
+To solve this problem, you need to update your *main* branch. Switch back to your
 feature branch and either merge it with or rebase it onto the *main* branch.
 Resolve any conflicts that arise and generate the patch files again. Merging and
 rebasing will be explained in Part 4.
