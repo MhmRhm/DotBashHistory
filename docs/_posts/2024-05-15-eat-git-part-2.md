@@ -54,8 +54,6 @@ tree .git/objects/
 # .git/objects/
 # ├── 13
 # │   └── 0a62108af843b46b9f90a588da8bf056a28778
-# ├── 2a
-# │   └── 5ef4501371ab683cbb4de8444e5e32f3bab092
 # ├── 74
 # │   └── 5b5efa7d5acb852d11cf14bc3a07c494bee605
 # ├── 98
@@ -228,11 +226,10 @@ cat .git/HEAD
 # ref: refs/heads/feat
 ```
 
-The content of the file *.git/HEAD* is *ref: refs/heads/feat*. This means that
-you are currently on the last commit of a branch called *feat*. If you make any
-changes, stage them, and create a commit, the *parent* of that commit will be
-what *refs/heads/feat* points to. Let's see where *refs/heads/feat* is pointing
-to:
+This means that you are currently on the last commit of a branch called *feat*.
+If you make any changes, stage them, and create a commit, the *parent* of that
+commit will be what *refs/heads/feat* points to. Let's see where
+*refs/heads/feat* is pointing to:
 
 ```bash
 cat .git/refs/heads/feat
@@ -251,7 +248,7 @@ It points to the second commit that we made in this repository. At that time, we
 were on the *main* branch.
 
 As you can see, branches are nothing but pointers to commits. Since each commit
-also points to its parent(s), you can have multiple lines of work in your
+also points to its *parent(s)*, you can have multiple lines of work in your
 repository simultaneously and switch between them. To switch back to the main
 branch:
 
@@ -260,7 +257,7 @@ git checkout main
 ```
 
 We can also check out a commit without creating a new branch. This state is
-called a *detached HEAD* because *HEAD* is not pointing to a branch.
+called a *Detached HEAD* because *HEAD* is not pointing to a branch.
 Occasionally, you may need to check out a specific commit to investigate if it
 contains an issue. To check out a commit, use the following command:
 
@@ -315,7 +312,7 @@ git diff --staged
 ```
 
 We need our directory structure to be recorded in the commit. Let's create a
-tree object from the *index*:
+tree object from the *Index*:
 
 ```bash
 cat employees.md
