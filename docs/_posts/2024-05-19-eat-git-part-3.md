@@ -33,12 +33,12 @@ them more flexible. You can store patch files on a USB stick or send them via
 email. Creating patch files is quite easy. 
 
 To demonstrate, let's continue with our CNN anchors example. Since you may have
-conducted experiments in previous sections, I will remove the directory and
+conducted experiments in previous part, I will remove the directory and
 repopulate it with two branches.
 
 If you seek examples with more substance, feel free to subscribe to one of the
-channels at [vger.kernel.org](vger.kernel.org) and apply patches that contributors post to those
-channels. In addition to the patch files, you also need to clone the
+channels at [vger.kernel.org](vger.kernel.org) and apply patches that
+contributors post. In addition to the patch files, you also need to clone the
 [Linux kernel][main-linux-repo] or [Git][main-git-repo] repositories.
 
 ```bash
@@ -115,7 +115,7 @@ cat 0001-Add-Phillip.patch
 
 Patch files are essentially text files. If you look inside one of them, you will
 see it is strikingly similar to the output of the `git diff` command. In fact,
-you can create a patch file by storing the output of git diff in a file:
+you can create a patch file by storing the output of `git diff` in a file:
 
 ```bash
 # equivalent to 0002-Add-Cornish-and-Asher.patch
@@ -154,7 +154,7 @@ git status
 As you can see, the changes are not committed yet. You can add them to the
 *Index* and then commit them, which will have your name as both the author and
 committer. Alternatively, you can use the following command to commit the patch
-file directly onto the main branch with the original author's name:
+file directly onto the *main* branch with the original author's name:
 
 ```bash
 git restore employees.md
@@ -185,7 +185,8 @@ git cat-file -p 548e193
 # Add Phillip
 ```
 
-To apply the second commit on the *woke* branch, useing the *hand-made-patch* file:
+To apply the second commit on the *woke* branch, using the *hand-made-patch*
+file:
 
 ```bash
 git checkout main
@@ -207,10 +208,10 @@ error message and won't apply any of the patches.
 # error: <file>: patch does not apply
 ```
 
-To solve this problem, you need to update your *main* branch. Switch back to your
-feature branch and either merge it with or rebase it onto the *main* branch.
-Resolve any conflicts that arise and generate the patch files again. Merging and
-rebasing will be explained in Part 4.
+To solve this problem, you need to update your *main* branch. Switch back to
+your feature branch and either merge it with or rebase it onto the *main* branch
+. Resolve any conflicts that arise and generate the patch files again. Merging
+and rebasing will be explained in Part 4.
 
 Patch files can be very handy and come to your rescue in times of need. They
 also play a central role in contributing to major open-source projects. I
@@ -264,6 +265,8 @@ git log --oneline --all --graph
 # * a48e1bb Add Cooper, Tapper and Wallace
 ```
 
+You can see the same commit from the *woke* branch now on the *main* branch.
+
 ## Interactive Rebase
 
 Rebasing is a procedure that affects the history of a branch. As mentioned
@@ -278,13 +281,14 @@ flag. I will explain merging and rebasing in the next part.
 
 With interactive rebasing, you can specify a range of commits and an action at
 each commit. The command goes through each one and applies the action. I
-typically use interactive rebasing to combine my commits into one before
-publishing my work. This way, as time passes, the project will maintain a clean
-history. You won't see commit messages like `Fix minor mistake` or
-`Rename variable` after a meaningful commit like `Fix bug report #6623`.
+typically use interactive rebasing to combine my commits on feature branch into
+one before publishing my work. This way, as time passes, the project will
+maintain a clean history. You won't see commit messages like
+*"Fix minor mistake"* or *"Rename variable"* after a meaningful commit like
+*"Fix bug report #6623"*.
 
 In our example project, before publishing our *main* branch, let's combine the
-first two commits together (to minimize the chance of getting canceled).
+first two commits together (to minimize the chance of getting canceled ;)).
 
 ```bash
 git checkout main
