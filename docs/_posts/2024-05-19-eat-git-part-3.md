@@ -118,8 +118,11 @@ see it is strikingly similar to the output of the `git diff` command. In fact,
 you can create a patch file by storing the output of git diff in a file:
 
 ```bash
+# equivalent to 0002-Add-Cornish-and-Asher.patch
 git diff 6bc2c0a 2dcbac8 > hand-made-patch.txt
 ```
+
+Here, I used the *.txt* extension, but it can be any file extension.
 
 The `format-patch` command, in addition to the diff, includes the corresponding
 commit hash, author's name, and timestamp of the modifications. You can email
@@ -183,6 +186,144 @@ git cat-file -p 548e193
 #
 # Add Phillip
 ```
+
+To apply the second commit on the *woke* branch, useing the *.txt* file:
+
+```bash
+git checkout main
+
+git apply hand-made-patch.txt
+
+git add employees.md
+git commit -m 'Add Cornish and Asher'
+```
+
+If you create a patch file using either of the two mentioned methods and send it
+to someone, they might not be able to apply the patch cleanly if their file has
+changed in the meantime. This is because the lines referenced in the patch
+file's diff may have been deleted or moved. In such cases, Git will output an
+error message and won't apply any of the patches.
+
+```bash
+# error: patch failed: <file>:<line>
+# error: <file>: patch does not apply
+```
+
+To solve this problem, you need to update your patch file. Switch back to your
+feature branch and either merge it with or rebase it onto the *main* branch.
+Resolve any conflicts that arise and generate the patch files again. Merging and
+rebasing will be explained in Part 4.
+
+Patch files can be very handy and come to your rescue in times of need. They
+also play a central role in contributing to major open-source projects. I
+recommend getting comfortable using them. This concludes my introduction to
+patch files.
+
+## Cherry Picking
+
+If you've done some work in a feature branch that turns out to be unnecessary,
+you can still cherry-pick useful commits from that branch. Another use case for
+cherry-picking is when you fix a bug in one branch and need the same fix in
+another. Or perhaps you committed your work to the wrong branch by mistake. In
+all these scenarios, cherry-picking can help.
+
+To avoid conflicts in our example project, let's explore the last mentioned use
+case. We'll create a commit but mistakenly place it on our *woke* branch.
+Conflicts and resolving them will be covered in Part 4.
+
+```bash
+git checkout woke
+
+echo 'Michael Smerconish' >> employees.md
+git add employees.md
+git commit -m 'Add Smerconish'
+
+git log --oneline --all --graph
+# * f892560 (HEAD -> woke) Add Smerconish
+# * 2dcbac8 Add Cornish and Asher
+# * 6bc2c0a Add Phillip
+# | * cf560f0 (main) Add Cornish and Asher
+# | * 548e193 Add Phillip
+# |/
+# * a48e1bb Add Cooper, Tapper and Wallace
+```
+
+Now, let's correct our mistake by cherry-picking the last commit to our main
+branch:
+
+```bash
+git checkout main
+git cherry-pick f892560
+
+git log --oneline --all --graph
+# * c588da3 (HEAD -> main) Add Smerconish
+# * cf560f0 Add Cornish and Asher
+# * 548e193 Add Phillip
+# | * f892560 (woke) Add Smerconish
+# | * 2dcbac8 Add Cornish and Asher
+# | * 6bc2c0a Add Phillip
+# |/
+# * a48e1bb Add Cooper, Tapper and Wallace
+```
+
+## Interactive Rebase
+
+Rebasing is a procedure that affects the history of a branch. As mentioned
+several times before, changing history can lead to many complications if others
+share that history with you. That being said, it is the most effective tool for
+organizing your work and creating a clean history.
+
+In this section, I will show you interactive rebasing. There is also a
+contribution workflow that involves rebasing, which is different from this one.
+Both use the `git rebase` command, but interactive rebasing also uses the `-i`
+flag. I will explain merging and rebasing in the next part.
+
+With interactive rebasing, you can specify a range of commits and an action at
+each commit. The command goes through each one and applies the action. I
+typically use interactive rebasing to combine my commits into one before
+publishing my work. This way, as time passes, the project will maintain a clean
+history. You won't see commit messages like `Fix minor mistake` or
+`Rename variable` after a meaningful commit like `Fix bug report #6623`.
+
+In our example project, before publishing our *main* branch, let's combine the
+first two commits together (to minimize the chance of getting canceled).
+
+```bash
+git checkout main
+git rebase -i --root
+```
+
+The `git rebase -i` command expects a commit and will list all the commits from
+HEAD up to but not including that commit. Because of this behavior, you cannot
+edit the initial commit. That's why I used the `--root` flag. The list is
+ordered from old at the top to new at the bottom.
+
+Edit the file and change the action at the second commit from `pick` to `squash`
+. Save and close the editor. The opened file also includes instructions on
+commands that you can use at each step.
+
+```bash
+pick a48e1bb Add Cooper, Tapper and Wallace
+squash 548e193 Add Phillip
+pick cf560f0 Add Cornish and Asher
+pick c588da3 Add Smerconish
+```
+
+The interactive rebase will show you one more editor for changing the commit
+message after combining the first two commits. Provide a meaningful message.
+
+Our new history should look like the following:
+
+```bash
+git log --oneline
+# 08206a8 (HEAD -> main) Add Smerconish
+# 301703c Add Cornish and Asher
+# cd0bbc3 Add Cooper, Tapper, Wallace and Phillip
+```
+
+Although it can be scary, I recommend using interactive rebase in your daily
+tasks. Keeping the history clean should be something that all team members
+strive for.
 
 
 [main-git-repo]: https://git.kernel.org/pub/scm/git/git.git/
