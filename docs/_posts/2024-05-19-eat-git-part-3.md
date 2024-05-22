@@ -406,7 +406,8 @@ between branches will maintain the state of both the *Index* and the
 
 ## Miscellaneous
 
-In this section, I will mention some tools that you may not use frequently.
+In this section, I'll introduce some Git tools that you might not use frequently
+but are nonetheless useful.
 
 ### Bisect
 
