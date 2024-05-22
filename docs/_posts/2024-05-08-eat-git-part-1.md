@@ -27,12 +27,13 @@ discussed material in each part:
         - Objects
         - Branches
         - Hand-made Commit
-3. Local Workflows
+3. Solo Workflows
     - Patch Files
     - Cherry Picking
     - Interactive Rebase
-    - Debugging with Git
-4. Remote Workflows
+    - Stashes
+    - Miscellaneous
+4. Team Workflows
     - Remotes
     - Branch Management
     - Merging and Merge Conflicts

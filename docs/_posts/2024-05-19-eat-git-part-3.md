@@ -327,6 +327,79 @@ Although it can be scary, I recommend using interactive rebase in your daily
 tasks. Keeping the history clean should be something that all team members
 strive for.
 
+## Stashes
+
+Imagine you are working on a feature when your boss informs you that a customer
+reported a bug after your last commit was published. You need to switch back to
+the main branch immediately and start investigating if the bug is caused by your
+changes. However, you have already made significant progress in your feature
+branch, but it is not finished or in a state that deserves its own commit. If
+you don’t want to lose your changes and also do not want to commit them, you can
+stash the changes. Each stash contains uncommitted work, whether it is in the
+*Working Tree* or the *Index*. Let's go through a slightly more complicated
+scenario.
+
+You are on a feature branch, refactoring some code. Your boss requests that you
+postpone the refactoring and instead write some additional tests for your recent
+module. To switch to another branch without losing the work you've already done:
+
+```bash
+git checkout -b refactor main
+
+# do some work, stage and do more work
+
+# boss asks for tests
+git stash push --all -m 'Refactor code'
+git checkout -b add-tests main
+
+# write some tests, stage and write more
+```
+
+While you are working on the tests, a customer reports a critical bug in the
+latest release, and you are assigned to fix it. To save your current work before
+committing:
+
+```bash
+git stash push --all -m 'Add tests for module'
+git checkout -b fix-bug main
+
+# fix the bug, then
+git commit -m 'Fix bug'
+```
+
+Now go back to writing tests:
+
+```bash
+git checkout add-tests
+git stash pop --index
+
+# finish rest of the tests, then
+git commit -m 'Add tests for module'
+```
+
+After writing the tests, continue refactoring the code:
+
+```bash
+git checkout refactor
+git stash pop --index
+```
+
+It is possible to stash your work on one branch and apply it to another branch.
+Additionally, you can list all your stashes and apply any specific stash:
+
+```bash
+git stash list
+# stash@{0}: On add-tests: Add tests
+# stash@{1}: On refactor: Refactor code
+
+git stash apply --index stash@{1}
+```
+
+To remove all the stashes use `git stash clear`.
+
+## Miscellaneous
+
+
 
 [main-git-repo]: https://git.kernel.org/pub/scm/git/git.git/
 [main-linux-repo]: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/
