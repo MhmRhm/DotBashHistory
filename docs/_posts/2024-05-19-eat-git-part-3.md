@@ -397,9 +397,151 @@ git stash apply --index stash@{1}
 
 To remove all the stashes use `git stash clear`.
 
+If any of the modified or staged files have a different revision on the other
+branch, the `git checkout` command will result in an error stating that your
+modified files need to be committed or stashed before switching. However, if
+checking out another branch won't overwrite any of those files, switching
+between branches will maintain the state of both the *Index* and the
+*Working Tree*.
+
 ## Miscellaneous
 
+In this section, I will mention some tools that you may not use frequently.
+
+### Bisect
+
+The git bisect command is used to find the exact commit that introduced a bad
+behavior. You begin by providing this command with a commit that has the issue
+and a commit that you know has been good. To start the binary search in the
+[it-tools][it-tools-repo] repository that we acquired in
+[Part 1]({{ site.baseurl }}{% link _posts/2024-05-08-eat-git-part-1.md %}):
+
+```bash
+# commit with the tag v2024.5.10-33e5294 is bad
+# commit with the tag v2023.12.21-5ed3693 is good
+git bisect start v2024.5.10-33e5294 v2023.12.21-5ed3693
+# Bisecting: 12 revisions left to test after this (roughly 4 steps)
+# [a07806cd15fdbd24c88afaf618a2d0c16d66bb3f] refactor(home): lightened tool cards (#882)
+```
+
+You can tag a commit with an explanation, which is usually used to mark a
+release version. The command can be something like:
+
+```bash
+git tag -a v2.0 abc123 -m "Version 2.0 LTS"
+```
+
+If you run `git log --oneline --all`, you will see that the `git bisect` command
+has positioned *HEAD* at a commit in the middle of both tags. You can examine
+the code and determine whether the issue exists or not. If it is a good commit,
+continue with:
+
+```bash
+git bisect good
+# Bisecting: 6 revisions left to test after this (roughly 3 steps)
+# [221ddfa75c5731d7a5dc1f0b03663ba4fd9e7965] fix(language): English language cleanup (#1036)
+```
+
+And if it is a bad commit:
+
+```bash
+git bisect bad
+# Bisecting: 2 revisions left to test after this (roughly 2 steps)
+# [23f82d956a8af21e176f7268c9414244168bd4eb] fix(bcrypt tool): allow salt rounds up to 100 (#987)
+```
+
+You continue investigating commits until Git tells you that it has found the
+commit that introduced the issue. You can stop the search midway with
+`git bisect reset`.
+
+If you have automated tests and some of them started to fail after an unknown
+change, you can use `git bisect run my_script arguments` to automatically find
+the problematic commit. The `my_script` or any other executable file should exit
+with code 0 if the current source code is good and exit with a code between 1
+and 127 (inclusive), except 125, if the current source code is bad.
+
+### Blame
+
+The `git show` command is used to display detailed information about a specific
+commit, including the files it altered. Alternatively, you can use the
+`git blame` command to see which commit introduced each line of a file. If you
+find a bug and want to blame someone for it, you can use `git blame` to trace
+each line back to its corresponding commit. To see which commit introduced each
+line of code:
+
+```bash
+git blame employees.md
+# ^cd0bbc3 (Mohammad Rahimi 2024-05-20 09:00:20 +0800 1) Anderson Cooper
+# ^cd0bbc3 (Mohammad Rahimi 2024-05-20 09:00:20 +0800 2) Jake Tapper
+# ^cd0bbc3 (Mohammad Rahimi 2024-05-20 09:00:20 +0800 3) Chris Wallace
+# ^cd0bbc3 (Mohammad Rahimi 2024-05-20 09:00:20 +0800 4) Abby Phillip
+# 301703c3 (Mohammad Rahimi 2024-05-20 19:05:45 +0800 5) Audie Cornish
+# 301703c3 (Mohammad Rahimi 2024-05-20 19:05:45 +0800 6) Zain Asher
+# 08206a8e (Mohammad Rahimi 2024-05-21 07:05:39 +0800 7) Michael Smerconish
+```
+
+The `^` symbol next to a commit hash indicates that the line of code was created
+by the very first commit that introduced the file into the repository.
+
+### Reflog
+
+Whenever there is a change to *HEAD* or any other references in Git, the
+reference log is updated. For example, when you switch branches, a new entry is
+added to this log. This entry indicates the commit hash that *HEAD* now points
+to:
+
+```bash
+git checkout 301703c
+git reflog
+# 301703c (HEAD) HEAD@{0}: checkout: moving from refactor to 3017
+# 08206a8 (refactor, main, add-tests) HEAD@{1}: checkout: moving from add-tests to refactor
+```
+
+When attempting to untangle branches in your Git history, mistakes can lead to
+losing commits. Without the hash of the lost commit, recovering it becomes
+impossible. However, `git reflog` can help retrieve the lost hash. As long as
+you have the hash of the last commit on a branch, you can do anything, except
+running the garbage collector in Git. I won't cover the garbage collection
+command in this tutorial.
+
+To create a new branch from where *HEAD* used to be 3 modifications before:
+
+```bash
+git reflog -3
+git checkout -b recovered HEAD@{2}
+```
+
+As a side note, there are two other syntaxes involving *HEAD* in Git. One of
+them is `HEAD~`, which refers to the parent commit of *HEAD*, while `HEAD~2`
+refers to the grandparent commit of *HEAD*. The other syntax, `HEAD^`, is less
+commonly used and is primarily used to refer to the first parent of a merge
+commit. We will explore merging in more detail in Part 4.
+
+### Archive
+
+To create an archive from your Git repository at a specific commit:
+
+```bash
+git archive v2024.5.13-a0bc346 --output v2024.5.13-a0bc346.zip
+```
+
+In addition to commit hashes, you can use tags, branch names, or *HEAD* as
+references when creating an archive. Essentially, anything that points to a
+specific commit can be used.
+
+## Summary
+
+In this part, we explored some useful tools offered by Git that can come in
+handy in your daily use. We learned how to create patch files, cherry-pick
+commits, and clean up our history with interactive rebase. Additionally, we used
+stashes to temporarily store work that isn't ready to be committed yet, allowing
+us to start new tasks. We also introduced some other less common tools.
+
+In Part 4, we'll delve into what Git offers in a collaborative environment.
+We'll take on the roles of different team members and explore how they can work
+together to maintain a well-structured, functional codebase.
 
 
 [main-git-repo]: https://git.kernel.org/pub/scm/git/git.git/
 [main-linux-repo]: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/
+[it-tools-repo]: https://github.com/CorentinTh/it-tools
