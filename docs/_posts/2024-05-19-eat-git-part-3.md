@@ -211,7 +211,8 @@ error message and won't apply any of the patches.
 To solve this problem, you need to update your *main* branch. Switch back to
 your feature branch and either merge it with or rebase it onto the *main* branch
 . Resolve any conflicts that arise and generate the patch files again. Merging
-and rebasing will be explained in Part 4.
+and rebasing will be explained in
+[Part 4]({{ site.baseurl }}{% link _posts/2024-05-23-eat-git-part-4.md %}).
 
 Patch files can be very handy and come to your rescue in times of need. They
 also play a central role in contributing to major open-source projects. I
@@ -228,7 +229,8 @@ all these scenarios, cherry-picking can help.
 
 To avoid conflicts in our example project, let's explore the last mentioned use
 case. We'll create a commit but mistakenly place it on our *woke* branch.
-Conflicts and resolving them will be covered in Part 4.
+Conflicts and resolving them will be covered in
+[Part 4]({{ site.baseurl }}{% link _posts/2024-05-23-eat-git-part-4.md %}).
 
 ```bash
 git checkout woke
@@ -516,7 +518,8 @@ As a side note, there are two other syntaxes involving *HEAD* in Git. One of
 them is `HEAD~`, which refers to the parent commit of *HEAD*, while `HEAD~2`
 refers to the grandparent commit of *HEAD*. The other syntax, `HEAD^`, is less
 commonly used and is primarily used to refer to the first parent of a merge
-commit. We will explore merging in more detail in Part 4.
+commit. We will explore merging in more detail in
+[Part 4]({{ site.baseurl }}{% link _posts/2024-05-23-eat-git-part-4.md %}).
 
 ### Archive
 
@@ -538,9 +541,10 @@ commits, and clean up our history with interactive rebase. Additionally, we used
 stashes to temporarily store work that isn't ready to be committed yet, allowing
 us to start new tasks. We also introduced some other less common tools.
 
-In Part 4, we'll delve into what Git offers in a collaborative environment.
-We'll take on the roles of different team members and explore how they can work
-together to maintain a well-structured, functional codebase.
+In [Part 4]({{ site.baseurl }}{% link _posts/2024-05-23-eat-git-part-4.md %}),
+we'll delve into what Git offers in a collaborative environment. We'll take on
+the roles of different team members and explore how they can work together to
+maintain a well-structured, functional codebase.
 
 
 [main-git-repo]: https://git.kernel.org/pub/scm/git/git.git/

@@ -36,8 +36,9 @@ discussed material in each part:
 4. Team Workflows
     - Remotes
     - Branch Management
-    - Merging and Merge Conflicts
-    - Rebasing and Rebase Conflicts
+    - Merging
+    - Rebasing
+    - Conflicts
 5. Do and Don't
     - Commit on the main Branch
     - Merge in Rebase Workflow
@@ -58,9 +59,10 @@ In [Part 3]({{ site.baseurl }}{% link _posts/2024-05-19-eat-git-part-3.md %}), I
 will wrap up most of the things you need to know to use Git effectively as a
 solo developer.
 
-In Part 4, you will find essential information if you have been using Git and
-want to learn how to apply your knowledge in a collaborative environment. I will
-introduce three workflows that I have successfully used with my colleagues.
+In [Part 4]({{ site.baseurl }}{% link _posts/2024-05-23-eat-git-part-4.md %}),
+you will find essential information if you have been using Git and want to learn
+how to apply your knowledge in a collaborative environment. I will introduce
+three workflows that I have successfully used with my colleagues.
 
 In Part 5 I share my experience with you. In my previous two positions, I
 introduced my colleagues to Git, and then we started using it in our day-to-day
@@ -346,7 +348,8 @@ on your behalf. This individual is referred to as the *Committer*. Typically,
 the *Author* and *Committer* are the same person.
 4. **Time**: The timestamp of when the changes were authored and committed.
 5. **Parent**: The ID of the commit before the one we are creating. This becomes
-important when explaining Rebasing in Part 4.
+important when explaining Rebasing in
+[Part 4]({{ site.baseurl }}{% link _posts/2024-05-23-eat-git-part-4.md %}).
 6. **Message**: An explanation of why and how some changes were made. This
 message is crucial for understanding the purpose of the commit, and it can be
 read later by you and others instead of inspecting each file to figure out what
@@ -435,7 +438,8 @@ the commit hash is changed. This can have consequences. If you have already
 published your work and others have based their changes on your commits, you
 cannot go back and change the history. These hashes are an important part of the
 history. As a rule of thumb, never change what has been published. We'll learn
-about publishing our work in Part 4.
+about publishing our work in
+[Part 4]({{ site.baseurl }}{% link _posts/2024-05-23-eat-git-part-4.md %}).
 
 It happens quite often that I forget to set my name and email in a fresh
 repository. To change the author information for the last commit:
@@ -597,10 +601,10 @@ index 1785192..7659b36 100644
 You can transfer the work done in one branch to another branch or merge branches
 together. In
 [Part 3]({{ site.baseurl }}{% link _posts/2024-05-19-eat-git-part-3.md %}) and
-Part 4, we will explore how to share work from one branch to another branch
-within the same Git repository or in someone else's repository. For now, we have
-learned how to create branches, commit on them, switch between them, and compare
-them.
+[Part 4]({{ site.baseurl }}{% link _posts/2024-05-23-eat-git-part-4.md %}), we
+will explore how to share work from one branch to another branch within the same
+Git repository or in someone else's repository. For now, we have learned how to
+create branches, commit on them, switch between them, and compare them.
 
 ## History
 
