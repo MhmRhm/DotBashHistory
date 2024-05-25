@@ -389,7 +389,7 @@ hash. That's why you should not change anything in the *.git* directory.
 The command above opens a text editor. If you exit the editor without saving,
 the commit is canceled. If you have set up nano as your editor, use Ctrl+X, then
 Y, and press Enter to save the file. Get more help from the
-[nano cheat sheet][nano-cheat-sheet] or the [vim cheat sheet][vim-cheat-sheet].
+[Nano Cheatsheet][nano-cheat-sheet] or the [Vim Cheat Sheet][vim-cheat-sheet].
 
 Multi-line messages are preferred. In your editor, on the first line, type a
 short explanation. Add an empty line, and on the third line, you can explain as
