@@ -386,19 +386,10 @@ Git combines all the mentioned pieces and creates a hash. If even a single bit
 changes, the entire hash will change. Every object in Git has its own unique
 hash. That's why you should not change anything in the *.git* directory.
 
-The command above opens a text editor, which can be Vim or Nano. If you exit the
-editor without saving, the commit is canceled.
-
-To exit Nano without saving, press *Ctrl+x*, then the *N* key.
-
-To exit Vim without saving, press *Esc*, then type `:q!`, and confirm with the
-*Enter* or *return* key. Don't forget the `:` in `:q!`.
-
-To save and exit in Nano, press *Ctrl+x*, then *Y*, and confirm the file name
-with the *Enter* or *return* key.
-
-In Vim, press *Esc*, then type `:wq`, and confirm with the *Enter* or *return*
-key.
+The command above opens a text editor. If you exit the editor without saving,
+the commit is canceled. If you have set up nano as your editor, use Ctrl+X, then
+Y, and press Enter to save the file. Get more help from the
+[nano cheat sheet][nano-cheat-sheet] or the [vim cheat sheet][vim-cheat-sheet].
 
 Multi-line messages are preferred. In your editor, on the first line, type a
 short explanation. Add an empty line, and on the third line, you can explain as
@@ -759,3 +750,5 @@ understand what you can find inside a *.git* directory.
 [git-lens]: https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens
 [git-ignore-collection]: https://github.com/github/gitignore
 [git-reference]: https://git-scm.com/docs
+[nano-cheat-sheet]: https://www.cheatsheet.wtf/Nano/
+[vim-cheat-sheet]: https://vim.rtorr.com/
