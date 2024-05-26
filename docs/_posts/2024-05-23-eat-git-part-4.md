@@ -398,7 +398,7 @@ somehow connected to branches, whether it's pushing to the wrong branch or
 dealing with a tangled history.
 
 Having a solid grasp of branches and their relationships can be quite beneficial
-. You're already familiar with one branch management command. To list all local
+. You're already familiar with one branch management command. To list all
 branches in a repository, you can use:
 
 ```bash
@@ -408,6 +408,73 @@ git branch --all -vv
 This command provides comprehensive information about the repository and its
 remotes. It displays the currently checked-out branch, the last commit on each
 branch, tracking branches (upstreams), and lists the remote branches.
+
+You should always do your work on a feature branch, never on the *main* branch.
+Feature branches are typically created from the *main* branch. Here is the
+procedure I recommend:
+
+```bash
+# update main branch
+git checkou main
+git pull origin main
+
+# create feature branch from main
+git checkout -b feat main
+```
+
+If you create the feature branch from the remote *main* branch, i.e.,
+*origin/main*, Git will set up the remote branch as the upstream for your local
+feature branch. However, you might end up with the wrong remote as the tracking
+branch. To remove the upstream from a branch and set another, follow these
+steps:
+
+```sh
+git checkout feat
+
+# remove upstream
+git branch --unset-upstream
+
+# set a new upstream
+git branch --set-upstream-to=origin/feat
+```
+
+To delete a local branch:
+
+```bash
+git branch -D feat
+```
+
+To rename a local branch:
+
+```bash
+git branch --move old-name new-name
+```
+
+To delete a branch on remote:
+
+```bash
+git push origin --delete old-name
+```
+
+To rename a branch on remote:
+
+```bash
+# pull the old branch to your local repository with the new name
+git fetch origin
+git checkout -b new-name origin/old-name
+
+# remove old tracking branch from new local branch
+git branch --unset-upstream
+
+# push the new branch to the remote repository
+git push origin new-name
+
+# delete the old branch from remote repository
+git push origin --delete old-name
+git branch -D new-name
+```
+
+Being able to manage your branches is crucial to maintaining a clear history.
 
 ## Merging
 
