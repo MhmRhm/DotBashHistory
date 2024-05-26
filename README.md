@@ -788,7 +788,7 @@ to get the uncommitted changes or compare revisions.
 
 ```bash
 # see all branches and trackings
-git branch -vv
+git branch --all -vv
 
 # checkout remote into local and set tracking
 git checkout -b new_branch origin/main
@@ -802,7 +802,7 @@ git switch -c new_branch
 # set tracking
 git branch --set-upstream-to=origin/main
 ```
-to show branches and bring frome remote to local.
+to show branches and bring from remote to local.
 
 ```bash
 git log --oneline --left-right --merge --patch
