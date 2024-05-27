@@ -478,6 +478,299 @@ Being able to manage your branches is crucial to maintaining a clear history.
 
 ## Merging
 
+Merging and rebasing are quite simple procedures. What can make them difficult
+are the conflicts that we face while performing a merge or rebase. In this
+section, I will show you what merge commits are and discuss fast-forward merges.
+
+In the following examples, I will append the version-controlled files with the
+current time. This will help you follow where each change comes into the picture
+and how they form the final history. I used two files to avoid conflicts.
+
+Let's create a repository with one commit for each file in it:
+
+```bash
+mkdir repo
+cd repo
+
+git init
+git config --local user.name 'Mohammad Rahimi'
+git config --local user.email 'rahimi.mhmmd@outlook.com'
+
+msg=$(date +%T) && echo $msg >> file1 && git add file1 && git commit -m "$msg"
+sleep 3
+msg=$(date +%T) && echo $msg >> file2 && git add file2 && git commit -m "$msg"
+
+cat file1 file2
+# 20:12:37
+# 20:12:40
+
+git log
+# commit c8ccc48d8c46477dac269d27177ab27500e5023c (HEAD -> main)
+# Author: Mohammad Rahimi <rahimi.mhmmd@outlook.com>
+# Date:   Sun May 26 20:12:40 2024 +0800
+#
+#     20:12:40
+#
+# commit c3541992bf61294bf0283edd32378235ad188f30
+# Author: Mohammad Rahimi <rahimi.mhmmd@outlook.com>
+# Date:   Sun May 26 20:12:37 2024 +0800
+#
+#     20:12:37
+```
+
+Create two branches from this commit:
+
+```bash
+git checkout -b feat1 main
+git checkout -b feat2 main
+```
+
+Create two commits on *feat1* and then two commits on *feat2*. Wait a few
+seconds between each commit to ensure the file content and commit messages
+differ by a few seconds.
+
+```bash
+git checkout feat1
+msg=$(date +%T) && echo $msg >> file1 && git add file1 && git commit -m "$msg"
+sleep 3
+msg=$(date +%T) && echo $msg >> file1 && git add file1 && git commit -m "$msg"
+sleep 3
+
+git checkout feat2
+msg=$(date +%T) && echo $msg >> file2 && git add file2 && git commit -m "$msg"
+sleep 3
+msg=$(date +%T) && echo $msg >> file2 && git add file2 && git commit -m "$msg"
+
+git log --oneline --all --graph
+# * b09b046 (HEAD -> feat2) 20:14:07
+# * dc3a6d3 20:14:04
+# | * ef67eb8 (feat1) 20:14:01
+# | * 885a51c 20:13:58
+# |/  
+# * c8ccc48 (main) 20:12:40
+# * c354199 20:12:37
+```
+
+Now we can see the exact times when each of these four commits were made and the
+diff introduced in each commit. Whether you choose to use merge or rebase, your
+repository will initially look like above. A few feature branches waiting to be
+integrated into the *main* branch.
+
+Let's merge *feat1* into *main*:
+
+```bash
+git checkout main
+git merge feat1
+
+git log --oneline --all --graph
+# * b09b046 (feat2) 20:14:07
+# * dc3a6d3 20:14:04
+# | * ef67eb8 (HEAD -> main, feat1) 20:14:01
+# | * 885a51c 20:13:58
+# |/  
+# * c8ccc48 20:12:40
+# * c354199 20:12:37
+```
+
+This was a fast-forward merge because the merge operation simply moved the
+*main* pointer to the same commit as *feat1*. Now, *HEAD*, *main*, and *feat1*
+all point to the same commit.
+
+Merge the other branch into *main*:
+
+```bash
+git merge feat2
+```
+
+Accept the commit message as is. You are prompted to enter a commit message
+because Git had to create a merge commit, indicating that a fast-forward merge
+was not possible; in other words, we merged two diverged branches.
+
+```bash
+git log --oneline --all --graph
+# *   c1e2259 (HEAD -> main) Merge branch 'feat2'
+# |\  
+# | * b09b046 (feat2) 20:14:07
+# | * dc3a6d3 20:14:04
+# * | ef67eb8 (feat1) 20:14:01
+# * | 885a51c 20:13:58
+# |/  
+# * c8ccc48 20:12:40
+# * c354199 20:12:37
+```
+
+A merge commit is a commit with two parents and usually has no diff unless
+conflicts arise.
+
+```bash
+git log --patch -1
+# commit c1e225981e8ab85fb540ae76088761362db56c89 (HEAD -> main)
+# Merge: ef67eb8 b09b046
+# Author: Mohammad Rahimi <rahimi.mhmmd@outlook.com>
+# Date:   Sun May 26 20:16:34 2024 +0800
+#
+#     Merge branch 'feat2'
+
+git cat-file -p HEAD
+# tree 2f74f78d47dd07601049cad50cc9eb66bc9f518f
+# parent ef67eb8e83f5cc23c8e74bd51cf0467435b9a26f
+# parent b09b046ace1008eba63b7e1a937b1e7b5926ad31
+# author Mohammad Rahimi <rahimi.mhmmd@outlook.com> 1716725794 +0800
+# committer Mohammad Rahimi <rahimi.mhmmd@outlook.com> 1716725794 +0800
+#
+# Merge branch 'feat2'
+```
+
+In practice, developers never merge directly into the *main* branch to avoid
+difficulties that may arise when multiple people push changes to the same
+branch. Instead, in a real-world scenario, you would typically have a remote
+repository hosted on a Git server like [Gitea][gitea] or [GitHub][github]. You
+would work on feature branches and push these branches to the remote repository.
+Then, you would ask other team members to review your work. If they have valid
+comments, you would address them by making new changes to your local branch and
+pushing those changes to the remote repository again. Once everyone is on the
+same page and your changes are approved, the person responsible for the project
+would merge your changes into the *main* branch, or the server might merge them
+automatically after approval. The key is that only one entity can merge changes
+into the *main* branch. Git servers often provide options to protect a branch
+and refuse any pushes to that branch.
+
+Running `git log --oneline --graph --all`, the line containing the *885a51c*
+commit shows two vertical lines representing the *feat2* and *main* branches. In
+large projects like the Linux kernel, you may see many more branches, so many
+that they fill the entire screen width with these vertical lines. In such
+projects, to show only commits with actual work, you can use the following
+command:
+
+```bash
+git log --oneline --all --no-merges
+# b09b046 (feat2) 20:14:07
+# dc3a6d3 20:14:04
+# ef67eb8 (feat1) 20:14:01
+# 885a51c 20:13:58
+# c8ccc48 20:12:40
+# c354199 20:12:37
+```
+
+If your work on a feature branch will take a long time, other changes from your
+teammates may get integrated into the *main* branch in the meantime. Some of
+these changes might conflict with yours. To keep your feature branch up to date
+and resolve conflicts gradually, it’s better to regularly merge the *main*
+branch into your feature branch while working on it. We will discuss conflicts
+shortly.
+
 ## Rebasing
 
+In the previous section, both *feat1* and *feat2* started from the same commit,
+performed independent work, and then merged into *main*. Now, let's consider a
+different scenario. First *feat1* starts and is merged into *main* using a
+fast-forward merge. Then *feat2* starts from the updated *main* branch and, when
+merged, also uses a fast-forward merge. This way, we maintain a linear history.
+This is the goal that rebase aims to achieve.
+
+With rebase, you can start both feature branches simultaneously and work on them
+in parallel. However, when it comes to integrate your work into the *main*
+branch, before using the merge command, use rebase. Rebase takes the work
+you've done in your feature branch and replays it onto *main*, making it seem as
+though your feature branches always started from the latest commit on *main*.
+The merge will be always a fast-forward operation, resulting in a clean, linear
+history. Let's see how this works in practice.
+
+We will continue with our previous example. Create another branch and add some
+commits to it and the *main* branch:
+
+```bash
+git checkout -b feat3 main
+
+git checkout main
+msg=$(date +%T) && echo $msg >> file1 && git add file1 && git commit -m "$msg"
+sleep 3
+msg=$(date +%T) && echo $msg >> file1 && git add file1 && git commit -m "$msg"
+sleep 3
+
+git checkout feat3
+msg=$(date +%T) && echo $msg >> file2 && git add file2 && git commit -m "$msg"
+sleep 3
+msg=$(date +%T) && echo $msg >> file2 && git add file2 && git commit -m "$msg"
+
+git log --oneline --all --graph
+# * 643b769 (HEAD -> feat3) 07:21:00
+# * 555ce45 07:20:57
+# | * 4e0cc3f (main) 07:20:52
+# | * 3c31ef2 07:20:49
+# |/  
+# *   c1e2259 Merge branch 'feat2'
+```
+
+To rebase *feat3* onto *main*:
+
+```bash
+git checkout feat3
+git rebase main
+
+git log --oneline --all --graph
+# * d168509 (HEAD -> feat3) 07:21:00
+# * 619cfa8 07:20:57
+# * 4e0cc3f (main) 07:20:52
+# * 3c31ef2 07:20:49
+# *   c1e2259 Merge branch 'feat2'
+```
+
+Notice that all commit hashes on *feat3* have changed. This is because the
+parent for the first commit on *feat3* has changed. Also, notice how everything
+is now aligned on one line.
+
+In a merge workflow, you can use the rebase operation. However, in a rebase
+workflow, you should avoid using the merge operation to update your feature
+branches.
+
+If, while you are working on your feature branch, other work gets integrated
+into *main*, your branch will diverge from *main*, and you will need to repeat
+the rebase. Doing this will bring up any possible conflicts and ensure that,
+after the rebase, no conflicts remain in your code. We will discuss conflicts
+shortly.
+
+To integrate your work into the *main* branch:
+
+```bash
+git checkout main
+git merge --ff-only feat3
+
+git log --oneline --all --graph
+# * d168509 (HEAD -> main, feat3) 07:21:00
+# * 619cfa8 07:20:57
+# * 4e0cc3f 07:20:52
+# * 3c31ef2 07:20:49
+# *   c1e2259 Merge branch 'feat2'
+```
+
+Notice that this operation should only be performed by the entity responsible
+for the *main* branch.
+
+If you have pushed your feature branch to a remote server, you will need to
+force push the changes after each rebase since commit hashes are changed. In
+this workflow, other team members should not branch out from your feature
+branches because you are constantly changing history on your branch.
+
 ## Conflicts
+
+Finally, you've made it here! So far, I've avoided any conflicts in the examples
+because they deserve their own section. Here, we'll explore why conflicts occur
+and how they manifest themselves in both merge and rebase workflows.
+
+In this section I won't use any third-party tools for resolving conflicts
+because I want you to see them in their true form. That being said, there are
+some great tools available out there, and I always use them. Some of them
+include Vimdiff, Meld, and P4Merge.
+
+### Conflicts in Merge
+
+
+
+### Conflicts in Rebase
+
+
+
+
+[gitea]: https://about.gitea.com/
+[github]: https://github.com/
