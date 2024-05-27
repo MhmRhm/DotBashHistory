@@ -763,14 +763,154 @@ because I want you to see them in their true form. That being said, there are
 some great tools available out there, and I always use them. Some of them
 include Vimdiff, Meld, and P4Merge.
 
-### Conflicts in Merge
+A conflict arises when two branches don't agree on a piece of code. Let's create
+a conflict. In the following example, I will start from a clean repository.
 
+```bash
+cd repo1
 
+git checkout main
+msg=$(date +%T) && echo $msg >> t.md && git add t.md && git commit -m "$msg"
+sleep 3
+
+git checkout -b feat main
+msg=$(date +%T) && echo $msg >> t.md && git add t.md && git commit -m "$msg"
+sleep 3
+
+git checkout main
+msg=$(date +%T) && echo $msg >> t.md && git add t.md && git commit -m "$msg"
+sleep 3
+
+git checkout main
+git merge feat
+# Auto-merging t.md
+# CONFLICT (content): Merge conflict in t.md
+# Automatic merge failed; fix conflicts and then commit the result.
+```
+
+When a conflict happens, Git enters conflict mode. In this mode, you can edit
+files, stage them, continue to the next round of conflicts, or abort the
+operation altogether. Let's first take a look at our conflict.
+
+```bash
+cat t.md
+20:07:03
+# <<<<<<< HEAD
+# 20:07:09
+# =======
+# 20:07:06
+# >>>>>>> feat
+```
+
+Remember, we were on the *main* branch and were merging *feat* into *main*. In a
+conflict, you'll see two sections in the conflicting file. The first section is
+the *ours*, which is between `<<<<<<< HEAD` and `=======`. This represents the
+content from the branch you were on and merging into, which is *main* in our
+example. Different tools may refer to this section with names like *local*,
+*current*, *source*, *mine*, or *Left*.
+
+The second section is the *theirs*, found between `=======` and `>>>>>>> feat`.
+This represents the incoming changes from the branch being merged, in this case,
+*feat*. Other names for this section include *remote*, *incoming*, *target*, or
+*right*.
+
+Before we continue to resolving the conflict, let me introduce you to the third
+section you might see based on your configuration.
+
+```bash
+git merge --abort
+
+git config --local merge.conflictstyle diff3
+
+git merge feat
+
+cat t.md
+# 20:07:03
+# <<<<<<< HEAD
+# 20:07:09
+# ||||||| dec4cb3
+# =======
+# 20:07:06
+# >>>>>>> feat
+```
+
+Anything between `|||||||` and `=======` is called the *base*. This section
+shows the common ancestor of the conflicting branches, i.e., the state of the
+file at the commit from which both branches diverged. In our case, the base
+portion is empty.
+
+To resolve the conflict, I will edit the file as follows:
+
+```bash
+# 20:07:03
+# 20:07:06
+# 20:07:09
+```
+
+Then stage the file:
+
+```bash
+git add t.md
+```
+
+And continue with the merge which will ask for a commit message:
+
+```bash
+git merge --continue
+
+git log --oneline --all --graph 
+# *   546e0ac (HEAD -> main) Merge branch 'feat'
+# |\  
+# | * e9b16ef (feat) 20:07:06
+# * | 6574241 20:07:09
+# |/  
+# * dec4cb3 20:07:03
+```
+
+If you prefer not to edit files by hand and would rather use a more advanced
+tool, after encountering a conflict, you can use one of Git's built-in conflict
+resolution tools:
+
+```bash
+git merge feat
+# Auto-merging t.md
+# CONFLICT (content): Merge conflict in t.md
+# Automatic merge failed; fix conflicts and then commit the result.
+
+git mergetool
+# This message is displayed because 'merge.tool' is not configured.
+# See 'git mergetool --tool-help' or 'git help config' for more details.
+# 'git mergetool' will now attempt to use one of the following tools:
+# meld opendiff kdiff3 tkdiff xxdiff tortoisemerge gvimdiff diffuse diffmerge ecmerge p4merge araxis bc codecompare smerge emerge vimdiff nvimdiff
+# Merging:
+# t.md
+#
+# Normal merge conflict for 't.md':
+#   {local}: modified file
+#   {remote}: modified file
+# Hit return to start merge resolution tool (bc):
+```
+
+At this point, I've covered all the possible operations you can perform during
+a conflict.
 
 ### Conflicts in Rebase
 
+When performing a merge, you will encounter conflicts only once at the point of
+the merge. This is not the case with a rebase operation. During a rebase, Git
+replays each commit from your branch onto the target branch, meaning you may
+encounter conflicts at each commit that Git attempts to apply. This can
+complicate the process of conflict resolution since you have to resolve
+conflicts for each commit individually. However, in both cases, you will face
+the same conflicts: all at once during a merge, or commit by commit during a
+rebase.
 
+Let me show you what I mean. In the following example, I will start from a clean
+repository.
 
+```bash
+
+```
 
 [gitea]: https://about.gitea.com/
 [github]: https://github.com/
