@@ -801,7 +801,7 @@ operation altogether. Let's first take a look at our conflict.
 
 ```bash
 cat t.md
-20:07:03
+# 20:07:03
 # <<<<<<< HEAD
 # 20:07:09
 # =======
