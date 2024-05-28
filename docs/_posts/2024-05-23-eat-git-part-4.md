@@ -909,8 +909,157 @@ Let me show you what I mean. In the following example, I will start from a clean
 repository.
 
 ```bash
+cd repo2
 
+git init
+git config --local user.name 'Mohammad Rahimi'
+git config --local user.email 'rahimi.mhmmd@outlook.com'
+git config --local merge.conflictstyle diff3
+
+msg=$(date +%T) && echo $msg >> t.md && git add t.md && git commit -m "$msg"
+sleep 3
+
+git checkout -b feat main
+msg=$(date +%T) && echo $msg >> t.md && git add t.md && git commit -m "$msg"
+sleep 3
+git checkout main
+msg=$(date +%T) && echo $msg >> t.md && git add t.md && git commit -m "$msg"
+sleep 3
+
+git checkout feat
+msg=$(date +%T) && echo $msg >> t.md && git add t.md && git commit -m "$msg"
+sleep 3
+git checkout main
+msg=$(date +%T) && echo $msg >> t.md && git add t.md && git commit -m "$msg"
+
+git log --oneline --all --graph
+# * 7f39578 (HEAD -> main) 08:26:37
+# * 13daa1d 08:26:31
+# | * 1bea4e6 (feat) 08:26:34
+# | * cee92fe 08:26:28
+# |/  
+# * bfed5e1 08:26:25
 ```
+
+We have distributed our commits between two branches, and we want the final
+result after the rebase to reflect a chronological order of all commits.
+
+Let's start the rebase. We expect Git to take commit *cee92fe* (08:26:28) and
+place it after commit *7f39578* (08:26:37), and then do the same with commit
+*1bea4e6* (08:26:34).
+
+```bash
+git checkout feat
+git rebase main
+# Auto-merging t.md
+# CONFLICT (content): Merge conflict in t.md
+# error: could not apply cee92fe... 08:26:28
+# hint: Resolve all conflicts manually, mark them as resolved with
+# hint: "git add/rm <conflicted_files>", then run "git rebase --continue".
+# hint: You can instead skip this commit: run "git rebase --skip".
+# hint: To abort and get back to the state before "git rebase", run "git rebase --abort".
+# hint: Disable this message with "git config advice.mergeConflict false"
+# Could not apply cee92fe... 08:26:28
+```
+
+We encountered a conflict while rebasing commit *cee92fe* (08:26:28). Let's
+resolve it by editing the file from:
+
+```bash
+# 08:26:25
+# <<<<<<< HEAD
+# 08:26:31
+# 08:26:37
+# ||||||| parent of cee92fe (08:26:28)
+# =======
+# 08:26:28
+# >>>>>>> cee92fe (08:26:28)
+```
+
+to:
+
+```bash
+# 08:26:25
+# 08:26:28
+# 08:26:31
+# 08:26:37
+```
+
+Stage the file and continue the rebase:
+
+```bash
+git add t.md
+git rebase --continue
+```
+
+Accept the commit message and proceed to the next conflict. Edit the file from:
+
+```bash
+# 08:26:25
+# 08:26:28
+# <<<<<<< HEAD
+# 08:26:31
+# 08:26:37
+# ||||||| parent of 1bea4e6 (08:26:34)
+# =======
+# 08:26:34
+# >>>>>>> 1bea4e6 (08:26:34)
+```
+
+to:
+
+```bash
+# 08:26:25
+# 08:26:28
+# 08:26:31
+# 08:26:34
+# 08:26:37
+```
+
+Stage the file and continue. After accepting the commit message, your repository
+will look like the following:
+
+```bash
+git add t.md
+git rebase --continue
+
+git log --oneline --all --graph
+# * 0db41fa (HEAD -> feat) 08:26:34
+# * 730a3ec 08:26:28
+# * 7f39578 (main) 08:26:37
+# * 13daa1d 08:26:31
+# * bfed5e1 08:26:25
+```
+
+If you find yourself resolving the same conflicts repeatedly during each rebase,
+consider using [Rerere][rerere]. 
+
+Rerere stands for "reuse recorded resolution" and helps Git remember how you've
+resolved conflicts in the past. This feature can save you time and effort by
+automatically applying the same conflict resolutions when they occur again. To
+enable it, run:
+
+```bash
+git config --local rerere.enabled true
+```
+
+This way, Git will record your conflict resolutions and reuse them in future
+merges or rebases.
+
+## Summary
+
+Now you know everything you need to be proficient with Git. We explained remotes
+and showed how they essentially hold branches. We learned some commands that
+help us manage and keep track of our branches. We finally learned about merge
+and rebase, gaining a solid understanding of how conflicts arise and how to
+address them.
+
+In [Part 5]({{ site.baseurl }}{% link _posts/2024-05-28-eat-git-part-5.md %}), I
+will go through a few common mistakes that my colleagues and I have made while
+working with Git and show you how to recover from them if you find yourself in a
+similar situation.
+
 
 [gitea]: https://about.gitea.com/
 [github]: https://github.com/
+[rerere]: https://git-scm.com/docs/git-rerere
