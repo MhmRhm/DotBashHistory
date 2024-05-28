@@ -489,8 +489,9 @@ and how they form the final history. I used two files to avoid conflicts.
 Let's create a repository with one commit for each file in it:
 
 ```bash
-mkdir repo
-cd repo
+cd ..
+mkdir repo1
+cd repo1
 
 git init
 git config --local user.name 'Mohammad Rahimi'
@@ -767,7 +768,13 @@ A conflict arises when two branches don't agree on a piece of code. Let's create
 a conflict. In the following example, I will start from a clean repository.
 
 ```bash
-cd repo1
+cd ..
+mkdir repo2
+cd repo2
+
+git init
+git config --local user.name 'Mohammad Rahimi'
+git config --local user.email 'rahimi.mhmmd@outlook.com'
 
 git checkout main
 msg=$(date +%T) && echo $msg >> t.md && git add t.md && git commit -m "$msg"
@@ -909,7 +916,9 @@ Let me show you what I mean. In the following example, I will start from a clean
 repository.
 
 ```bash
-cd repo2
+cd ..
+mkdir repo3
+cd repo3
 
 git init
 git config --local user.name 'Mohammad Rahimi'
