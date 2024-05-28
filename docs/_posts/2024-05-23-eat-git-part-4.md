@@ -260,6 +260,12 @@ from our *main* branch, but here we used a remote branch instead of *main*.
 The `*` in `* channel-1 683cc74 [tv/msnbc] Add Joe, Mika and Willie` indicates
 the checked-out branch, and [tv/msnbc] indicates the upstream for this branch.
 
+When creating local branches from remote branches, Git automatically sets the
+remote branch as the tracking branch. If you don't pay attention to this, you
+may end up with many feature branches that all attempt to push to the same
+branch, usually *main*. This can cause confusion and potential conflicts in your
+workflow.
+
 Now let's go to our MSNBC repository and add another anchor:
 
 ```bash
@@ -721,9 +727,14 @@ Notice that all commit hashes on *feat3* have changed. This is because the
 parent for the first commit on *feat3* has changed. Also, notice how everything
 is now aligned on one line.
 
-In a merge workflow, you can use the rebase operation. However, in a rebase
-workflow, you should avoid using the merge operation to update your feature
-branches.
+In a merge workflow, using the rebase operation is perfectly acceptable. However
+, in a rebase workflow, you should avoid using the merge operation to update
+your feature branches. If you merge with the *main* branch and then rebase onto
+*main*, you'll create a situation where one commit on *main* is both a direct
+parent (because of the merge) and an ancestor (because of the rebase). I have
+seen strange behavior in pull requests and diffs when this happens. In
+[Part 5]({{ site.baseurl }}{% link _posts/2024-05-28-eat-git-part-5.md %}), we
+will learn how to recover from such situations.
 
 If, while you are working on your feature branch, other work gets integrated
 into *main*, your branch will diverge from *main*, and you will need to repeat

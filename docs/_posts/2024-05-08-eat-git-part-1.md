@@ -39,12 +39,9 @@ discussed material in each part:
     - Merging
     - Rebasing
     - Conflicts
-5. Do and Don't
-    - Commit on the main Branch
+5. Do and Undo
+    - Commit on Wrong Branch
     - Merge in Rebase Workflow
-    - Feature Branch That Tracks the main Branch
-    - Checkouts While There is Work in Index
-    - Commit Before Configuring User Name and Email
 
 In Part 1, we get to know Git and become comfortable using it. If you're
 curious and want to understand what everyone is talking about, this part should
@@ -64,10 +61,10 @@ you will find essential information if you have been using Git and want to learn
 how to apply your knowledge in a collaborative environment. I will introduce
 three workflows that I have successfully used with my colleagues.
 
-In Part 5 I share my experience with you. In my previous two positions, I
-introduced my colleagues to Git, and then we started using it in our day-to-day
-development. This part sums up the mistakes that me and my colleagues used to
-make and show how to fix things when something goes wrong.
+In [Part 5]({{ site.baseurl }}{% link _posts/2024-05-28-eat-git-part-5.md %}) I
+will share my experience with Git in my previous two positions, where I
+introduced my colleagues to Git and integrated it into our daily development
+workflow. This part will focus on how you can undo actions in Git.
 
 ### Why Another Git Tutorial?
 
@@ -472,7 +469,8 @@ git status
 git restore .
 ```
 
-You can undo a commit, and I'll cover that in Part 5.
+You can undo a commit, and I'll cover that in
+[Part 5]({{ site.baseurl }}{% link _posts/2024-05-28-eat-git-part-5.md %}).
 
 For now, let's make another change to the *employees.md*:
 

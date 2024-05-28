@@ -287,8 +287,9 @@ cat .git/HEAD
 ```
 
 The purpose of this section was to help you understand that branches are nothing
-but pointers to commits. This fact becomes important when, in Part 5, I explain
-how to fix common issues that arise when working with Git.
+but pointers to commits. This fact becomes important when, in
+[Part 5]({{ site.baseurl }}{% link _posts/2024-05-28-eat-git-part-5.md %}), I
+explain how to fix common issues that arise when working with Git.
 
 ## A Hand-made Commit
 
