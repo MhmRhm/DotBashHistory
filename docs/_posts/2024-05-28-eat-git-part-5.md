@@ -342,7 +342,7 @@ git reset --hard HEAD~
 3. Optionally apply the patch created from `git format-patch HEAD~`:
 
 ```bash
-git am 0001-*.patch
+git am *.patch
 ```
 
 4. Perform the rebase by running:
