@@ -1355,7 +1355,7 @@ services:
       timeout: 20s
       retries: 3
 
-  runner:
+  runner_gitea:
     image: gitea/act_runner:nightly
     container_name: runner_gitea
     environment:
