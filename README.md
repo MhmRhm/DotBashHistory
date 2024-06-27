@@ -1313,6 +1313,7 @@ services:
     volumes:
       - ./nginx/data:/data
       - ./nginx/letsencrypt:/etc/letsencrypt
+
   gitea:
     image: 'gitea/gitea:latest'
     container_name: gitea
