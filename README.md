@@ -1355,6 +1355,17 @@ services:
       timeout: 20s
       retries: 3
 
+  runner:
+    image: gitea/act_runner:nightly
+    container_name: runner_gitea
+    environment:
+      GITEA_INSTANCE_URL: "http://<server-ip>:3000"
+      GITEA_RUNNER_REGISTRATION_TOKEN: "<from-gitea>"
+      GITEA_RUNNER_NAME: "Local Runner"
+    volumes:
+      - ./gitea/runner:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+
   nextcloud:
     image: 'nextcloud:latest'
     container_name: nextcloud
@@ -1420,7 +1431,7 @@ services:
       - ./emulatorjs/config:/config
       - ./emulatorjs/data:/data
 ```
-to setup gitea, nexcloud and more behind a reverse proxy. [Use duckdns.org to add SSL Certificates.](https://notthebe.ee/blog/easy-ssl-in-homelab-dns01/)
+to setup gitea, nexcloud and more behind a reverse proxy. [Use duckdns.org to add SSL Certificates.](https://notthebe.ee/blog/easy-ssl-in-homelab-dns01/). Use `sudo docker compose up -d` for runner to work.
 
 ```bash
 # to run services
