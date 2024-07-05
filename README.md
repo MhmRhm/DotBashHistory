@@ -787,6 +787,12 @@ git rev-list HEAD # to get all parents hashes
 to get the uncommitted changes or compare revisions.
 
 ```bash
+git clone --depth 10 https://github.com/MhmRhm/DotBashHistory.git
+git pull --unshallow
+```
+to shallow clone a repository then unshallow it if needed.
+
+```bash
 # see all branches and trackings
 git branch --all -vv
 
@@ -963,7 +969,7 @@ to checkout a remote branch or push a local branch with different name from or t
 git checkout feat
 git rebase main
 git checkout main
-git merge feat
+git merge --ff-only feat
 ```
 to rebase instead of merge.
 
