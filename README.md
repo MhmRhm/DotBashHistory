@@ -1690,7 +1690,7 @@ cd build-qt-everywhere-src-6.6.1/
 
 sudo apt-get install build-essential cmake ninja-build libgl-dev libegl-dev libfontconfig1-dev libinput-dev libfontconfig1-dev libfreetype6-dev libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-cursor-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxcb-util-dev libxcb-xinerama0-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev libatspi2.0-dev libclang-dev
 
-../qt-everywhere-src-6.6.1/configure -skip qtwayland -skip qtwebengine | tee ../build-qt.log
+../qt-everywhere-src-6.6.1/configure -skip qtwayland -skip qtwebengine | tee ../build_$(TZ='Asia/Singapore' date +%Y-%m-%dT%H.%M.%S%Z).log
 cmake --build . --parallel $(nproc) | tee -a ../build-qt.log
 sudo cmake --install .
 ```
