@@ -1699,13 +1699,37 @@ to build Qt6 from source.
 ```bash
 git clone --recurse-submodules https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
 cd linux
-cp /boot/config-release .config # copy distribution config file to source tree
-make menuconfig # save then exit to apply default new features
-make -j$(nproc)
+make mrproper
+
+# for host
+# copy distribution config file to source tree
+cp /boot/config-release .config
+make olddefconfig
+make menuconfig
+
+make -j$(nproc) all | tee ../config_$(TZ='Asia/Singapore' date +%Y-%m-%dT%H.%M.%S%Z).log
 sudo make modules_install
 sudo make install
-uname --kernel-release # old kernel version
+
+# old kernel version
+uname --kernel-release
 sudo reboot
-uname --kernel-release # new kernel version
+# new kernel version
+uname --kernel-release
+
+# for an SoC
+KERNEL=kernel8
+# copy config file to source tree
+scp <user>@<address>:/boot/config* .config
+make ARCH=arm64 olddefconfig
+make ARCH=arm64 menuconfig
+
+make -j$(nproc) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- all | tee ../config_$(TZ='Asia/Singapore' date +%Y-%m-%dT%H.%M.%S%Z).log
+make -j$(nproc) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- deb-pkg
+cd ..
+scp *.deb <user>@<address>:/home/<user>
+
+# on SoC
+sudo dpkg -i *.deb
 ```
 to update kernel from source.
