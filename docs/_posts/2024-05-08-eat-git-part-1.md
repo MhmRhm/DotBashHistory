@@ -68,12 +68,12 @@ workflow. This part will focus on how you can undo actions in Git.
 
 ### Why Another Git Tutorial?
 
-I wanted to make a guide to Git that I wish I had when I first started learning.
-If you have time to read the [Pro Git][pro-git-book] Book, please do so—it's a
+I wanted to make a guide to Git that I wish had when first started learning. If
+you have time to read the [Pro Git][pro-git-book] Book, please do so—it's a
 great resource that inspired much of this tutorial. However, if you're looking
 to learn Git thoroughly in about a week, spending 1 to 2 hours daily, and want
-to be able to assist your colleagues, I hope this tutorial can help you achieve
-that goal.
+to be able to assist your colleagues, hopefully this tutorial can help you
+achieve that goal.
 
 For this tutorial, all you need is to install Git, which I'll explain shortly.
 Installing Git is straightforward. However, as a recommendation, I suggest using
