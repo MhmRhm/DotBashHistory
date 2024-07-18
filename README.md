@@ -18,9 +18,20 @@ The following contains some useful commands and configs as a day-to-day referenc
 
 # General
 ```bash
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
+# the script
+# ...
+```
+to use the unofficial [Bash Strict Mode](http://redsymbol.net/articles/unofficial-bash-strict-mode/).
+
+```bash
 man 5 passwd
 ```
 to search man pages for `passwd` in section 5.
+
 ```bash
 !! && !-2
 ```
@@ -30,6 +41,7 @@ to execute last and second-to-last commands.
 history -d -2
 ```
 to remove the last executed command.
+
 ```bash
 chsh
 ```
