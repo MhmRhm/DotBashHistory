@@ -1717,6 +1717,8 @@ make mrproper
 # copy distribution config file to source tree
 cp /boot/config-release .config
 make olddefconfig
+# to avoid error regarding CONFIG_SYSTEM_REVOCATION_KEYS="debian/canonical-revoked-certs.pem"
+scripts/config --disable SYSTEM_REVOCATION_KEYS
 make menuconfig
 
 make -j$(nproc) all | tee ../config_$(TZ='Asia/Singapore' date +%Y-%m-%dT%H.%M.%S%Z).log
