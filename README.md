@@ -1747,3 +1747,52 @@ scp *.deb <user>@<address>:/home/<user>
 sudo dpkg -i *.deb
 ```
 to update kernel from source.
+
+```bash
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
+scripts/config --enable CONFIG_DEBUG_KERNEL
+scripts/config --enable CONFIG_DEBUG_INFO
+
+scripts/config --enable CONFIG_DEBUG_MISC
+
+# Generic kernel debugging instruments
+scripts/config --enable CONFIG_MAGIC_SYSRQ
+scripts/config --enable CONFIG_DEBUG_FS
+scripts/config --enable CONFIG_KGDB
+scripts/config --enable CONFIG_UBSAN
+scripts/config --enable CONFIG_KCSAN
+
+# Memory debugging
+scripts/config --enable CONFIG_SLUB_DEBUG
+scripts/config --enable CONFIG_DEBUG_MEMORY_INIT
+scripts/config --enable CONFIG_KASAN
+
+scripts/config --enable CONFIG_DEBUG_SHIRQ
+
+scripts/config --enable CONFIG_SCHED_STACK_END_CHECK
+
+scripts/config --enable CONFIG_DEBUG_PREEMPT
+
+# Lock debugging
+scripts/config --enable CONFIG_PROVE_LOCKING
+scripts/config --enable CONFIG_LOCK_STAT
+scripts/config --enable CONFIG_DEBUG_ATOMIC_SLEEP
+
+scripts/config --enable CONFIG_BUG_ON_DATA_CORRUPTION
+
+scripts/config --enable CONFIG_STACKTRACE
+
+scripts/config --enable CONFIG_DEBUG_BUGVERBOSE
+
+scripts/config --enable CONFIG_FTRACE
+scripts/config --enable CONFIG_FUNCTION_TRACER
+scripts/config --enable CONFIG_FUNCTION_GRAPH_TRACER
+
+# Arch specific
+scripts/config --enable CONFIG_FRAME_POINTER
+scripts/config --enable CONFIG_STACK_VALIDATION
+```
+to add debug configs to kernel
