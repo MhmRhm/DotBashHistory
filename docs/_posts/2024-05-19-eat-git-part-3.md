@@ -514,6 +514,19 @@ git reflog -3
 git checkout -b recovered HEAD@{2}
 ```
 
+or to search for a lost branch:
+
+```bash
+git reflog | grep -E "<key-word>"
+```
+
+You can improve the `git reflog` output with the following:
+
+```bash
+git config --local alias.flog 'reflog --pretty=format:"%C(White)%gd %C(Yellow)%h %C(Cyan)%ch %C(Green)%an %C(magenta)%gs %C(White)%<(80,trunc)%s"'
+git flog
+```
+
 As a side note, there are two other syntaxes involving *HEAD* in Git. One of
 them is `HEAD~`, which refers to the parent commit of *HEAD*, while `HEAD~2`
 refers to the grandparent commit of *HEAD*. The other syntax, `HEAD^`, is less
