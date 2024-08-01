@@ -778,8 +778,8 @@ git log feat --not main # same as main..feat or feat ^main
 git log --left-right --oneline main...feat # on main and feat but not both
 git log --left-right --oneline HEAD...MERGE_HEAD # while in merge conflict
 git log --pretty=format:"%C(Red)%d %C(Yellow)%h %C(Cyan)%ch %C(Green)%an %C(White)%<(80,trunc)%s" --graph --all --since="one week ago"
-git reflog --pretty=format:"%C(White)%gd %C(Yellow)%h %C(Cyan)%ch %C(Green)%an %C(magenta)%gs %C(White)%<(80,trunc)%s"
 git log --grep 'text' --grep 'word' --all-match # commits mentioning 'text' and 'word'
+git reflog --pretty=format:"%C(White)%gd %C(Yellow)%h %C(Cyan)%ch %C(Green)%an %C(magenta)%gs %C(White)%<(80,trunc)%s"
 git shortlog -sne --all # to get a list of contributors on all branches
 ```
 to see commit history in different ways.
