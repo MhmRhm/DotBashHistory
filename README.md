@@ -1797,3 +1797,20 @@ scripts/config --enable CONFIG_FRAME_POINTER
 scripts/config --enable CONFIG_STACK_VALIDATION
 ```
 to add debug configs to kernel
+
+```bash
+# on host
+make -C <kernel-source-tree> M=$(pwd) ARCH=arm64 \
+  CROSS_COMPILE=aarch64-linux-gnu- modules
+make -C <kernel-source-tree> M=$(pwd) ARCH=arm64 \
+  CROSS_COMPILE=aarch64-linux-gnu- INSTALL_MOD_PATH=<temp-directory> modules_install
+tar zcvf - <temp-directory> | ssh <user-name>@<target-address> tar zxvf -
+
+# on target
+cd ~/<temp-directory>
+sudo cp -r lib /lib
+sudo echo <module-name> >> /etc/modules-load.d/modules.conf
+sudo depmod
+sudo reboot
+```
+to cross-compile linux modules and install them on remote target.
