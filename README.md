@@ -1808,9 +1808,10 @@ tar zcvf - <temp-directory> | ssh <user-name>@<target-address> tar zxvf -
 
 # on target
 cd ~/<temp-directory>
-sudo cp -r lib /lib
-sudo echo <module-name> >> /etc/modules-load.d/modules.conf
-sudo depmod
-sudo reboot
+sudo su
+cp -r lib /lib
+echo <module-name> >> /etc/modules-load.d/modules.conf
+depmod
+reboot
 ```
 to cross-compile linux modules and install them on remote target.
