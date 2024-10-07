@@ -15,6 +15,7 @@ The following contains some useful commands and configs as a day-to-day referenc
 - [Docker](#docker)
 - [CMake](#cmake)
 - [Development](#development)
+- [Debugging](#debugging)
 
 # General
 ```bash
@@ -1815,3 +1816,23 @@ depmod
 reboot
 ```
 to cross-compile linux modules and install them on remote target.
+
+# Debugging
+
+```bash
+# Start GDB with a program but without running it
+gdb <executable>
+
+# Attach GDB to an already running process
+sudo gdb -p <pid>
+
+# Start GDB without any program or process
+gdb
+# Then, load a program or attach to a running process manually:
+> file <executable>
+> attach <pid>
+
+> break main
+> run
+```
+to start gdb in different ways.
