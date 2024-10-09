@@ -1824,15 +1824,56 @@ to cross-compile linux modules and install them on remote target.
 gdb <executable>
 
 # Attach GDB to an already running process
+sudo gdb <executable> <pid>
 sudo gdb -p <pid>
+
+# Pass arguments to inferior
+gdb --args <executable> <args>
 
 # Start GDB without any program or process
 gdb
 # Then, load a program or attach to a running process manually:
-> file <executable>
-> attach <pid>
-
-> break main
-> run
+(gdb) file <executable>
+(gdb) attach <pid>
 ```
 to start gdb in different ways.
+
+```
+(gdb) show logging
+```
+to show the settings for saving the output of gdb commands to a file.
+
+```bash
+# Break on a line
+(gdb) break main.cpp:113
+# Break on all overloads of a function
+(gdb) break method
+# Break on next line
+(gdb) break
+# Break if
+(gdb) break main.cpp:113 if var == val
+# Print list of all breakpoints
+(gdb) info breakpoints
+# Ignore next n crossings of a breakpoint.
+(gdb) ignore <id> <n>
+# Remove all or some of breakpoints
+(gdb) delete <ids>
+# Enable or disable breakpoints
+(gdb) disable <id>
+(gdb) enable <id>
+ ```
+ to work with breakpoints.
+
+```bash
+# Break when a variable changes
+watch <var>
+# Break when data at address changes
+watch -location *<address>
+# Break when address is accessed
+awatch -location *<address>
+# Break when variable is read
+rwatch <var>
+# Print list of all watchpoints
+info watchpoints
+```
+to work with watchpoints.
