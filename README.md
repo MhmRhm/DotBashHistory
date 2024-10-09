@@ -1834,6 +1834,11 @@ gdb --args <executable> <args>
 gdb
 # Then, load a program or attach to a running process manually:
 (gdb) file <executable>
+# Execute the program
+(gdb) run
+# Execute the program and break on first line
+(gdb) start
+# Attach to a running instance
 (gdb) attach <pid>
 ```
 to start gdb in different ways.
@@ -1844,14 +1849,14 @@ to start gdb in different ways.
 to show the settings for saving the output of gdb commands to a file.
 
 ```bash
-# Break on a line
-(gdb) break main.cpp:113
+# Break on a location (line or file:line or function)
+(gdb) break <locspec>
 # Break on all overloads of a function
 (gdb) break method
 # Break on next line
 (gdb) break
 # Break if
-(gdb) break main.cpp:113 if var == val
+(gdb) break <locspec> if <expression>
 # Print list of all break, watch and catch points
 (gdb) info breakpoints
 # Ignore next n crossings of a breakpoint.
@@ -1916,3 +1921,38 @@ to execute commands after hitting a breakpoint.
 (gdb) source file
 ```
 to save breakpoints to a file and load from it.
+
+```bash
+# To continue to reach a different line with debug info
+(gdb) step <count>
+# To continue to the next line in current stack
+(gdb) next <count>
+# To continue to just after function in the stack returns
+(gdb) finish
+# To continue until after current line or the stack returns
+# If called at the end of a loop, continues until loop is finished
+(gdb) until
+# If called in recursive function, continues until function is over
+# <locspec> can be a line number or file:line or function name
+(gdb) until <locspec>
+# To cancel execution of a function call and return
+(gdb) return <return-value-expression>
+# To resume execution at <locspec>
+# Break once due to temporary breakpoint
+(gdb) tbreak <locspec>
+(gdb) jump <locspec>
+```
+to move the control around.
+
+```bash
+# To prevent stepping in function containing <locspec>
+(gdb) skip function <locspec>
+# To prevent stepping in all functions of a file
+(gdb) skip file <name>
+# To manage skips
+(gdb) info skip
+(gdb) skip enable <ids>
+(gdb) skip disable <ids>
+(gdb) skip delete <ids>
+```
+to disable stepping in functions.
