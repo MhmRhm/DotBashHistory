@@ -1852,7 +1852,7 @@ to show the settings for saving the output of gdb commands to a file.
 (gdb) break
 # Break if
 (gdb) break main.cpp:113 if var == val
-# Print list of all breakpoints
+# Print list of all break, watch and catch points
 (gdb) info breakpoints
 # Ignore next n crossings of a breakpoint.
 (gdb) ignore <id> <n>
@@ -1866,14 +1866,53 @@ to show the settings for saving the output of gdb commands to a file.
 
 ```bash
 # Break when a variable changes
-watch <var>
+(gdb) watch <var>
 # Break when data at address changes
-watch -location *<address>
+(gdb) watch -location *<address>
 # Break when address is accessed
-awatch -location *<address>
+(gdb) awatch -location *<address>
 # Break when variable is read
-rwatch <var>
+(gdb) rwatch <var>
 # Print list of all watchpoints
-info watchpoints
+(gdb) info watchpoints
 ```
 to work with watchpoints.
+
+```bash
+# To break on an exception
+(gdb) catch throw <exception>
+# To break on a rethrow
+(gdb) catch rethrow <exception>
+# To break on a catch block
+(gdb) catch catch <exception>
+# To break on a system call
+# List of system calls: /usr/include/asm-generic/unistd.h
+(gdb) catch syscal <system-call>
+```
+to work with catchpoints.
+
+```bash
+# Add a conditional breakpoint
+(gdb) break <function> if <expression>
+# Set a condition on a breakpoint
+(gdb) condition <id> <expression>
+# Remove the condition on a break point
+(gdb) condition <id>
+```
+to set and clear conditional breakpoints.
+
+```bash
+(gdb) commands <id>
+  silent
+  print <var>
+  enable <id>
+  continue
+end
+```
+to execute commands after hitting a breakpoint.
+
+```bash
+(gdb) save breakpoints file
+(gdb) source file
+```
+to save breakpoints to a file and load from it.
