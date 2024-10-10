@@ -1840,8 +1840,12 @@ gdb
 (gdb) start
 # Attach to a running instance
 (gdb) attach <pid>
+# To stop inferior debugging
+(gdb) kill
+(gdb) detach
+(gdb) quit
 ```
-to start gdb in different ways.
+to start gdb in different ways or stop it.
 
 ```
 (gdb) show logging
@@ -1857,6 +1861,8 @@ to show the settings for saving the output of gdb commands to a file.
 (gdb) break
 # Break if
 (gdb) break <locspec> if <expression>
+# To break only in one thread
+(gdb) break <locspec> thread <id>
 # Print list of all break, watch and catch points
 (gdb) info breakpoints
 # Ignore next n crossings of a breakpoint.
@@ -1935,6 +1941,15 @@ to save breakpoints to a file and load from it.
 # If called in recursive function, continues until function is over
 # <locspec> can be a line number or file:line or function name
 (gdb) until <locspec>
+# To immediately give a command prompt so you can issue other commands
+# (Non-Stop Mode)
+(gdb) run&
+(gdb) attach&
+(gdb) step&
+(gdb) next&
+(gdb) continue&
+(gdb) finish&
+(gdb) until&
 # To cancel execution of a function call and return
 (gdb) return <return-value-expression>
 # To resume execution at <locspec>
@@ -1956,3 +1971,33 @@ to move the control around.
 (gdb) skip delete <ids>
 ```
 to disable stepping in functions.
+
+```bash
+(gdb) set pagination off
+(gdb) set non-stop on
+# Set before running or attaching
+(gdb) run
+(gdb) attach <pid>
+# To continue all threads
+(gdb) continue -a
+# To stop all threads
+(gdb) interrupt -a
+# To list existing threads
+(gdb) info threads
+# To switch between threads
+(gdb) thread <id>
+```
+to set non-stop mode in debugging multi-threaded code, only the current thread
+will pause while others keep running, unless explicitly stopped.
+
+```bash
+# To list all checkpoints
+(gdb) info checkpoints
+# To create a checkpoint from current state
+(gdb) checkpoint
+# To restore a checkpoint
+(gdb) restart checkpoint-id
+# To delete checkpoints
+(gdb) delete checkpoint <ids>
+```
+to save and restore checkpoints.
