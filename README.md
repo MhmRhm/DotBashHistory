@@ -1950,6 +1950,11 @@ to save breakpoints to a file and load from it.
 (gdb) continue&
 (gdb) finish&
 (gdb) until&
+# To run backward
+(gdb) reverse-step
+(gdb) reverse-next
+(gdb) reverse-continue
+(gdb) reverse-finish # where current function was called
 # To cancel execution of a function call and return
 (gdb) return <return-value-expression>
 # To resume execution at <locspec>
