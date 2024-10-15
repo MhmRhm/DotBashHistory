@@ -80,7 +80,10 @@ There are three versions of `git reset`:
 commit but leaves the *Working Directory* and the *Index* unchanged.
 2. `git reset --mixed HEAD~`: Moves the current branch pointer to the parent
 commit and updates the *Index* to match the previous commit, but leaves the
-*Working Directory* unchanged.
+*Working Directory* unchanged. This version of `git reset` allows you to remove
+files that were accidentally included in a commit. Use this command to reset the
+last commit, then stage the files you actually want to include, and create a new
+commit.
 3. `git reset --hard HEAD~`: Moves the current branch pointer to the parent
 commit, updates the *Index* to match the previous commit, and updates the
 *Working Directory* to match the previous commit.
