@@ -16,6 +16,7 @@ The following contains some useful commands and configs as a day-to-day referenc
 - [CMake](#cmake)
 - [Development](#development)
 - [Debugging](#debugging)
+- [Kernel Internals](#kernel-internals)
 
 # General
 ```bash
@@ -2006,3 +2007,10 @@ will pause while others keep running, unless explicitly stopped.
 (gdb) delete checkpoint <ids>
 ```
 to save and restore checkpoints.
+
+# Kernel Internals
+
+```bash
+sudo cat /sys/kernel/debug/lru_gen
+```
+to see Multi-Generational LRU stats.
