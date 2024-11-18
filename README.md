@@ -2053,9 +2053,9 @@ sudo dmesg
 to prevent non-privileged users from viewing kernel messages. See [sysctl-explorer](https://sysctl-explorer.net).
 
 ```bash
-sudo bash -c 'echo "test_script: Hello '"$(whoami)"'!" > /dev/kmsg'
+sudo bash -c 'echo "<1>test_script: Hello '"$(whoami)"'!" > /dev/kmsg'
 ```
-to print messages into kernel logs from scripts.
+to print messages into kernel logs from scripts at KERN_ALERT level.
 
 ```bash
 sudo cat /sys/kernel/debug/lru_gen
