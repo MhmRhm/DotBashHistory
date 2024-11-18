@@ -2011,6 +2011,29 @@ to save and restore checkpoints.
 # Kernel Internals
 
 ```bash
+# to list files
+lsinitramfs /boot/initrd.img-6.11.3
+
+# to extract
+TMPDIR=$(mktemp -d)
+unmkinitramfs /boot/initrd.img-6.11.3 ${TMPDIR}
+tree ${TMPDIR}
+
+# to create
+find ${TMPDIR} | cpio -o -H newc | gzip > initrd.img-mod-6.11.3
+```
+to extract existing initramfs, modify, then create a new initramfs from it.
+
+```bash
+# uInitrd
+mkimage -A arm -O linux -T ramdisk -C none -a 0 -e 0 -n uInitrd -d /boot/initrd.img-$version /boot/uInitrd
+
+# boot.src
+mkimage -C none -A arm -T script -d /boot/boot.cmd /boot/boot.scr
+```
+on SoCs booting from U-Boot, to extract existing initramfs, modify, then create a new initramfs from it.
+
+```bash
 sudo cat /sys/kernel/debug/lru_gen
 ```
 to see Multi-Generational LRU stats.
