@@ -2034,6 +2034,30 @@ mkimage -C none -A arm -T script -d /boot/boot.cmd /boot/boot.scr
 on SoCs booting from U-Boot, to extract existing initramfs, modify, then create a new initramfs from it.
 
 ```bash
+modinfo <mod-name>
+systool -m <loaded-mod-name> -v
+```
+to show general information about a module.
+
+```bash
+lsmod
+sudo insmod <module>
+sudo rmmod <module>
+```
+to list all loaded modules, load a module and remove it.
+
+```bash
+sysctl -w kernel.dmesg_restrict=1
+sudo dmesg
+```
+to prevent non-privileged users from viewing kernel messages. See [sysctl-explorer](https://sysctl-explorer.net).
+
+```bash
+sudo bash -c 'echo "test_script: Hello '"$(whoami)"'!" > /dev/kmsg'
+```
+to print messages into kernel logs from scripts.
+
+```bash
 sudo cat /sys/kernel/debug/lru_gen
 ```
 to see Multi-Generational LRU stats.
