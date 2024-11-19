@@ -19,6 +19,7 @@ The following contains some useful commands and configs as a day-to-day referenc
 - [Kernel Internals](#kernel-internals)
 
 # General
+
 ```bash
 #!/bin/bash
 set -euo pipefail
@@ -328,6 +329,7 @@ if __name__ == "__main__":
 to run a task for notifying dynamic IP changes.
 
 # Cryptography
+
 ```bash
 gpg --gen-key
 gpg --list-keys
@@ -356,6 +358,7 @@ gpg --output file --decrypt file.gpg
 to verify and decrypt a signed content.
 
 # Journal
+
 ```bash
 journalctl -r SYSLOG_IDENTIFIER=sudo
 ```
@@ -397,6 +400,7 @@ dmesg --follow --human --level debug
 to see debug messages by drivers.
 
 # Disks and Partitions
+
 ```bash
 lsblk
 ```
@@ -499,6 +503,7 @@ lvresize -r -l +100%FREE myvg/mylv1
 to create, remove and resize logical volumes.
 
 # Kernel Bootup
+
 ```bash
 cat /proc/cmdline
 ```
@@ -546,6 +551,7 @@ boot
 to manually boot from the GRUB command line.
 
 # Systemd
+
 ```bash
 systemd-cgls
 ```
@@ -588,6 +594,7 @@ systemctl show <unit>
 to list all properties for a unit.
 
 # File Sharing
+
 ```bash
 python3 -m http.server 8127 -d /home/user/
 ```
@@ -637,6 +644,7 @@ fusermount -u mountpoint
 to mount another Linux directory on the network using ssh.
 
 # Networking
+
 ```bash
 ip route show
 ip route del default
@@ -750,6 +758,7 @@ done
 to scan an IP range for a port (AI generated.)
 
 # Version Controlling
+
 ```bash
 git config --list --show-origin
 git config --local user.email "account@mail.com" && git config --local user.name "Your Name"
@@ -1170,6 +1179,7 @@ GIT_TRACE_PACK_ACCESS=true GIT_TRACE_PACKET=true GIT_TRACE_SETUP=true git fetch 
 to work with git internals.
 
 # Docker
+
 ```bash
 nano Dockerfile
 #FROM alpine:latest
@@ -1612,6 +1622,7 @@ echo "|$(cat /run/secrets/my_secret1)|"
 to add secrets to swarm and use in services.
 
 # CMake
+
 ```bash
 cmake --help
 cmake -B ./build_dir -S ./source_dir
@@ -1658,6 +1669,7 @@ cmake -E make_directory dir
 to run some commands in a platform-independent way.
 
 # Development
+
 ```bash
 sudo apt-get update
 apt-cache policy cmake
@@ -2061,3 +2073,13 @@ to print messages into kernel logs from scripts at KERN_ALERT level.
 sudo cat /sys/kernel/debug/lru_gen
 ```
 to see Multi-Generational LRU stats.
+
+```bash
+sudo su
+# Enable the magic SysRq keys
+echo 1 > /proc/sys/kernel/sysrq
+# Kill the memory hungry process
+echo f > /proc/sysrq-trigger
+dmesg
+```
+triggering out-of-memory killer using [Linux Magic System Request](https://www.kernel.org/doc/html/latest/admin-guide/sysrq.html).
