@@ -2070,6 +2070,11 @@ sudo bash -c 'echo "<1>test_script: Hello '"$(whoami)"'!" > /dev/kmsg'
 to print messages into kernel logs from scripts at KERN_ALERT level.
 
 ```bash
+cat /proc/zoneinfo
+```
+to print memory zone watermarks. If number of free pages drop below the min value, kernel will deny page allocation request on that zone. 
+
+```bash
 sudo cat /sys/kernel/debug/lru_gen
 ```
 to see Multi-Generational LRU stats.
@@ -2083,3 +2088,9 @@ echo f > /proc/sysrq-trigger
 dmesg
 ```
 triggering out-of-memory killer using [Linux Magic System Request](https://www.kernel.org/doc/html/latest/admin-guide/sysrq.html).
+
+```bash
+man choom
+choom -p $(pidof init)
+```
+to show OOM killer score and adjustment value.
