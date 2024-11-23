@@ -2020,6 +2020,16 @@ will pause while others keep running, unless explicitly stopped.
 ```
 to save and restore checkpoints.
 
+```bash
+# To list all stack frames with local variables
+(gdb) backtrace -full
+# To list innermost count frames
+(gdb) backtrace +<count>
+# To list outermost count frames
+(gdb) backtrace -<count>
+```
+to print stack frames.
+
 # Kernel Internals
 
 ```bash
