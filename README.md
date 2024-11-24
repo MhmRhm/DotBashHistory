@@ -2022,11 +2022,15 @@ to save and restore checkpoints.
 
 ```bash
 # To list all stack frames with local variables
-(gdb) backtrace -full
+(gdb) backtrace -full -frame-arguments all
 # To list innermost count frames
 (gdb) backtrace +<count>
 # To list outermost count frames
 (gdb) backtrace -<count>
+# To list frames beyond main
+(gdb) backtrace -past-main -past-entry
+# To list all frames for all threads
+(gdb) thread apply all backtrace
 ```
 to print stack frames.
 
