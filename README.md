@@ -2034,6 +2034,29 @@ to save and restore checkpoints.
 ```
 to print stack frames.
 
+```bash
+# To move between frames
+(gdb) frame level <num>
+(gdb) frame function <name>
+(gdb) up
+(gdb) down
+# To show information on a frame
+(gdb) frame
+(gdb) info frame
+(gdb) info args # <name> or -t <type-name>
+(gdb) info locals # <name> or -t <type-name>
+# To list all variables of a certain type in the program
+(gdb) thread apply all -s frame apply all -s info locals -q -t <variable-type>
+```
+to sellect a frame and show information about it.
+
+```bash
+print <var-name>
+whatis <var-name>
+print <expression>
+```
+to print an expression or a variable value or type.
+
 # Kernel Internals
 
 ```bash
