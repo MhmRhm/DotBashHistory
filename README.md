@@ -2051,6 +2051,30 @@ to print stack frames.
 to sellect a frame and show information about it.
 
 ```bash
+# To show a function
+list <function>
+# To show only fully qualified functions
+list -qualified <namespace::function>
+# To show a function in a file
+list <file>:<function>
+# To show a line in a file
+list <file>:<line>
+# To show current source location
+(gdb) list .
+# To show lines after current source location
+(gdb) list +
+# To show lines before current source location
+(gdb) list -
+# To show lines between two source locations
+(gdb) list <from>,<to>
+# To show more surrounding lines
+(gdb) list -20,+50
+# To reset source location
+(gdb) frame
+```
+to show source locations.
+
+```bash
 print <var-name>
 whatis <var-name>
 print <expression>
