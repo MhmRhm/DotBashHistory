@@ -2094,6 +2094,26 @@ list -source <file> -line 0
 to search or edit a source location.
 
 ```bash
+# To show the source path
+(gdb) show directories
+# To show substitution rules
+(gdb) show substitute-path
+
+# To reset source path to default
+(gdb) directory
+# To reset substitution rules
+(gdb) unset substitute-path
+# To remove a substitution rule
+(gdb) unset substitute-path </from/dir>
+
+# To add directory to source path
+(gdb) directory <dir1> <dir2> ...
+# To add substitution rule
+(gdb) set substitute-path </from/dir> </to/dir>
+```
+to manipulate source directories that GDB looks inside.
+
+```bash
 print <expression>
 print <var-name>
 whatis <var-name>
