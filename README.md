@@ -1843,6 +1843,9 @@ sudo gdb -p <pid>
 # Pass arguments to inferior
 gdb --args <executable> <args>
 
+# Start GDB with editor set
+EDITOR=/usr/bin/nano gdb
+
 # Start GDB without any program or process
 gdb
 # Then, load a program or attach to a running process manually:
@@ -2059,6 +2062,7 @@ list -qualified <namespace::function>
 list <file>:<function>
 # To show a line in a file
 list <file>:<line>
+
 # To show current source location
 (gdb) list .
 # To show lines after current source location
@@ -2069,15 +2073,30 @@ list <file>:<line>
 (gdb) list <from>,<to>
 # To show more surrounding lines
 (gdb) list -20,+50
+
 # To reset source location
 (gdb) frame
 ```
 to show source locations.
 
 ```bash
+list -source <file> -line 0
+(gdb) forward-search <expression>
+# or search <expression>
+(gdb) reverse-search <expression>
+
+(gdb) edit <line>
+(gdb) edit <function>
+
+# To show file name in vim
+:echo expand('%:p')
+```
+to search or edit a source location.
+
+```bash
+print <expression>
 print <var-name>
 whatis <var-name>
-print <expression>
 ```
 to print an expression or a variable value or type.
 
