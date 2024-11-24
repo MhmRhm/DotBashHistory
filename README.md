@@ -2114,9 +2114,17 @@ to search or edit a source location.
 to manipulate source directories that GDB looks inside.
 
 ```bash
-print <expression>
-print <var-name>
-whatis <var-name>
+# For a function in a file
+(gdb) disassemble /sb '<file>'::<namespace::class::method>
+# For current instruction at program counter
+(gdb) disassemble /sb $pc-64,+64
+```
+to show assembly code.
+
+```bash
+(gdb) print <expression>
+(gdb) print <var-name>
+(gdb) whatis <var-name>
 ```
 to print an expression or a variable value or type.
 
