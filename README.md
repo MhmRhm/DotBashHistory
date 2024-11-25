@@ -2122,6 +2122,12 @@ to manipulate source directories that GDB looks inside.
 to show assembly code.
 
 ```bash
+(gdb) explore value <expression>
+(gdb) explore type <expression>
+```
+to interactively explore an expression or its type.
+
+```bash
 (gdb) print <expression>
 (gdb) print <var-name>
 (gdb) whatis <var-name>
