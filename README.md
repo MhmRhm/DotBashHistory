@@ -1833,6 +1833,12 @@ to cross-compile linux modules and install them on remote target.
 # Debugging
 
 ```bash
+# To ask when some expression is ambiguous
+set multiple-symbols ask
+```
+to customize GDB.
+
+```bash
 # Start GDB with a program but without running it
 gdb <executable>
 
@@ -2133,6 +2139,13 @@ to interactively explore an expression or its type.
 (gdb) whatis <var-name>
 ```
 to print an expression or a variable value or type.
+
+```bash
+# To print data at <address> as if it where of type <type>
+(gdb) print {<type>} <address>
+(gdb) print {double} 0xffab
+```
+to use GDB operators in expressions.
 
 # Kernel Internals
 
