@@ -1834,9 +1834,9 @@ to cross-compile linux modules and install them on remote target.
 
 ```bash
 # To ask when some expression is ambiguous
-set multiple-symbols ask
+(gdb) set multiple-symbols ask
 # To print arguments at function entry
-set print entry-values on
+(gdb) set print entry-values on
 ```
 to customize GDB.
 
