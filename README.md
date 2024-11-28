@@ -2146,8 +2146,42 @@ to print an expression or a variable value or type.
 # To print data at <address> as if it where of type <type>
 (gdb) print {<type>} <address>
 (gdb) print {double} 0xffab
+
+# Artificial Array
+# To print data at *&<first_element> as an array of decltype(<first_element>)
+(gdb) print <first_element>@<length>
+(gdb) set $ptr = &my_vector[0]
+(gdb) print *$ptr@3
+# $1 = {3, 2, 1}
+(gdb) print /x *(unsigned char*)$ptr@(8*3)
+# $2 = {0x3, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}
 ```
 to use GDB operators in expressions.
+
+```bash
+set $i = 0
+print *(array[$i++])
+# Hit enter/return key again
+```
+to print pointed-to elements of an array of pointers.
+
+```bash
+(gdb) print /c 10
+# $1 = 10 '\n'
+(gdb) print /t 10
+# $2 = 1010
+(gdb) print /x 10
+# $3 = 0xa
+(gdb) print /z 10
+# $4 = 0x0000000a
+(gdb) print /r 10 # to bypass pretty-printers
+# $5 = 0x0000000a
+(gdb) print /d 0xfffffff6
+# $6 = -10
+(gdb) print /u 0xfffffff6
+# $7 = 4294967286
+```
+to format the print output.
 
 # Kernel Internals
 
