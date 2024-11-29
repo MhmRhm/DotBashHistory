@@ -2214,6 +2214,13 @@ to examine an address.
 ```
 to automatically display expressions when program stops.
 
+```bash
+(gdb) compare-sections
+# Use -r for just read-only sections
+(gdb) compare-sections -r
+```
+to compare the sections of an executable file with the same sections in the target machine’s memory.
+
 # Kernel Internals
 
 ```bash
