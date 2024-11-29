@@ -2183,6 +2183,21 @@ to print pointed-to elements of an array of pointers.
 ```
 to format the print output.
 
+```bash
+(gdb) explore object
+(gdb) print sizeof(object)
+# $9 = 40
+(gdb) x /40bx &object # b for bytes
+(gdb) x /20hx &object # h for half words  (4 bytes)
+(gdb) x /10wx &object # w for words       (4 bytes)
+(gdb) x /5gx &object  # g for giant words (8 bytes)
+(gdb) x /40bt &object # t for base two
+
+(gdb) print $_   # print the address last examined
+(gdb) print $__  # print the content last examined
+```
+to examine an address.
+
 # Kernel Internals
 
 ```bash
