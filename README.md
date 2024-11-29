@@ -2192,11 +2192,27 @@ to format the print output.
 (gdb) x /10wx &object # w for words       (4 bytes)
 (gdb) x /5gx &object  # g for giant words (8 bytes)
 (gdb) x /40bt &object # t for base two
-
 (gdb) print $_   # print the address last examined
 (gdb) print $__  # print the content last examined
 ```
 to examine an address.
+
+```bash
+# To add to displays
+(gdb) display object
+(gdb) display /t object.member
+(gdb) display /10wx &object
+# To show all displays again
+(gdb) display
+# To list all displays
+(gdb) info display
+# To delete all displays
+(gdb) delete display
+# To disable/enable a display
+(gdb) disable display <id>
+(gdb) enable display <id>
+```
+to automatically display expressions when program stops.
 
 # Kernel Internals
 
