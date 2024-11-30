@@ -1841,12 +1841,16 @@ to cross-compile linux modules and install them on remote target.
 (gdb) set print array-indexes on
 # To limit printing array elements
 (gdb) set print elements <num>
+# To omit repeated array elements
+(gdb) set print repeats <num>
 # To split bytes on nibbles
 (gdb) set print nibbles on
 # To whether show frame arguments
 (gdb) set print frame-arguments <all|scalars|presence|none>
 # To print arguments at function entry
-(gdb) set print entry-values on
+(gdb) set print entry-values <no|default|both|...>
+# To control what `frame` shows
+(gdb) set print frame-info <auto|location-and-address|...>
 ```
 to customize GDB.
 
@@ -2237,7 +2241,9 @@ to automatically display expressions when program stops.
 # To also print array indexes
 (gdb) print -array-indexes -- <array>
 # To limit number of elements shown
-(gdb) print -elements 1 -- <array>
+(gdb) print -elements <num> -- <array>
+# To limit repeated array elements
+(gdb) print -repeats <num> -- <array>
 # To split bytes in 4-bit groups
 (gdb) print -nibbles on -- /t <value>
 ```
