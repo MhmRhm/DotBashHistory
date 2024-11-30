@@ -1835,6 +1835,16 @@ to cross-compile linux modules and install them on remote target.
 ```bash
 # To ask when some expression is ambiguous
 (gdb) set multiple-symbols ask
+# To pretty print arrays
+(gdb) set print array on
+# To print array indexes
+(gdb) set print array-indexes on
+# To limit printing array elements
+(gdb) set print elements <num>
+# To split bytes on nibbles
+(gdb) set print nibbles on
+# To whether show frame arguments
+(gdb) set print frame-arguments <all|scalars|presence|none>
 # To print arguments at function entry
 (gdb) set print entry-values on
 ```
@@ -2159,8 +2169,8 @@ to print an expression or a variable value or type.
 to use GDB operators in expressions.
 
 ```bash
-set $i = 0
-print *(array[$i++])
+(gdb) set $i = 0
+(gdb) print *(array[$i++])
 # Hit enter/return key again
 ```
 to print pointed-to elements of an array of pointers.
@@ -2198,6 +2208,13 @@ to format the print output.
 to examine an address.
 
 ```bash
+(gdb) compare-sections
+# Use -r for just read-only sections
+(gdb) compare-sections -r
+```
+to compare the sections of an executable file with the same sections in the target machine’s memory.
+
+```bash
 # To add to displays
 (gdb) display object
 (gdb) display /t object.member
@@ -2215,11 +2232,16 @@ to examine an address.
 to automatically display expressions when program stops.
 
 ```bash
-(gdb) compare-sections
-# Use -r for just read-only sections
-(gdb) compare-sections -r
+# To pretty print arrays
+(gdb) print -array -- <array>
+# To also print array indexes
+(gdb) print -array-indexes -- <array>
+# To limit number of elements shown
+(gdb) print -elements 1 -- <array>
+# To split bytes in 4-bit groups
+(gdb) print -nibbles on -- /t <value>
 ```
-to compare the sections of an executable file with the same sections in the target machine’s memory.
+to alter print settings for current command.
 
 # Kernel Internals
 
