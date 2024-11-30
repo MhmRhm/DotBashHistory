@@ -1843,6 +1843,18 @@ to cross-compile linux modules and install them on remote target.
 (gdb) set print elements <num>
 # To omit repeated array elements
 (gdb) set print repeats <num>
+# To omit deeply nested members
+(gdb) set print max-depth <num>
+# To stop printing strings after null
+(gdb) set print null-stop <on|off>
+# To print with indentation
+(gdb) set print pretty <on|off>
+# To print unions
+(gdb) set print union <on|off>
+# To show the actual drived type
+(gdb) set print object <on|off>
+# To show v-tables
+(gdb) set print vtbl <on|off>
 # To split bytes on nibbles
 (gdb) set print nibbles on
 # To whether show frame arguments
@@ -2244,6 +2256,18 @@ to automatically display expressions when program stops.
 (gdb) print -elements <num> -- <array>
 # To limit repeated array elements
 (gdb) print -repeats <num> -- <array>
+# To limit nested members
+(gdb) print -max-depth <num> -- <variable>
+# To stop printing strings after null
+(gdb) print -null-stop <on|off> -- <text>
+# To print with indentation
+(gdb) print -pretty <on|off> -- <text>
+# To print unions
+(gdb) print -union <on|off> -- <var>
+# To show the actual drived type
+(gdb) print -object <on|off> -- <obj>
+# To show v-tables
+(gdb) print -vtbl <on|off> -- <obj>
 # To split bytes in 4-bit groups
 (gdb) print -nibbles on -- /t <value>
 ```
