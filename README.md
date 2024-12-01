@@ -2273,6 +2273,50 @@ to automatically display expressions when program stops.
 ```
 to alter print settings for current command.
 
+```bash
+(gdb) print -pretty -object -vtbl -- /x *obj
+# $1 = (Derived) {
+#   <Base2> = {
+#     <Base1> = {
+#       _vptr.Base1 = 0xaaaaaaabfcc0 <vtable for Derived+16>
+#     }, <No data fields>}, <No data fields>}
+(gdb) set $vtbl = 0xaaaaaaabfcc0 - 16
+(gdb) set $i = 0
+(gdb) while($i < 24)
+(gdb) print ((void **)$vtbl)[$i++]
+(gdb) end
+# $2 = (void *) 0x0
+# $3 = (void *) 0xaaaaaaabfd28 <typeinfo for Derived>
+# $4 = (void *) 0xaaaaaaaa0d2c <Derived::sayHello() const>
+# $5 = (void *) 0xaaaaaaaa0e8c <Derived::~Derived()>
+# ...
+(gdb) print -object -pretty -- *(std::type_info*)($3)
+# $26 = (__cxxabiv1::__si_class_type_info) {
+#   <__cxxabiv1::__class_type_info> = {
+#     <std::type_info> = {
+#       _vptr.type_info = 0xfffff7e77958 <vtable for __cxxabiv1::__si_class_type_info+16>,
+#       __name = 0xaaaaaaaa0f48 <typeinfo name for Derived> "7Derived"
+#     }, <No data fields>}, 
+#   members of __cxxabiv1::__si_class_type_info:
+#   __base_type = 0xaaaaaaabfd40 <typeinfo for Base2>
+# }
+(gdb) x /22wi 0xaaaaaaaa0e8c
+# ...
+#    0xaaaaaaaa0ebc <_ZN7DerivedD0Ev>:    stp     x29, x30, [sp, #-32]!
+#    0xaaaaaaaa0ec0 <_ZN7DerivedD0Ev+4>:  mov     x29, sp
+#    0xaaaaaaaa0ec4 <_ZN7DerivedD0Ev+8>:  str     x0, [sp, #24]
+#    0xaaaaaaaa0ec8 <_ZN7DerivedD0Ev+12>: ldr     x0, [sp, #24]
+#    0xaaaaaaaa0ecc <_ZN7DerivedD0Ev+16>: bl      0xaaaaaaaa0e8c <_ZN7DerivedD2Ev>
+#    0xaaaaaaaa0ed0 <_ZN7DerivedD0Ev+20>: mov     x1, #0x8                        // #8
+#    0xaaaaaaaa0ed4 <_ZN7DerivedD0Ev+24>: ldr     x0, [sp, #24]
+#    0xaaaaaaaa0ed8 <_ZN7DerivedD0Ev+28>: bl      0xaaaaaaaa0af0 <_ZdlPvm@plt>
+#    0xaaaaaaaa0edc <_ZN7DerivedD0Ev+32>: ldp     x29, x30, [sp], #32
+#    0xaaaaaaaa0ee0 <_ZN7DerivedD0Ev+36>: ret
+(gdb) info symbol '_ZdlPvm@plt'
+# operator delete(void*, unsigned long)@plt in section .plt of /home/user/main
+```
+to print v-table of an object.
+
 # Kernel Internals
 
 ```bash
