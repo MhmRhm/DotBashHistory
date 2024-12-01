@@ -2218,6 +2218,7 @@ to format the print output.
 (gdb) x /10wx &object # w for words       (4 bytes)
 (gdb) x /5gx &object  # g for giant words (8 bytes)
 (gdb) x /40bt &object # t for base two
+(gdb) x /32wi &object->method # i for instructions
 (gdb) print $_   # print the address last examined
 (gdb) print $__  # print the content last examined
 ```
