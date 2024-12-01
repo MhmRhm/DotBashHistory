@@ -2283,8 +2283,8 @@ to alter print settings for current command.
 (gdb) set $vtbl = 0xaaaaaaabfcc0 - 16
 (gdb) set $i = 0
 (gdb) while($i < 24)
-(gdb) print ((void **)$vtbl)[$i++]
-(gdb) end
+# print ((void **)$vtbl)[$i++]
+# end
 # $2 = (void *) 0x0
 # $3 = (void *) 0xaaaaaaabfd28 <typeinfo for Derived>
 # $4 = (void *) 0xaaaaaaaa0d2c <Derived::sayHello() const>
