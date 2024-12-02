@@ -2225,6 +2225,28 @@ to format the print output.
 to examine an address.
 
 ```bash
+# To show last ten values
+(gdb) show values
+# To show surrounding of <num>
+(gdb) show values <num>
+```
+to show variables history.
+
+```bash
+(gdb) show convenience
+(gdb) print $_inferior
+(gdb) print $_thread
+(gdb) print $_gthread
+(gdb) print $_exitcode
+(gdb) print $_exitsignal
+(gdb) print $_shell_exitcode
+(gdb) print $_shell_exitsignal
+(gdb) print $_gdb_major
+(gdb) print $_gdb_minor
+```
+to work with convenience variables.
+
+```bash
 (gdb) compare-sections
 # Use -r for just read-only sections
 (gdb) compare-sections -r
