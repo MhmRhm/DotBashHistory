@@ -2233,6 +2233,8 @@ to examine an address.
 to show variables history.
 
 ```bash
+(gdb) help function
+(gdb) break <function> if $_any_caller_matches("<pattern>", <depth>)
 (gdb) show convenience
 (gdb) print $_inferior
 (gdb) print $_thread
@@ -2244,7 +2246,7 @@ to show variables history.
 (gdb) print $_gdb_major
 (gdb) print $_gdb_minor
 ```
-to work with convenience variables.
+to work with convenience functions and variables.
 
 ```bash
 (gdb) compare-sections
