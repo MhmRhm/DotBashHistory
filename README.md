@@ -2233,8 +2233,15 @@ to examine an address.
 to show variables history.
 
 ```bash
+(gdb) info registers
+(gdb) p/x $pc # for program counter
+(gdb) x/i $pc # for next instruction
+(gdb) p/x $sp # for top of the stack
+(gdb) p/x $fp # for current stack
+
 (gdb) help function
 (gdb) break <function> if $_any_caller_matches("<pattern>", <depth>)
+
 (gdb) show convenience
 (gdb) print $_inferior
 (gdb) print $_thread
@@ -2246,7 +2253,7 @@ to show variables history.
 (gdb) print $_gdb_major
 (gdb) print $_gdb_minor
 ```
-to work with convenience functions and variables.
+to work with registers, convenience functions and variables.
 
 ```bash
 (gdb) compare-sections
