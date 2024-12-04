@@ -2256,6 +2256,23 @@ to show variables history.
 to work with registers, convenience functions and variables.
 
 ```bash
+# To create the dump
+(gdb) dump binary value dmp.bin object
+(gdb) dump binary memory dmp.bin 0xaaaaaabb72e0 0xaaaaaabb7300
+# To restore the dump
+(gdb) restore dmp.bin binary 0xaaaaaabb72e0
+# To view the dump
+xxd -g4 dmp.bin
+```
+to save memory into a file and restore it.
+
+```bash
+(gdb) gcore
+gdb <executable> core.<pid>
+```
+to create core dumps and investigate them.
+
+```bash
 (gdb) compare-sections
 # Use -r for just read-only sections
 (gdb) compare-sections -r
