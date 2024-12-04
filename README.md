@@ -2349,6 +2349,12 @@ to alter print settings for current command.
 ```
 to print v-table of an object.
 
+```bash
+(gdb) info auxv
+(gdb) info os
+```
+to get system information.
+
 # Kernel Internals
 
 ```bash
