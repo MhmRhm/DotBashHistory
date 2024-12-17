@@ -2114,7 +2114,7 @@ list <file>:<line>
 to show source locations.
 
 ```bash
-list -source <file> -line 0
+(gdb) list -source <file> -line 0
 (gdb) forward-search <expression>
 # or search <expression>
 (gdb) reverse-search <expression>
