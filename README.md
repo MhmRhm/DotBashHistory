@@ -593,6 +593,18 @@ systemctl show <unit>
 ```
 to list all properties for a unit.
 
+```bash
+# To enable and start
+timedatectl set-ntp true
+# To check the service status
+timedatectl status
+# To see verbose service information
+timedatectl timesync-status
+# To view the last 24 hours of logged events
+journalctl -u systemd-timesyncd --no-hostname --since "1 day ago"
+```
+to enable time synchronization.
+
 # File Sharing
 
 ```bash
