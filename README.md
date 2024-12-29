@@ -2458,3 +2458,20 @@ man choom
 choom -p $(pidof init)
 ```
 to show OOM killer score and adjustment value.
+
+```bash
+taskset -c 1,2,3 yes > /dev/null &
+```
+to set a task to run on limited CPU cores.
+
+```bash
+sudo perf sched record
+sudo perf sched map > report.txt
+sudo perf timechart -i ./perf.data
+```
+to record context-switches on CPU cores.
+
+```bash
+watch -n 0.3 cat /proc/<PID>/sched
+```
+to watch scheduling statistics on a process.
