@@ -2387,6 +2387,35 @@ to get system information.
 # Kernel Internals
 
 ```bash
+sudo vim /etc/default/grub
+# edit for example:
+# GRUB_TIMEOUT_STYLE=menu
+# GRUB_TIMEOUT=3
+# GRUB_CMDLINE_LINUX=""
+sudo update-grub
+```
+to update grub.
+
+```bash
+# To enable kernel debug messages
+debug
+# To output loglevels less than n
+loglevel=n
+# To let kernel to be preempted
+preempt=full
+# To isolates CPUs from scheduler
+isolcpus=0,4-8
+# To boot into single-user mode
+single
+```
+useful kernel command line arguments.
+
+```bash
+cat /proc/cmdline
+```
+to query current kernel command line arguments.
+
+```bash
 # to list files
 lsinitramfs /boot/initrd.img-6.11.3
 
@@ -2475,3 +2504,13 @@ to record context-switches on CPU cores.
 watch -n 0.3 cat /proc/<PID>/sched
 ```
 to watch scheduling statistics on a process.
+
+```bash
+# To start with a policy and priority
+sudo chrt <--other|--fifo|--rr|...> <priority> <command> <arguments>
+# To change the policy and priority
+sudo chrt --fifo -p 99 <pid>
+# To see the policy and priority
+chrt -p <pis>
+```
+to set, change and query scheduling policy and priority.
