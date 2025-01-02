@@ -2514,3 +2514,16 @@ sudo chrt --fifo -p 99 <pid>
 chrt -p <pis>
 ```
 to set, change and query scheduling policy and priority.
+
+```bash
+# To list all cgroups and their processes
+systemd-cgls
+# To list cgroups
+systemctl -t slice --all
+# To list cgroups descendants
+systemctl -t scope --all
+# To list processes and their cgroup
+# Add -w for wide output, -f for parent-child
+ps -axfeo pid,user,tty,stat,cgroup,cmd
+```
+to view cgroups.
