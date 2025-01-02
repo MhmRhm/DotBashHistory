@@ -2525,5 +2525,7 @@ systemctl -t scope --all
 # To list processes and their cgroup
 # Add -w for wide output, -f for parent-child
 ps -axfeo pid,user,tty,stat,cgroup,cmd
+# To monitor cgroups resources
+systemd-cgtop
 ```
-to view cgroups.
+to view and monitor cgroups.
