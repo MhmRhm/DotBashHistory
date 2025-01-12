@@ -2506,6 +2506,14 @@ watch -n 0.3 cat /proc/<PID>/sched
 to watch scheduling statistics on a process.
 
 ```bash
+# -t, --timestamp
+# -y, --no-first
+# -S, --unit character
+vmstat -tyS M 1
+```
+to see number of interrupts and context switches per second.
+
+```bash
 # To start with a policy and priority
 sudo chrt <--other|--fifo|--rr|...> <priority> <command> <arguments>
 # To change the policy and priority
