@@ -2537,3 +2537,8 @@ ps -axfeo pid,user,tty,stat,cgroup,cmd
 systemd-cgtop
 ```
 to view and monitor cgroups.
+
+```bash
+sudo virt-what
+```
+to detect if we are running in a virtual machine.
