@@ -2394,10 +2394,12 @@ sudo vim /etc/default/grub
 # edit for example:
 # GRUB_TIMEOUT_STYLE=menu
 # GRUB_TIMEOUT=3
+# GRUB_SAVEDEFAULT=true
+# GRUB_DEFAULT=saved
 # GRUB_CMDLINE_LINUX=""
 sudo update-grub
 ```
-to update grub.
+to update grub settings.
 
 ```bash
 # To enable kernel debug messages
