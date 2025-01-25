@@ -1796,6 +1796,8 @@ scripts/config --enable CONFIG_UBSAN
 scripts/config --enable CONFIG_KCSAN
 
 # Memory debugging
+scripts/config --enable CONFIG_DEBUG_PAGEALLOC
+scripts/config --enable CONFIG_DEBUG_PAGEALLOC_ENABLE_DEFAULT
 scripts/config --enable CONFIG_SLUB_DEBUG
 scripts/config --enable CONFIG_DEBUG_MEMORY_INIT
 scripts/config --enable CONFIG_KASAN
@@ -1808,6 +1810,7 @@ scripts/config --enable CONFIG_DEBUG_PREEMPT
 
 # Lock debugging
 scripts/config --enable CONFIG_PROVE_LOCKING
+scripts/config --enable CONFIG_RCU_EXPERT
 scripts/config --enable CONFIG_LOCK_STAT
 scripts/config --enable CONFIG_DEBUG_RT_MUTEXES
 scripts/config --enable CONFIG_DEBUG_MUTEXES
