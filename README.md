@@ -1809,7 +1809,14 @@ scripts/config --enable CONFIG_DEBUG_PREEMPT
 # Lock debugging
 scripts/config --enable CONFIG_PROVE_LOCKING
 scripts/config --enable CONFIG_LOCK_STAT
+scripts/config --enable CONFIG_DEBUG_RT_MUTEXES
+scripts/config --enable CONFIG_DEBUG_MUTEXES
+scripts/config --enable CONFIG_DEBUG_SPINLOCK
+scripts/config --enable CONFIG_DEBUG_RWSEMS
+scripts/config --enable CONFIG_DEBUG_LOCK_ALLOC
 scripts/config --enable CONFIG_DEBUG_ATOMIC_SLEEP
+scripts/config --enable CONFIG_PROVE_RCU_LIST
+scripts/config --enable CONFIG_DEBUG_OBJECTS_RCU_HEAD
 
 scripts/config --enable CONFIG_BUG_ON_DATA_CORRUPTION
 
