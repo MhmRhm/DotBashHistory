@@ -10,6 +10,7 @@ The following contains some useful commands and configs as a day-to-day referenc
 - [Kernel Bootup](#kernel-bootup)
 - [Systemd](#systemd)
 - [File Sharing](#file-sharing)
+- [Email Client](#email-client)
 - [Networking](#networking)
 - [Version Controlling](#version-controlling)
 - [Docker](#docker)
@@ -657,6 +658,56 @@ sshfs username@address:dir mountpoint -p port
 fusermount -u mountpoint
 ```
 to mount another Linux directory on the network using ssh.
+
+# Email Client
+
+```bash
+# Choose /usr/bin/vim.basic
+sudo update-alternatives --config editor
+```
+to set vim as editor.
+
+```bash
+sudo apt-get install neomutt
+```
+to install the email client.
+
+```bash
+# .muttrc
+# ================  IMAP  ====================
+set imap_user = 'rahimi.mhmmd@gmail.com'
+set imap_pass = 'ayxa knlm nanu nicx'
+set spoolfile = imaps://imap.gmail.com/INBOX
+set folder = imaps://imap.gmail.com/
+set record="imaps://imap.gmail.com/[Gmail]/Sent Mail"
+set postponed="imaps://imap.gmail.com/[Gmail]/Drafts"
+set trash="imaps://imap.gmail.com/[Gmail]/Trash"
+set mbox="imaps://imap.gmail.com/[Gmail]/All Mail"
+mailboxes =INBOX =[Gmail]/Sent\ Mail =[Gmail]/Drafts =[Gmail]/Spam =[Gmail]/Trash =[Gmail]/All\ Mail
+
+# ================  SMTP  ====================
+set smtp_url = "smtp://rahimi.mhmmd@smtp.gmail.com:587/"
+set smtp_pass = $imap_pass
+set ssl_force_tls = yes # Require encrypted connection
+
+# ================  Composition  ====================
+set edit_headers = yes  # See the headers when editing
+set charset = UTF-8     # value of $LANG; also fallback for send_charset
+# Sender, email address, and sign-off line must match
+unset use_domain        # because joe@localhost is just embarrassing
+set realname = "Mohammad Rahimi"
+set from = "rahimi.mhmmd@gmail.com"
+set use_from = yes
+set envelope_from=yes
+
+source colors.muttrc
+```
+to config Mutt. See [here](https://gist.githubusercontent.com/LukeSmithxyz/de94948264649a9264193e96f5610c44/raw/d274199d3ed1bcded2039afe33a771643451a9d5/colors.muttrc) for colors.
+
+```bash
+neomutt
+```
+to run the email client.
 
 # Networking
 
