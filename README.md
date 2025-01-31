@@ -1213,7 +1213,7 @@ git format-patch origin/master -o ../
 # Check patch for issues
 ./scripts/checkpatch.pl ../0*
 # Find maintainers
-./scripts/get_maintainer.pl /tmp/0001-Fix.patch
+./scripts/get_maintainer.pl ../0*
 # Email last commit to maintainers
 git send-email -1 --annotate --cover-letter --to=maintainer1@linux.com --cc=maintainer2@linux.com --cc=maintainer3@linux.com
 ```
