@@ -1204,12 +1204,18 @@ git fetch ../repo.bundle feat:other-feat
 to share work when offline.
 
 ```bash
-git commit # commit your changes in a feature branch
-git commit --amend -s # sign your commit
-git format-patch origin/master -o /tmp/ # create patch file relative to master
-./scripts/checkpatch.pl /tmp/0001-Fix.patch # check the patch file for issues
-./scripts/get_maintainer.pl /tmp/0001-Fix.patch # find maintainers responsible for the fix
-git send-email /tmp/0001-Fix.patch --to=user1@mail.com --cc=user2@mail.com # email them the patch file
+# Commit to feature branch
+git commit
+# Sign the commit
+git commit --amend -s
+# Create patch
+git format-patch origin/master -o ../
+# Check patch for issues
+./scripts/checkpatch.pl ../0*
+# Find maintainers
+./scripts/get_maintainer.pl /tmp/0001-Fix.patch
+# Email last commit to maintainers
+git send-email -1 --annotate --cover-letter --to=maintainer1@linux.com --cc=maintainer2@linux.com --cc=maintainer3@linux.com
 ```
 to contribute to linux source code.
 
