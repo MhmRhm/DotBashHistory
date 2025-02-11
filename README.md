@@ -1836,65 +1836,6 @@ sudo dpkg -i *.deb
 to update kernel from source.
 
 ```bash
-#!/bin/bash
-set -euo pipefail
-IFS=$'\n\t'
-
-scripts/config --enable CONFIG_DEBUG_KERNEL
-scripts/config --enable CONFIG_DEBUG_INFO
-
-scripts/config --enable CONFIG_DEBUG_MISC
-
-# Generic kernel debugging instruments
-scripts/config --enable CONFIG_MAGIC_SYSRQ
-scripts/config --enable CONFIG_DEBUG_FS
-scripts/config --enable CONFIG_KGDB
-scripts/config --enable CONFIG_UBSAN
-scripts/config --enable CONFIG_KCSAN
-
-# Memory debugging
-scripts/config --enable CONFIG_DEBUG_PAGEALLOC
-scripts/config --enable CONFIG_DEBUG_PAGEALLOC_ENABLE_DEFAULT
-scripts/config --enable CONFIG_SLUB_DEBUG
-scripts/config --enable CONFIG_DEBUG_MEMORY_INIT
-scripts/config --enable CONFIG_KASAN
-
-scripts/config --enable CONFIG_DEBUG_SHIRQ
-
-scripts/config --enable CONFIG_SCHED_STACK_END_CHECK
-
-scripts/config --enable CONFIG_DEBUG_PREEMPT
-
-# Lock debugging
-scripts/config --enable CONFIG_PROVE_LOCKING
-scripts/config --enable CONFIG_RCU_EXPERT
-scripts/config --enable CONFIG_LOCK_STAT
-scripts/config --enable CONFIG_DEBUG_RT_MUTEXES
-scripts/config --enable CONFIG_DEBUG_MUTEXES
-scripts/config --enable CONFIG_DEBUG_SPINLOCK
-scripts/config --enable CONFIG_DEBUG_RWSEMS
-scripts/config --enable CONFIG_DEBUG_LOCK_ALLOC
-scripts/config --enable CONFIG_DEBUG_ATOMIC_SLEEP
-scripts/config --enable CONFIG_PROVE_RCU_LIST
-scripts/config --enable CONFIG_DEBUG_OBJECTS_RCU_HEAD
-
-scripts/config --enable CONFIG_BUG_ON_DATA_CORRUPTION
-
-scripts/config --enable CONFIG_STACKTRACE
-
-scripts/config --enable CONFIG_DEBUG_BUGVERBOSE
-
-scripts/config --enable CONFIG_FTRACE
-scripts/config --enable CONFIG_FUNCTION_TRACER
-scripts/config --enable CONFIG_FUNCTION_GRAPH_TRACER
-
-# Arch specific
-scripts/config --enable CONFIG_FRAME_POINTER
-scripts/config --enable CONFIG_STACK_VALIDATION
-```
-to add debug configs to kernel
-
-```bash
 # on host
 make -C <kernel-source-tree> M=$(pwd) ARCH=arm64 \
   CROSS_COMPILE=aarch64-linux-gnu- modules
@@ -1911,6 +1852,24 @@ depmod
 reboot
 ```
 to cross-compile linux modules and install them on remote target.
+
+```bash
+# To start the LTTng session daemon
+lttng-sessiond --daemonize
+# To list available userspace tracepoints (requires the program to be running)
+lttng list --userspace
+# To create a new tracing session
+lttng create user-space-session
+# To enable a specific userspace tracepoint
+lttng enable-event --userspace provider:event
+# To start tracing
+lttng start
+# To destroy the session (clears session data)
+lttng destroy
+# To display recorded events
+babeltrace2 ~/lttng-traces/user-space-session*
+```
+to use [LTTng](https://lttng.org/docs/v2.13/#doc-tracing-your-own-user-application) for recording traces.
 
 # Debugging
 
@@ -2614,3 +2573,46 @@ to view and monitor cgroups.
 sudo virt-what
 ```
 to detect if we are running in a virtual machine.
+
+```bash
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
+scripts/config --enable CONFIG_DEBUG_KERNEL
+scripts/config --enable CONFIG_DEBUG_INFO
+scripts/config --enable CONFIG_DEBUG_MISC
+scripts/config --enable CONFIG_MAGIC_SYSRQ
+scripts/config --enable CONFIG_DEBUG_FS
+scripts/config --enable CONFIG_KGDB
+scripts/config --enable CONFIG_UBSAN
+scripts/config --enable CONFIG_KCSAN
+scripts/config --enable CONFIG_DEBUG_PAGEALLOC
+scripts/config --enable CONFIG_DEBUG_PAGEALLOC_ENABLE_DEFAULT
+scripts/config --enable CONFIG_SLUB_DEBUG
+scripts/config --enable CONFIG_DEBUG_MEMORY_INIT
+scripts/config --enable CONFIG_KASAN
+scripts/config --enable CONFIG_DEBUG_SHIRQ
+scripts/config --enable CONFIG_SCHED_STACK_END_CHECK
+scripts/config --enable CONFIG_DEBUG_PREEMPT
+scripts/config --enable CONFIG_PROVE_LOCKING
+scripts/config --enable CONFIG_RCU_EXPERT
+scripts/config --enable CONFIG_LOCK_STAT
+scripts/config --enable CONFIG_DEBUG_RT_MUTEXES
+scripts/config --enable CONFIG_DEBUG_MUTEXES
+scripts/config --enable CONFIG_DEBUG_SPINLOCK
+scripts/config --enable CONFIG_DEBUG_RWSEMS
+scripts/config --enable CONFIG_DEBUG_LOCK_ALLOC
+scripts/config --enable CONFIG_DEBUG_ATOMIC_SLEEP
+scripts/config --enable CONFIG_PROVE_RCU_LIST
+scripts/config --enable CONFIG_DEBUG_OBJECTS_RCU_HEAD
+scripts/config --enable CONFIG_BUG_ON_DATA_CORRUPTION
+scripts/config --enable CONFIG_STACKTRACE
+scripts/config --enable CONFIG_DEBUG_BUGVERBOSE
+scripts/config --enable CONFIG_FTRACE
+scripts/config --enable CONFIG_FUNCTION_TRACER
+scripts/config --enable CONFIG_FUNCTION_GRAPH_TRACER
+scripts/config --enable CONFIG_FRAME_POINTER
+scripts/config --enable CONFIG_STACK_VALIDATION
+```
+to add debug configs to kernel
