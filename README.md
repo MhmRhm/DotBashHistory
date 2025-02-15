@@ -4,32 +4,24 @@ For tutorials, please take a look at my [DotBashHistory](https://mhmrhm.github.i
 The following contains some useful commands and configs as a day-to-day reference.
 
 - [General](#general)
+- [Monitoring](#monitoring)
 - [Cryptography](#cryptography)
-- [Journal](#journal)
 - [Disks and Partitions](#disks-and-partitions)
-- [Kernel Bootup](#kernel-bootup)
-- [Systemd](#systemd)
 - [File Sharing](#file-sharing)
 - [Email Client](#email-client)
+- [Systemd](#systemd)
 - [Networking](#networking)
 - [Version Controlling](#version-controlling)
-- [Docker](#docker)
+- [Virtualization](#virtualization)
+- [Debugging](#debugging)
 - [CMake](#cmake)
 - [Development](#development)
-- [Debugging](#debugging)
+- [Kernel Bootup](#kernel-bootup)
 - [Kernel Internals](#kernel-internals)
+- [Builds](#builds)
+- [Scripts](#scripts)
 
-# General
-
-```bash
-#!/bin/bash
-set -euo pipefail
-IFS=$'\n\t'
-
-# the script
-# ...
-```
-to use the unofficial [Bash Strict Mode](http://redsymbol.net/articles/unofficial-bash-strict-mode/).
+## General
 
 ```bash
 man 5 passwd
@@ -57,22 +49,41 @@ nohup <my_command> &
 to run a command so it can continue after shell is closed.
 
 ```bash
+PATH=first:$PATH:last
+```
+to add directories to the search path.
+
+```bash
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
+# the script
+# ...
+```
+to use the unofficial [Bash Strict Mode](http://redsymbol.net/articles/unofficial-bash-strict-mode/).
+
+```bash
+ps ax 2>&1 1>> stdout.txt
+```
+to send outputs to a files.
+
+```bash
+/usr/bin/time command
+time { tar -xf repo.tar.xz && rm -rf repo; }
+```
+to show CPU time and memory faults after running command.
+
+```bash
+FILE=$(mktemp)
+echo $FILE #/tmp/tmp.rvUW4WNN5H
+```
+to create a unique temp file.
+
+```bash
 ls -alhF .
 ```
 to list all files and directories with inodes and readable size.
-
-```bash
-find / -regex .*initrd.img.* -print
-```
-to find all paths containing `initrd.img`.
-
-```bash
-# To search all files in a path for an expression
-grep -Rn path/to/search -e 'expression'
-# To show line numbers and sorounding lines
-grep -i 'expression' -Hn -B3 -A3 file
-```
-to find in files.
 
 ```bash
 ls .[^.]*
@@ -80,54 +91,9 @@ ls .[^.]*
 to list all hidden files and directories not including `.` and `..`.
 
 ```bash
-# to create
-tar -zcvf arch.tar.gz file dir
-# to list TOC
-tar -ztvf arch.tar.gz
-# to extract .tar.gz
-tar -zxpvf arch.tar.gz -C ./outdir
-# to extract .tar.xz
-tar -xpvf arch.tar.xz
-```
-to create then show the table of contents for the archive then extract it.
-
-```bash
-ps ax 2>&1 1>> stdout.txt && cat stdout.txt
-```
-to list all processes and send outputs to appropriate files.
-
-```bash
-PATH=first:$PATH:last
-```
-to add directories to the search path.
-
-```bash
-sed -i.bak 's/#VERBOSE_FSCK=no/VERBOSE_FSCK=yes/' /etc/sysconfig/rc.site
-```
-to change a line in a file and keep a backup.
-
-```bash
-mknod mypipe p
-tail -f mypipe &
-man man > mypipe
-unlink mypipe
-```
-to create a named pipe and connect two processes through it.
-
-```bash
 sudo usermod -aG <group_name> $USER
 ```
 to add user to a group.
-
-```bash
-watch "ps aux | grep ssh | grep -Eo '^[^ ]+' | sort | uniq"
-```
-to list online users.
-
-```bash
-nload -U M -t 3000 eth0
-```
-to monitor network traffic.
 
 ```bash
 ls -al /usr/share/zoneinfo/
@@ -147,10 +113,59 @@ sudo locale-gen ms_MY.UTF-8
 to list all available or generated locales and generate one.
 
 ```bash
-/usr/bin/time command
-time { tar -xf repo.tar.xz && rm -rf repo; }
+find / -regex .*initrd.img.* -print
 ```
-to show CPU time and memory faults after running command.
+to find all paths containing `initrd.img`.
+
+```bash
+# To search all files in a path for an expression
+grep -Rn path/to/search -e 'expression'
+# To show line numbers and sorounding lines
+grep -i 'expression' -Hn -B3 -A3 file
+```
+to find in files.
+
+```bash
+# to create
+tar -zcvf arch.tar.gz file dir
+# to list TOC
+tar -ztvf arch.tar.gz
+# to extract .tar.gz
+tar -zxpvf arch.tar.gz -C ./outdir
+# to extract .tar.xz
+tar -xpvf arch.tar.xz
+```
+to create then show the table of contents for the archive then extract it.
+
+```bash
+tar cvf - src | (cd dst; tar xvf -)
+```
+to move a directory with a lot of files.
+
+```bash
+sed -i.bak 's/#VERBOSE_FSCK=no/VERBOSE_FSCK=yes/' /etc/sysconfig/rc.site
+```
+to change a line in a file and keep a backup.
+
+```bash
+mknod mypipe p
+tail -f mypipe &
+man man > mypipe
+unlink mypipe
+```
+to create a named pipe and connect two processes through it.
+
+```bash
+sudo startx /usr/bin/gedit
+```
+to start a graphical application without a desktop manager.
+
+```bash
+firefox localhost:631
+```
+to open CUPS setup page.
+
+## Monitoring
 
 ```bash
 pidstat -ru -p <PID> 1
@@ -163,9 +178,14 @@ netstat -ntl
 to list all TCP connections in use.
 
 ```bash
-sudo startx /usr/bin/gedit
+watch "ps aux | grep ssh | grep -Eo '^[^ ]+' | sort | uniq"
 ```
-to start a graphical application without a desktop manager.
+to list online users.
+
+```bash
+nload -U M -t 3000 eth0
+```
+to monitor network traffic.
 
 ```bash
 sudo apt-get install libinput-bin
@@ -188,151 +208,7 @@ dbus-monitor --session
 ```
 to monitor D-Bus events originated from system and session.
 
-```bash
-firefox localhost:631
-```
-to open CUPS setup page.
-
-```bash
-FILE=$(mktemp)
-echo $FILE #/tmp/tmp.rvUW4WNN5H
-```
-to create a unique temp file.
-
-```bash
-tar cvf - src | (cd dst; tar xvf -)
-```
-to move a directory with a lot of files.
-
-```bash
-#!/bin/bash
-
-PORT=17356
-
-if [ ! -f /etc/ssh/sshd_config_bak ]; then
-        cp /etc/ssh/sshd_config /etc/ssh/sshd_config_bak
-fi
-
-sed -i 's/#Port 22/Port '"$PORT"'/' /etc/ssh/sshd_config
-sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
-sed -i 's/#PermitTunnel no/PermitTunnel yes/' /etc/ssh/sshd_config
-
-if [ -f ./users.txt ]; then
-        rm ./users.txt
-fi
-
-MYIP=$(curl -s https://checkip.amazonaws.com)
-
-for i in {1..2}; do
-        PASS=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1)
-        deluser "user$i" &> /dev/null
-        useradd "user$i" --shell /sbin/nologin
-        echo "user$i:$PASS" | chpasswd
-        echo "ssh://user$i:$PASS@$MYIP:$PORT#Profile$i" >> users.txt
-done
-cat users.txt
-```
-to setup SSH for VPN use and automatically add users. Later import profiles to NetMod Syna.
-
-```python
-# pip install python-telegram-bot --upgrade
-# pip install requests
-
-import logging, requests
-from telegram import (
-    Update
-)
-from telegram.ext import (
-    Application,
-    CommandHandler,
-    ContextTypes
-)
-
-bot_father_token = "YOUR_TOKEN"
-your_username = "YOUR_ID"
-
-async def getCommand(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    logging.info(f"{update.effective_user}, {update.effective_chat}")
-    if update.effective_user.username != your_username:
-        return
-    await update.message.reply_text("...")
-    ip = requests.get('https://checkip.amazonaws.com').text.strip()
-    await update.message.reply_text(ip)
-
-def main() -> None:
-    logging.basicConfig(filename="ipbot.log", encoding='utf-8', level=logging.INFO)
-    application = Application.builder().token(bot_father_token).connect_timeout(30).build()
-    application.add_handler(CommandHandler("get", getCommand))
-    application.run_polling()
-
-if __name__ == "__main__":
-    main()
-```
-to run a Telegram bot for fetching dynamic IP.
-
-```python
-# pip install boto3
-# pip install schedule
-
-import logging, time, socket, requests, schedule, boto3
-from botocore.exceptions import ClientError
-
-IP = ''
-
-def getCurrentIP() -> str:
-    return requests.get('https://checkip.amazonaws.com').text.strip()
-
-def emailNewIP(ip: str) -> bool:
-    SENDER = "YOUR_NAME <YOUR_FROM_MAIL>" # keep < and >
-    RECIPIENT = "YOUR_TO_MAIL"
-    AWS_REGION = "ap-southeast-2" # can find it in server address
-    SUBJECT = "New IP Assignment"
-    BODY_TEXT = f"{ip} assigned to `{socket.gethostname()}`."
-    CHARSET = "UTF-8"
-    
-    client = boto3.client('ses',
-                          region_name=AWS_REGION,
-                          aws_access_key_id="YOUR_KEY",
-                          aws_secret_access_key="YOUR_SECRET"
-                          )
-    
-    try:
-        response = client.send_email(
-            Destination = {'ToAddresses': [RECIPIENT]},
-            Message = {
-                'Body': {'Text': {'Charset': CHARSET,'Data': BODY_TEXT}},
-                'Subject': {'Charset': CHARSET,'Data': SUBJECT},
-                },
-            Source = SENDER
-        )
-    except ClientError as e:
-        logging.critical(e.response['Error']['Message'])
-        return False
-    else:
-        logging.info(f"Email sent to {RECIPIENT} with new IP {ip}.")
-        logging.info(response['MessageId'])
-        return True
-
-def periodic_task():
-    global IP
-    if (ip := getCurrentIP()) != IP:
-        if emailNewIP(ip):
-            IP = ip
-
-schedule.every(60).seconds.do(periodic_task) # every minute
-
-def main() -> None:
-    logging.basicConfig(filename="in_mail_ip.log", encoding='utf-8', level=logging.INFO)
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
-
-if __name__ == "__main__":
-    main()
-```
-to run a task for notifying dynamic IP changes.
-
-# Cryptography
+## Cryptography
 
 ```bash
 gpg --gen-key
@@ -361,49 +237,7 @@ gpg --output file --decrypt file.gpg
 ```
 to verify and decrypt a signed content.
 
-# Journal
-
-```bash
-journalctl -r SYSLOG_IDENTIFIER=sudo
-```
-to list the most recent commands ran with `sudo`.
-
-```bash
-journalctl -S -1h30m
-```
-to list all logs since one and a half hours ago.
-
-```bash
-journalctl -S 06:00:00 -U 07:00:00
-```
-to list all logs since 6 AM until 7 AM.
-
-```bash
-journalctl -fkp 3..4
-```
-to show a live feed for kernel messages including only errors and warnings.
-
-```bash
-udevadm monitor
-```
-to monitor events passed between udev and kernel.
-
-```bash
-udevadm info /dev/sda
-```
-to get all information for a device.
-
-```bash
-journalctl --unit=ssh.service
-```
-to list logs related to a service.
-
-```bash
-dmesg --follow --human --level debug
-```
-to see debug messages by drivers.
-
-# Disks and Partitions
+## Disks and Partitions
 
 ```bash
 lsblk
@@ -506,110 +340,7 @@ lvresize -r -l +100%FREE myvg/mylv1
 ```
 to create, remove and resize logical volumes.
 
-# Kernel Bootup
-
-```bash
-cat /proc/cmdline
-```
-to show parameters passed to the kernel by the boot loader.
-
-```
-systemd.unit=multi-user.target ro quiet splash video=HDMI-A-1:D
-```
-to boot into text mode with GRUB press `e` and add the above kernel arguments.
-
-```
-setenv extraargs ${extraargs} systemd.unit=rescue.target; env print;
-```
-to add rescue mode to kernel arguments using [uboot](https://u-boot.readthedocs.io/en/v2021.04/index.html) on OrangePi 5 and print environment variables.
-
-```
-mmc dev 1; setenv scriptaddr 0x00500000; setenv prefix /; setenv script boot.scr; load ${devtype} ${devnum}:${distro_bootpart} ${scriptaddr} ${prefix}${script}; source ${scriptaddr}
-```
-to boot into MMC using uboot on OrangePi 5.
-
-```
-setenv devtype usb; setenv devnum 0; setenv distro_bootpart 1; setenv scriptaddr 0x00500000; setenv prefix /; setenv script boot.scr; usb start; load ${devtype} ${devnum}:${distro_bootpart} ${scriptaddr} ${prefix}${script}; source ${scriptaddr}
-```
-to boot into USB using uboot on OrangePi 5.
-
-```
-videoinfo
-terminal_output console
-set gfxmode=1280x1024 # set gfxmode=auto
-set # print env
-terminal_output gfxterm
-```
-to list available resolutions in GRUB, set the resolution, and print environment variables.
-
-```
-ls ($root)/
-```
-to list files and directories in the GRUB root directory.
-
-```
-linux /($root)/vmlinuz quiet splash systemd.unit=graphical.target
-initrd /($root)/initrd
-boot
-```
-to manually boot from the GRUB command line.
-
-# Systemd
-
-```bash
-systemd-cgls
-```
-to list control groups.
-
-```bash
-systemctl list-units --all --full
-```
-to list all systemd units.
-
-```bash
-systemd-run --on-calendar='02-14 12:46:00' /bin/wall "Buy Chocolate!" # once a year
-systemd-run --on-active=1m /bin/wall "Wish you luck!" # a minute in future
-systemctl list-timers
-systemctl stop <UNIT>
-```
-to schedule a task using systemd.
-
-```
-[Unit]
-Description=My Service
-After=network.target
-
-[Service]
-Type=idle
-WorkingDirectory=<dir>
-User=<username>
-ExecStart=<dir>/.venv/bin/python3 <dir>/script.py
-Restart=always
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target
-```
-to add a new service to systemd. Create the service file at `/etc/systemd/system/`. Run `systemctl daemon-reload` afterward.
-
-```bash
-systemctl show <unit>
-```
-to list all properties for a unit.
-
-```bash
-# To enable and start
-timedatectl set-ntp true
-# To check the service status
-timedatectl status
-# To see verbose service information
-timedatectl timesync-status
-# To view the last 24 hours of logged events
-journalctl -u systemd-timesyncd --no-hostname --since "1 day ago"
-```
-to enable time synchronization.
-
-# File Sharing
+## File Sharing
 
 ```bash
 python3 -m http.server 8127 -d /home/user/
@@ -659,7 +390,7 @@ fusermount -u mountpoint
 ```
 to mount another Linux directory on the network using ssh.
 
-# Email Client
+## Email Client
 
 ```bash
 # Choose /usr/bin/vim.basic
@@ -709,7 +440,112 @@ neomutt
 ```
 to run the email client.
 
-# Networking
+## Systemd
+
+```bash
+# To list all cgroups and their processes
+systemd-cgls
+# To list cgroups
+systemctl -t slice --all
+# To list cgroups descendants
+systemctl -t scope --all
+# To list processes and their cgroup
+# Add -w for wide output, -f for parent-child
+ps -axfeo pid,user,tty,stat,cgroup,cmd
+# To monitor cgroups resources
+systemd-cgtop
+```
+to view and monitor cgroups.
+
+```bash
+systemctl list-units --all --full
+```
+to list all systemd units.
+
+```bash
+systemd-run --on-calendar='02-14 12:46:00' /bin/wall "Buy Chocolate!" # once a year
+systemd-run --on-active=1m /bin/wall "Wish you luck!" # a minute in future
+systemctl list-timers
+systemctl stop <UNIT>
+```
+to schedule a task using systemd.
+
+```
+[Unit]
+Description=My Service
+After=network.target
+
+[Service]
+Type=idle
+WorkingDirectory=<dir>
+User=<username>
+ExecStart=<dir>/.venv/bin/python3 <dir>/script.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+```
+to add a new service to systemd. Create the service file at `/etc/systemd/system/`. Run `systemctl daemon-reload` afterward.
+
+```bash
+systemctl show <unit>
+```
+to list all properties for a unit.
+
+```bash
+# To enable and start
+timedatectl set-ntp true
+# To check the service status
+timedatectl status
+# To see verbose service information
+timedatectl timesync-status
+# To view the last 24 hours of logged events
+journalctl -u systemd-timesyncd --no-hostname --since "1 day ago"
+```
+to enable time synchronization.
+
+```bash
+journalctl -r SYSLOG_IDENTIFIER=sudo
+```
+to list the most recent commands ran with `sudo`.
+
+```bash
+journalctl -S -1h30m
+```
+to list all logs since one and a half hours ago.
+
+```bash
+journalctl -S 06:00:00 -U 07:00:00
+```
+to list all logs since 6 AM until 7 AM.
+
+```bash
+journalctl -fkp 3..4
+```
+to show a live feed for kernel messages including only errors and warnings.
+
+```bash
+udevadm monitor
+```
+to monitor events passed between udev and kernel.
+
+```bash
+udevadm info /dev/sda
+```
+to get all information for a device.
+
+```bash
+journalctl --unit=ssh.service
+```
+to list logs related to a service.
+
+```bash
+dmesg --follow --human --level debug
+```
+to see debug messages by drivers.
+
+## Networking
 
 ```bash
 ip route show
@@ -789,41 +625,7 @@ nmap <ip_address> -p17450-17460,17000
 ```
 to scan a host for open ports.
 
-```bash
-#!/bin/bash
-
-# IP range (replace with your desired range)
-start_ip="192.168.1.1"
-end_ip="192.168.1.10"
-
-# Port to check
-port=80
-
-# Iterate through the IP range
-IFS='.' read -r -a start <<< "$start_ip"
-IFS='.' read -r -a end <<< "$end_ip"
-
-for ((i=${start[0]}; i<=${end[0]}; i++))
-do
-  for ((j=${start[1]}; j<=${end[1]}; j++))
-  do
-    for ((k=${start[2]}; k<=${end[2]}; k++))
-    do
-      for ((l=${start[3]}; l<=${end[3]}; l++))
-      do
-        ip="${i}.${j}.${k}.${l}"
-        echo "Checking $ip"
-        
-        # Check if the port is open
-        nc -z -v -w 1 "$ip" "$port" 2>&1 | grep "succeeded" && echo "Port $port is open on $ip"
-      done
-    done
-  done
-done
-```
-to scan an IP range for a port (AI generated.)
-
-# Version Controlling
+## Version Controlling
 
 ```bash
 git config --list --show-origin
@@ -1250,7 +1052,7 @@ GIT_TRACE_PACK_ACCESS=true GIT_TRACE_PACKET=true GIT_TRACE_SETUP=true git fetch 
 ```
 to work with git internals.
 
-# Docker
+## Virtualization
 
 ```bash
 nano Dockerfile
@@ -1693,185 +1495,7 @@ echo "|$(cat /run/secrets/my_secret1)|"
 ```
 to add secrets to swarm and use in services.
 
-# CMake
-
-```bash
-cmake --help
-cmake -B ./build_dir -S ./source_dir
-cmake -B ./build_dir -S ./source_dir -G Ninja
-cmake -B ./build_dir -S ./source_dir -L
-cmake -B ./build_dir -S ./source_dir -L -D CMAKE_BUILD_TYPE=Release
-cmake -B ./build_dir -S ./source_dir -L -U CMAKE_BUILD_TYPE
-cmake -B ./build_dir -S ./source_dir -LAH # with advance and help strings
-cmake --list-presets
-cmake --preset=WinRelease
-```
-to configure a project.
-
-```bash
-# in CMakeLists.txt:
-# function(addDependency)
-#     list(APPEND CMAKE_MESSAGE_CONTEXT "addDep")
-#     message(DEBUG "dependency included")
-# endfunction()
-
-cmake -B ./build_dir -S ./source_dir --log-level=DEBUG
-cmake -B ./build_dir -S ./source_dir --log-context
-cmake -B ./build_dir -S ./source_dir --trace
-```
-to debug the configuration process.
-
-```bash
-cmake --build ./build_dir -j $(nproc)
-cmake --build ./build_dir --target clean
-cmake --build ./build_dir --clean-first
-cmake --build ./build_dir --config release
-```
-to build a project and targets.
-
-```bash
-cmake --install ./build_dir --config release --prefix /opt/prj/
-```
-to install a project and components.
-
-```bash
-cmake -E # to list commands
-cmake -E make_directory dir
-```
-to run some commands in a platform-independent way.
-
-# Development
-
-```bash
-sudo apt-get update
-apt-cache policy cmake
-```
-to check the repository version of a package.
-
-```bash
-apt-file search gl.h
-```
-to find packages that will install `*gl.h*` header file.
-
-```bash
-ldconfig -v
-```
-to rebuild shared libraries cache.
-
-```bash
-valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose ./executable
-```
-to find memory leaks.
-
-```bash
-python3 -m venv .venv
-. .venv/bin/activate
-deactivate
-```
-to create a Python virtual environment.
-
-```bash
-git clone --depth=1 --recurse-submodules https://gitlab.kitware.com/cmake/cmake.git
-mkdir cmake-build
-cd cmake-build
-../cmake/bootstrap --parallel=$(nproc) && make && sudo make install
-ctest --rerun-failed --output-on-failure
-cd .. && rm -rf cmake/ cmake-build/
-```
-to install latest cmake from source.
-
-```bash
-wget https://download.qt.io/official_releases/qt/6.5/6.6.1/single/qt-everywhere-src-6.6.1.tar.xz
-tar xvf qt-everywhere-src-6.6.1.tar.xz
-
-mkdir build-qt-everywhere-src-6.6.1
-cd build-qt-everywhere-src-6.6.1/
-
-sudo apt-get install build-essential cmake ninja-build libgl-dev libegl-dev libfontconfig1-dev libinput-dev libfontconfig1-dev libfreetype6-dev libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-cursor-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxcb-util-dev libxcb-xinerama0-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev libatspi2.0-dev libclang-dev
-
-../qt-everywhere-src-6.6.1/configure -skip qtwayland -skip qtwebengine | tee ../config_$(TZ='Asia/Singapore' date +%Y-%m-%dT%H.%M.%S%Z).log
-cmake --build . --parallel $(nproc) | tee ../build_$(TZ='Asia/Singapore' date +%Y-%m-%dT%H.%M.%S%Z).log
-sudo cmake --install .
-```
-to build Qt6 from source.
-
-```bash
-git clone --recurse-submodules https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-cd linux
-make mrproper
-
-# for host
-# copy distribution config file to source tree
-cp /boot/config-release .config
-make olddefconfig
-# to avoid error regarding CONFIG_SYSTEM_REVOCATION_KEYS="debian/canonical-revoked-certs.pem"
-scripts/config --disable SYSTEM_REVOCATION_KEYS
-make menuconfig
-
-make -j$(nproc) all | tee ../config_$(TZ='Asia/Singapore' date +%Y-%m-%dT%H.%M.%S%Z).log
-sudo make modules_install
-sudo make install
-
-# old kernel version
-uname --kernel-release
-sudo reboot
-# new kernel version
-uname --kernel-release
-
-# for an SoC
-KERNEL=kernel8
-# copy config file to source tree
-scp <user>@<address>:/boot/config* .config
-make ARCH=arm64 olddefconfig
-make ARCH=arm64 menuconfig
-
-make -j$(nproc) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- all | tee ../config_$(TZ='Asia/Singapore' date +%Y-%m-%dT%H.%M.%S%Z).log
-make -j$(nproc) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- deb-pkg
-cd ..
-scp *.deb <user>@<address>:/home/<user>
-
-# on SoC
-sudo dpkg -i *.deb
-```
-to update kernel from source.
-
-```bash
-# on host
-make -C <kernel-source-tree> M=$(pwd) ARCH=arm64 \
-  CROSS_COMPILE=aarch64-linux-gnu- modules
-make -C <kernel-source-tree> M=$(pwd) ARCH=arm64 \
-  CROSS_COMPILE=aarch64-linux-gnu- INSTALL_MOD_PATH=<temp-directory> modules_install
-tar zcvf - <temp-directory> | ssh <user-name>@<target-address> tar zxvf -
-
-# on target
-cd ~/<temp-directory>
-sudo su
-cp -r lib /lib
-echo <module-name> >> /etc/modules-load.d/modules.conf
-depmod
-reboot
-```
-to cross-compile linux modules and install them on remote target.
-
-```bash
-# To start the LTTng session daemon
-lttng-sessiond --daemonize
-# To list available userspace tracepoints (requires the program to be running)
-lttng list --userspace
-# To create a new tracing session
-lttng create user-space-session
-# To enable a specific userspace tracepoint
-lttng enable-event --userspace provider:event
-# To start tracing
-lttng start
-# To destroy the session (clears session data)
-lttng destroy
-# To display recorded events
-babeltrace2 ~/lttng-traces/user-space-session*
-```
-to use [LTTng](https://lttng.org/docs/v2.13/#doc-tracing-your-own-user-application) for recording traces.
-
-# Debugging
+## Debugging
 
 ```bash
 # To ask when some expression is ambiguous
@@ -2413,7 +2037,115 @@ to print v-table of an object.
 ```
 to get system information.
 
-# Kernel Internals
+## CMake
+
+```bash
+cmake --help
+cmake -B ./build_dir -S ./source_dir
+cmake -B ./build_dir -S ./source_dir -G Ninja
+cmake -B ./build_dir -S ./source_dir -L
+cmake -B ./build_dir -S ./source_dir -L -D CMAKE_BUILD_TYPE=Release
+cmake -B ./build_dir -S ./source_dir -L -U CMAKE_BUILD_TYPE
+cmake -B ./build_dir -S ./source_dir -LAH # with advance and help strings
+cmake --list-presets
+cmake --preset=WinRelease
+```
+to configure a project.
+
+```bash
+# in CMakeLists.txt:
+# function(addDependency)
+#     list(APPEND CMAKE_MESSAGE_CONTEXT "addDep")
+#     message(DEBUG "dependency included")
+# endfunction()
+
+cmake -B ./build_dir -S ./source_dir --log-level=DEBUG
+cmake -B ./build_dir -S ./source_dir --log-context
+cmake -B ./build_dir -S ./source_dir --trace
+```
+to debug the configuration process.
+
+```bash
+cmake --build ./build_dir -j $(nproc)
+cmake --build ./build_dir --target clean
+cmake --build ./build_dir --clean-first
+cmake --build ./build_dir --config release
+```
+to build a project and targets.
+
+```bash
+cmake --install ./build_dir --config release --prefix /opt/prj/
+```
+to install a project and components.
+
+```bash
+cmake -E # to list commands
+cmake -E make_directory dir
+```
+to run some commands in a platform-independent way.
+
+## Development
+
+```bash
+sudo apt-get update
+apt-cache policy cmake
+```
+to check the repository version of a package.
+
+```bash
+apt-file search gl.h
+```
+to find packages that will install `*gl.h*` header file.
+
+```bash
+# Add `deb-src` for each `deb`
+sudo nano /etc/apt/sources.list.d/ubuntu.sources
+sudo apt-get update
+sudo apt-get build-dep git
+```
+to install all the build dependencies for a program.
+
+```bash
+ldconfig -v
+```
+to rebuild shared libraries cache.
+
+```bash
+valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose ./executable
+```
+to find memory leaks.
+
+```bash
+python3 -m venv .venv
+. .venv/bin/activate
+deactivate
+```
+to create a Python virtual environment.
+
+```bash
+# To start the LTTng session daemon
+lttng-sessiond --daemonize
+# To list available userspace tracepoints (requires the program to be running)
+lttng list --userspace
+# To create a new tracing session
+lttng create user-space-session
+# To enable a specific userspace tracepoint
+lttng enable-event --userspace provider:event
+# To start tracing
+lttng start
+# To destroy the session (clears session data)
+lttng destroy
+# To display recorded events
+babeltrace2 ~/lttng-traces/user-space-session*
+```
+to use [LTTng](https://lttng.org/docs/v2.13/#doc-tracing-your-own-user-application) for recording traces.
+
+## Kernel Bootup
+
+```bash
+cat /proc/cmdline
+```
+to show parameters passed to the kernel by the boot loader.
 
 ```bash
 sudo vim /etc/default/grub
@@ -2442,11 +2174,6 @@ single
 useful kernel command line arguments.
 
 ```bash
-cat /proc/cmdline
-```
-to query current kernel command line arguments.
-
-```bash
 # to list files
 lsinitramfs /boot/initrd.img-6.11.3
 
@@ -2468,6 +2195,49 @@ mkimage -A arm -O linux -T ramdisk -C none -a 0 -e 0 -n uInitrd -d /boot/initrd.
 mkimage -C none -A arm -T script -d /boot/boot.cmd /boot/boot.scr
 ```
 on SoCs booting from U-Boot, to extract existing initramfs, modify, then create a new initramfs from it.
+
+```
+systemd.unit=multi-user.target ro quiet splash video=HDMI-A-1:D
+```
+to boot into text mode with GRUB press `e` and add the above kernel arguments.
+
+```
+setenv extraargs ${extraargs} systemd.unit=rescue.target; env print;
+```
+to add rescue mode to kernel arguments using [uboot](https://u-boot.readthedocs.io/en/v2021.04/index.html) on OrangePi 5 and print environment variables.
+
+```
+mmc dev 1; setenv scriptaddr 0x00500000; setenv prefix /; setenv script boot.scr; load ${devtype} ${devnum}:${distro_bootpart} ${scriptaddr} ${prefix}${script}; source ${scriptaddr}
+```
+to boot into MMC using uboot on OrangePi 5.
+
+```
+setenv devtype usb; setenv devnum 0; setenv distro_bootpart 1; setenv scriptaddr 0x00500000; setenv prefix /; setenv script boot.scr; usb start; load ${devtype} ${devnum}:${distro_bootpart} ${scriptaddr} ${prefix}${script}; source ${scriptaddr}
+```
+to boot into USB using uboot on OrangePi 5.
+
+```
+videoinfo
+terminal_output console
+set gfxmode=1280x1024 # set gfxmode=auto
+set # print env
+terminal_output gfxterm
+```
+to list available resolutions in GRUB, set the resolution, and print environment variables.
+
+```
+ls ($root)/
+```
+to list files and directories in the GRUB root directory.
+
+```
+linux /($root)/vmlinuz quiet splash systemd.unit=graphical.target
+initrd /($root)/initrd
+boot
+```
+to manually boot from the GRUB command line.
+
+## Kernel Internals
 
 ```bash
 modinfo <mod-name>
@@ -2555,21 +2325,6 @@ chrt -p <pis>
 to set, change and query scheduling policy and priority.
 
 ```bash
-# To list all cgroups and their processes
-systemd-cgls
-# To list cgroups
-systemctl -t slice --all
-# To list cgroups descendants
-systemctl -t scope --all
-# To list processes and their cgroup
-# Add -w for wide output, -f for parent-child
-ps -axfeo pid,user,tty,stat,cgroup,cmd
-# To monitor cgroups resources
-systemd-cgtop
-```
-to view and monitor cgroups.
-
-```bash
 sudo virt-what
 ```
 to detect if we are running in a virtual machine.
@@ -2616,3 +2371,218 @@ scripts/config --enable CONFIG_FRAME_POINTER
 scripts/config --enable CONFIG_STACK_VALIDATION
 ```
 to add debug configs to kernel
+
+## Builds
+
+```bash
+git clone --depth=1 --recurse-submodules https://gitlab.kitware.com/cmake/cmake.git
+mkdir cmake-build
+cd cmake-build
+../cmake/bootstrap --parallel=$(nproc) && make && sudo make install
+ctest --rerun-failed --output-on-failure
+cd .. && rm -rf cmake/ cmake-build/
+```
+to install latest cmake from source.
+
+```bash
+wget https://download.qt.io/official_releases/qt/6.5/6.6.1/single/qt-everywhere-src-6.6.1.tar.xz
+tar xvf qt-everywhere-src-6.6.1.tar.xz
+
+mkdir build-qt-everywhere-src-6.6.1
+cd build-qt-everywhere-src-6.6.1/
+
+sudo apt-get install build-essential cmake ninja-build libgl-dev libegl-dev libfontconfig1-dev libinput-dev libfontconfig1-dev libfreetype6-dev libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-cursor-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxcb-util-dev libxcb-xinerama0-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev libatspi2.0-dev libclang-dev
+
+../qt-everywhere-src-6.6.1/configure -skip qtwayland -skip qtwebengine | tee ../config_$(TZ='Asia/Singapore' date +%Y-%m-%dT%H.%M.%S%Z).log
+cmake --build . --parallel $(nproc) | tee ../build_$(TZ='Asia/Singapore' date +%Y-%m-%dT%H.%M.%S%Z).log
+sudo cmake --install .
+```
+to build Qt6 from source.
+
+```bash
+git clone --recurse-submodules https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+cd linux
+make mrproper
+
+# for host
+# copy distribution config file to source tree
+cp /boot/config-release .config
+make olddefconfig
+# to avoid error regarding CONFIG_SYSTEM_REVOCATION_KEYS="debian/canonical-revoked-certs.pem"
+scripts/config --disable SYSTEM_REVOCATION_KEYS
+make menuconfig
+
+make -j$(nproc) all | tee ../config_$(TZ='Asia/Singapore' date +%Y-%m-%dT%H.%M.%S%Z).log
+sudo make modules_install
+sudo make install
+
+# old kernel version
+uname --kernel-release
+sudo reboot
+# new kernel version
+uname --kernel-release
+
+# for an SoC
+KERNEL=kernel8
+# copy config file to source tree
+scp <user>@<address>:/boot/config* .config
+make ARCH=arm64 olddefconfig
+make ARCH=arm64 menuconfig
+
+make -j$(nproc) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- all | tee ../config_$(TZ='Asia/Singapore' date +%Y-%m-%dT%H.%M.%S%Z).log
+make -j$(nproc) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- deb-pkg
+cd ..
+scp *.deb <user>@<address>:/home/<user>
+
+# on SoC
+sudo dpkg -i *.deb
+```
+to update kernel from source.
+
+```bash
+# on host
+make -C <kernel-source-tree> M=$(pwd) ARCH=arm64 \
+  CROSS_COMPILE=aarch64-linux-gnu- modules
+make -C <kernel-source-tree> M=$(pwd) ARCH=arm64 \
+  CROSS_COMPILE=aarch64-linux-gnu- INSTALL_MOD_PATH=<temp-directory> modules_install
+tar zcvf - <temp-directory> | ssh <user-name>@<target-address> tar zxvf -
+
+# on target
+cd ~/<temp-directory>
+sudo su
+cp -r lib /lib
+echo <module-name> >> /etc/modules-load.d/modules.conf
+depmod
+reboot
+```
+to cross-compile linux modules and install them on remote target.
+
+## Scripts
+
+```bash
+#!/bin/bash
+
+PORT=17356
+
+if [ ! -f /etc/ssh/sshd_config_bak ]; then
+        cp /etc/ssh/sshd_config /etc/ssh/sshd_config_bak
+fi
+
+sed -i 's/#Port 22/Port '"$PORT"'/' /etc/ssh/sshd_config
+sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+sed -i 's/#PermitTunnel no/PermitTunnel yes/' /etc/ssh/sshd_config
+
+if [ -f ./users.txt ]; then
+        rm ./users.txt
+fi
+
+MYIP=$(curl -s https://checkip.amazonaws.com)
+
+for i in {1..2}; do
+        PASS=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1)
+        deluser "user$i" &> /dev/null
+        useradd "user$i" --shell /sbin/nologin
+        echo "user$i:$PASS" | chpasswd
+        echo "ssh://user$i:$PASS@$MYIP:$PORT#Profile$i" >> users.txt
+done
+cat users.txt
+```
+to setup SSH for VPN use and automatically add users. Later import profiles to NetMod Syna.
+
+```python
+# pip install python-telegram-bot --upgrade
+# pip install requests
+
+import logging, requests
+from telegram import (
+    Update
+)
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    ContextTypes
+)
+
+bot_father_token = "YOUR_TOKEN"
+your_username = "YOUR_ID"
+
+async def getCommand(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    logging.info(f"{update.effective_user}, {update.effective_chat}")
+    if update.effective_user.username != your_username:
+        return
+    await update.message.reply_text("...")
+    ip = requests.get('https://checkip.amazonaws.com').text.strip()
+    await update.message.reply_text(ip)
+
+def main() -> None:
+    logging.basicConfig(filename="ipbot.log", encoding='utf-8', level=logging.INFO)
+    application = Application.builder().token(bot_father_token).connect_timeout(30).build()
+    application.add_handler(CommandHandler("get", getCommand))
+    application.run_polling()
+
+if __name__ == "__main__":
+    main()
+```
+to run a Telegram bot for fetching dynamic IP.
+
+```python
+# pip install boto3
+# pip install schedule
+
+import logging, time, socket, requests, schedule, boto3
+from botocore.exceptions import ClientError
+
+IP = ''
+
+def getCurrentIP() -> str:
+    return requests.get('https://checkip.amazonaws.com').text.strip()
+
+def emailNewIP(ip: str) -> bool:
+    SENDER = "YOUR_NAME <YOUR_FROM_MAIL>" # keep < and >
+    RECIPIENT = "YOUR_TO_MAIL"
+    AWS_REGION = "ap-southeast-2" # can find it in server address
+    SUBJECT = "New IP Assignment"
+    BODY_TEXT = f"{ip} assigned to `{socket.gethostname()}`."
+    CHARSET = "UTF-8"
+    
+    client = boto3.client('ses',
+                          region_name=AWS_REGION,
+                          aws_access_key_id="YOUR_KEY",
+                          aws_secret_access_key="YOUR_SECRET"
+                          )
+    
+    try:
+        response = client.send_email(
+            Destination = {'ToAddresses': [RECIPIENT]},
+            Message = {
+                'Body': {'Text': {'Charset': CHARSET,'Data': BODY_TEXT}},
+                'Subject': {'Charset': CHARSET,'Data': SUBJECT},
+                },
+            Source = SENDER
+        )
+    except ClientError as e:
+        logging.critical(e.response['Error']['Message'])
+        return False
+    else:
+        logging.info(f"Email sent to {RECIPIENT} with new IP {ip}.")
+        logging.info(response['MessageId'])
+        return True
+
+def periodic_task():
+    global IP
+    if (ip := getCurrentIP()) != IP:
+        if emailNewIP(ip):
+            IP = ip
+
+schedule.every(60).seconds.do(periodic_task) # every minute
+
+def main() -> None:
+    logging.basicConfig(filename="in_mail_ip.log", encoding='utf-8', level=logging.INFO)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+if __name__ == "__main__":
+    main()
+```
+to run a task for notifying dynamic IP changes.
