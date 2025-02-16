@@ -75,10 +75,14 @@ time { tar -xf repo.tar.xz && rm -rf repo; }
 to show CPU time and memory faults after running command.
 
 ```bash
+# To make temp file
 FILE=$(mktemp)
 echo $FILE #/tmp/tmp.rvUW4WNN5H
+# To make temp folder
+DIR=$(mktemp -d)
+cd $DIR
 ```
-to create a unique temp file.
+to create a unique temp file or folder.
 
 ```bash
 ls -alhF .
