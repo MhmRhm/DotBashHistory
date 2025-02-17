@@ -172,6 +172,13 @@ to open CUPS setup page.
 ## Monitoring
 
 ```bash
+lsb_release -a
+cat /etc/os-release
+virt-what
+```
+to get information about the host system.
+
+```bash
 pidstat -ru -p <PID> 1
 ```
 to show memory and CPU usage of `<PID>` every second.
@@ -2320,11 +2327,6 @@ sudo chrt --fifo -p 99 <pid>
 chrt -p <pis>
 ```
 to set, change and query scheduling policy and priority.
-
-```bash
-sudo virt-what
-```
-to detect if we are running in a virtual machine.
 
 ```bash
 #!/bin/bash
