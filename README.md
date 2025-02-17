@@ -969,11 +969,11 @@ to include gpg signing in workflow.
 
 ```bash
 git switch feat
-git format-patch origin/main #/path/to/specific/files/optionally
+git format-patch origin/main -- 'optional/path/to/include/specific/files'
+git format-patch origin/main -- ':!optional/path/to/exclude/specific/files'
 git request-pull origin/main fork
-git send-email /tmp/0001-feat.patch --to=maintainer@mail.com --cc=reviewer@mail.com # use --compose to add a cover letter
 ```
-to prepare your work for integration and create a pull request or send patch to maintainer.
+to prepare your work for integration and create patch files or a pull request.
 
 ```bash
 git am -i 0001-feat.patch
