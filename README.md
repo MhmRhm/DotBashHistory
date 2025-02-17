@@ -2420,23 +2420,29 @@ uname --kernel-release
 sudo reboot
 # new kernel version
 uname --kernel-release
+```
+to update kernel from source.
 
+```bash
 # for an SoC
 KERNEL=kernel8
+
 # copy config file to source tree
 scp <user>@<address>:/boot/config* .config
-make ARCH=arm64 olddefconfig
-make ARCH=arm64 menuconfig
+ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- make olddefconfig
+ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- make menuconfig
 
-make -j$(nproc) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- all | tee ../config_$(TZ='Asia/Singapore' date +%Y-%m-%dT%H.%M.%S%Z).log
-make -j$(nproc) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- deb-pkg
+ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- make -j$(nproc) all | tee ../config_$(TZ='Asia/Singapore' date +%Y-%m-%dT%H.%M.%S%Z).log
+ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- make -j$(nproc) deb-pkg
+
+# copy new kernel to SoC
 cd ..
 scp *.deb <user>@<address>:/home/<user>
 
 # on SoC
 sudo dpkg -i *.deb
 ```
-to update kernel from source.
+to cross-compile and install kernel for an SoC.
 
 ```bash
 # on host
