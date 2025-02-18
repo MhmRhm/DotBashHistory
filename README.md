@@ -2333,6 +2333,10 @@ to set, change and query scheduling policy and priority.
 set -euo pipefail
 IFS=$'\n\t'
 
+scripts/config --enable CONFIG_IKCONFIG
+scripts/config --enable CONFIG_IKCONFIG_PROC
+scripts/config --enable CONFIG_KALLSYMS
+scripts/config --enable CONFIG_PRINTK_TIME
 scripts/config --enable CONFIG_DEBUG_KERNEL
 scripts/config --enable CONFIG_DEBUG_INFO
 scripts/config --enable CONFIG_DEBUG_MISC
@@ -2366,6 +2370,9 @@ scripts/config --enable CONFIG_DEBUG_BUGVERBOSE
 scripts/config --enable CONFIG_FTRACE
 scripts/config --enable CONFIG_FUNCTION_TRACER
 scripts/config --enable CONFIG_FUNCTION_GRAPH_TRACER
+scripts/config --enable CONFIG_IRQSOFF_TRACER
+scripts/config --enable CONFIG_PREEMPT_TRACER
+scripts/config --enable CONFIG_SCHED_TRACER
 scripts/config --enable CONFIG_FRAME_POINTER
 scripts/config --enable CONFIG_STACK_VALIDATION
 ```
@@ -2403,11 +2410,10 @@ git clone --recurse-submodules https://git.kernel.org/pub/scm/linux/kernel/git/t
 cd linux
 make mrproper
 
-# for host
-# copy distribution config file to source tree
+# Copy distribution config file to source tree
 cp /boot/config-release .config
 make olddefconfig
-# to avoid error regarding CONFIG_SYSTEM_REVOCATION_KEYS="debian/canonical-revoked-certs.pem"
+# To avoid error regarding CONFIG_SYSTEM_REVOCATION_KEYS="debian/canonical-revoked-certs.pem"
 scripts/config --disable SYSTEM_REVOCATION_KEYS
 make menuconfig
 
@@ -2415,41 +2421,40 @@ make -j$(nproc) all | tee ../config_$(TZ='Asia/Singapore' date +%Y-%m-%dT%H.%M.%
 sudo make modules_install
 sudo make install
 
-# old kernel version
+# Old kernel version
 uname --kernel-release
 sudo reboot
-# new kernel version
+# New kernel version
 uname --kernel-release
 ```
 to update kernel from source.
 
 ```bash
-# for an SoC
+# On host
 KERNEL=kernel8
-
-# copy config file to source tree
+# Copy config file to source tree
 scp <user>@<address>:/boot/config* .config
 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- make olddefconfig
 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- make menuconfig
-
-ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- make -j$(nproc) all | tee ../config_$(TZ='Asia/Singapore' date +%Y-%m-%dT%H.%M.%S%Z).log
+# To save log use | tee $(TZ='Asia/Singapore' date +%Y-%m-%dT%H.%M.%S%Z).log
+ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- make -j$(nproc) all
 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- make -j$(nproc) deb-pkg
 
-# copy new kernel to SoC
+# Copy new kernel to SoC
 cd ..
 scp *.deb <user>@<address>:/home/<user>
 
-# on SoC
+# On SoC
 sudo dpkg -i *.deb
 ```
 to cross-compile and install kernel for an SoC.
 
 ```bash
 # on host
-make -C <kernel-source-tree> M=$(pwd) ARCH=arm64 \
-  CROSS_COMPILE=aarch64-linux-gnu- modules
-make -C <kernel-source-tree> M=$(pwd) ARCH=arm64 \
-  CROSS_COMPILE=aarch64-linux-gnu- INSTALL_MOD_PATH=<temp-directory> modules_install
+M=$(pwd) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- \
+  make -C <kernel-source-tree> modules
+M=$(pwd) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- \
+  make -C <kernel-source-tree> INSTALL_MOD_PATH=<temp-directory> modules_install
 tar zcvf - <temp-directory> | ssh <user-name>@<target-address> tar zxvf -
 
 # on target
@@ -2460,7 +2465,7 @@ echo <module-name> >> /etc/modules-load.d/modules.conf
 depmod
 reboot
 ```
-to cross-compile linux modules and install them on remote target.
+to cross-compile a linux module and install it on the remote target.
 
 ## Scripts
 
