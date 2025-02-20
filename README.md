@@ -2244,6 +2244,7 @@ to manually boot from the GRUB command line.
 ## Kernel Internals
 
 ```bash
+objdump -d -j .modinfo <mod-name>
 modinfo <mod-name>
 systool -m <loaded-mod-name> -v
 ```
