@@ -2454,6 +2454,9 @@ to cross-compile and install kernel for an SoC.
 # Add this to drivers/char/Kconfig
 source "drivers/char/mydrv/Kconfig"
 
+# Add this to drivers/char/Makefile
+obj-$(CONFIG_MYDRV) += mydrv/
+
 # Create drivers/char/mydrv/Kconfig with the following
 config MYDRV
         tristate "My test driver"
