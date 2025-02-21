@@ -2412,7 +2412,7 @@ cd linux
 make mrproper
 
 # Copy distribution config file to source tree
-cp /boot/config-release .config
+cp /boot/config-$(uname -r) .config
 make olddefconfig
 # To avoid error regarding CONFIG_SYSTEM_REVOCATION_KEYS="debian/canonical-revoked-certs.pem"
 scripts/config --disable SYSTEM_REVOCATION_KEYS
@@ -2434,7 +2434,7 @@ to update kernel from source.
 # On host
 KERNEL=kernel8
 # Copy config file to source tree
-scp <user>@<address>:/boot/config* .config
+scp <user>@<address>:/boot/<config-file> .config
 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- make olddefconfig
 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- make menuconfig
 # To save log use | tee $(TZ='Asia/Singapore' date +%Y-%m-%dT%H.%M.%S%Z).log
@@ -2449,6 +2449,25 @@ scp *.deb <user>@<address>:/home/<user>
 sudo dpkg -i *.deb
 ```
 to cross-compile and install kernel for an SoC.
+
+```bash
+# Add this to drivers/char/Kconfig
+source "drivers/char/mydrv/Kconfig"
+
+# Create drivers/char/mydrv/Kconfig with the following
+config MYDRV
+        tristate "My test driver"
+        default m
+        help
+          This creates a test driver.
+          Will add /dev/mydrv char device.
+
+# Create drivers/char/mydrv/Makefile with the following
+obj-$(CONFIG_MYDRV) += mydrv.o
+
+# Create drivers/char/mydrv/mydrv.c with your code
+```
+to add in-tree Linux driver.
 
 ```bash
 # on host
