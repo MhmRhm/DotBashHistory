@@ -2469,6 +2469,18 @@ obj-$(CONFIG_MYDRV) += mydrv.o
 ```
 to add in-tree Linux driver.
 
+```make
+# Create Makefile with the following
+obj-m := mydrv.o
+mydrv-y := srcfile1.c srcfile2.c
+KERNEL_SRC ?= /lib/modules/$(shell uname -r)/build
+all default: modules
+install: modules_install
+modules modules_install help clean:
+        $(MAKE) -C $(KERNEL_SRC) M=$(shell pwd) $@
+```
+to compile an out-of-tree Linux driver. Run `make` afterwards.
+
 ```bash
 # on host
 M=$(pwd) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- \
