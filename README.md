@@ -2258,6 +2258,12 @@ sudo rmmod <module>
 to list all loaded modules, load a module and remove it.
 
 ```bash
+cat /sys/module/<module-name>/parameters/<param-name>
+echo <value> > /sys/module/<module-name>/parameters/<param-name>
+```
+to query or change modules parameters.
+
+```bash
 sysctl -w kernel.dmesg_restrict=1
 sudo dmesg
 ```
