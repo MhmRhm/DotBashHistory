@@ -2252,8 +2252,13 @@ to show general information about a module.
 
 ```bash
 lsmod
+# To load a single module
 sudo insmod <module>
 sudo rmmod <module>
+# To load with dependencies
+sudo modprobe <module>
+# To unload with unused dependencies
+sudo modprobe -r <module>
 ```
 to list all loaded modules, load a module and remove it.
 
@@ -2262,6 +2267,14 @@ cat /sys/module/<module-name>/parameters/<param-name>
 echo <value> > /sys/module/<module-name>/parameters/<param-name>
 ```
 to query or change modules parameters.
+
+```bash
+# To see module dependencies
+cat /lib/modules/$(uname -r)/modules.dep
+# To see associated devices
+cat /lib/modules/$(uname -r)/modules.alias
+```
+to list module dependencies and product and vendor ids associated with each driver.
 
 ```bash
 sysctl -w kernel.dmesg_restrict=1
