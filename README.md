@@ -1,5 +1,5 @@
 # DotBashHistory
-For tutorials, please take a look at my [DotBashHistory](https://mhmrhm.github.io/tutorials/) webpage.
+For tutorials, please take a look at the [DotBashHistory](https://mhmrhm.github.io/tutorials/).
 
 The following contains some useful commands and configs as a day-to-day reference.
 
@@ -2286,6 +2286,11 @@ to prevent non-privileged users from viewing kernel messages. See [sysctl-explor
 sudo bash -c 'echo "<1>test_script: Hello '"$(whoami)"'!" > /dev/kmsg'
 ```
 to print messages into kernel logs from scripts at KERN_ALERT level.
+
+```bash
+watch -n 0.3 cat /proc/softirqs
+```
+to watch system stat on soft interrupt requests.
 
 ```bash
 cat /proc/zoneinfo
