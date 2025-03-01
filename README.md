@@ -2288,9 +2288,9 @@ sudo bash -c 'echo "<1>test_script: Hello '"$(whoami)"'!" > /dev/kmsg'
 to print messages into kernel logs from scripts at KERN_ALERT level.
 
 ```bash
-watch -n 0.3 cat /proc/softirqs
+cat /proc/softirqs
 ```
-to watch system stat on soft interrupt requests.
+to see system stat on soft interrupt requests.
 
 ```bash
 cat /proc/zoneinfo
