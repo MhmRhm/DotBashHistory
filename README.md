@@ -643,6 +643,7 @@ git config --local submodule.recurse true
 git config --global credential.helper 'cache --timeout 900'
 git config --global core.autocrlf true
 git config --local core.whitespace indent-with-non-tab # tab-in-indent to treat tabs as error
+git config --global color.diff.meta 'BrightMagenta'
 
 git config --global gpg.program gpg2
 git config --local user.signingkey <key_id>
