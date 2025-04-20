@@ -2404,6 +2404,60 @@ scripts/config --enable CONFIG_STACK_VALIDATION
 ```
 to add debug configs to kernel
 
+```c
+#include <linux/delay.h>
+#include <linux/init.h>
+#include <linux/interrupt.h>
+#include <linux/kernel.h>
+#include <linux/module.h>
+
+#define pr_fmt(fmt) KBUILD_MODNAME ": %s: " fmt, __func__
+
+// Tasklet function declaration
+void tasklet_function(struct tasklet_struct *t);
+
+// Declare a tasklet
+DECLARE_TASKLET(my_tasklet, tasklet_function);
+
+static int counter = 0;
+static const int max_recursions = 10; // Limit the number of recursive calls
+
+// Tasklet callback function
+void tasklet_function(struct tasklet_struct *t) {
+  pr_info("Running tasklet callback for the %d time(s)\n", ++counter);
+
+  // Schedule the tasklet again if the recursion limit is not reached
+  if (counter < max_recursions) {
+    tasklet_hi_schedule(&my_tasklet);
+  } else {
+    pr_info("Reached maximum recursion limit of %d\n", max_recursions);
+  }
+}
+
+// Module initialization function
+static int __init my_init(void) {
+  pr_info("Initializing tasklet example module\n");
+  // Schedule the tasklet
+  tasklet_hi_schedule(&my_tasklet);
+  return 0;
+}
+
+// Module cleanup function
+static void __exit my_exit(void) {
+  // Ensure the tasklet is killed
+  tasklet_kill(&my_tasklet);
+  pr_info("Tasklet example module cleanup\n");
+}
+
+module_init(my_init);
+module_exit(my_exit);
+
+MODULE_AUTHOR("Mohammad Rahimi <rahimi.mhmmd@gmail.com>");
+MODULE_DESCRIPTION("Tasklet example with controlled recursion");
+MODULE_LICENSE("GPL");
+```
+to use tasklets in a kernel module.
+
 ## Builds
 
 ```bash
