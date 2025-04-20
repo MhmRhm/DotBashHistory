@@ -2428,6 +2428,8 @@ void tasklet_function(struct tasklet_struct *t) {
 
   // Schedule the tasklet again if the recursion limit is not reached
   if (counter < max_recursions) {
+    // BUG: sleep in interrupt context.
+    // msleep(500);
     tasklet_hi_schedule(&my_tasklet);
   } else {
     pr_info("Reached maximum recursion limit of %d\n", max_recursions);
@@ -2457,6 +2459,62 @@ MODULE_DESCRIPTION("Tasklet example with controlled recursion");
 MODULE_LICENSE("GPL");
 ```
 to use tasklets in a kernel module.
+
+```c
+#include <linux/delay.h>
+#include <linux/init.h>
+#include <linux/module.h>
+#include <linux/sched.h>
+#include <linux/time.h>
+#include <linux/workqueue.h>
+
+#define pr_fmt(fmt) KBUILD_MODNAME ": %s: " fmt, __func__
+
+static DECLARE_WAIT_QUEUE_HEAD(my_wait_queue);
+static struct workqueue_struct* my_work_queue;
+static struct work_struct deferred_wake;
+static int condition = 0;
+
+// Workqueue handler function
+static void work_handler(struct work_struct *work) {
+  // OK: sleep in process context
+  msleep(5000);
+  condition = 1;
+  pr_info("Work finished\n");
+  wake_up_interruptible(&my_wait_queue);
+}
+
+// Module initialization function
+static int __init my_init(void) {
+  pr_info("Initializing\n");
+  my_work_queue = create_singlethread_workqueue("my_work_queue");
+  INIT_WORK(&deferred_wake, work_handler);
+  queue_work(my_work_queue, &deferred_wake);
+
+  pr_info("Waiting...\n");
+  if (wait_event_interruptible(my_wait_queue, condition != 0)) {
+    pr_info("Wait interrupted\n");
+    return 0;
+  }
+  pr_info("Wait finished\n");
+  return 0;
+}
+
+// Module cleanup function
+static void __exit my_exit(void) {
+  pr_info("Cleaning up\n");
+  flush_workqueue(my_work_queue);
+  destroy_workqueue(my_work_queue);
+}
+
+module_init(my_init);
+module_exit(my_exit);
+
+MODULE_AUTHOR("Mohammad Rahimi <rahimi.mhmmd@gmail.com>");
+MODULE_DESCRIPTION("Wait queue example with workqueue and interruptible sleep");
+MODULE_LICENSE("GPL");
+```
+to wait for events and defer work with workqueue in a kernel moule.
 
 ## Builds
 
