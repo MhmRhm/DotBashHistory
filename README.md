@@ -2516,6 +2516,119 @@ MODULE_LICENSE("GPL");
 ```
 to wait for events and defer work with workqueue in a kernel moule.
 
+```c
+#include <linux/cdev.h>
+#include <linux/device.h>
+#include <linux/fs.h>
+#include <linux/init.h>
+#include <linux/module.h>
+#include <linux/version.h>
+
+#define pr_fmt(fmt) KBUILD_MODNAME ": %s: " fmt, __func__
+
+int dummy_open(struct inode *inode, struct file *filp);
+int dummy_release(struct inode *inode, struct file *filp);
+ssize_t dummy_read(struct file *filp, char __user *buf, size_t count,
+                   loff_t *offset);
+ssize_t dummy_write(struct file *filp, const char __user *buf, size_t count,
+                    loff_t *offset);
+
+int dummy_open(struct inode *inode, struct file *filp) {
+  pr_info("Someone tried to open me\n");
+  return 0;
+}
+
+int dummy_release(struct inode *inode, struct file *filp) {
+  pr_info("Someone closed me\n");
+  return 0;
+}
+
+ssize_t dummy_read(struct file *filp, char __user *buf, size_t count,
+                   loff_t *offset) {
+  pr_info("Nothing to read guy\n");
+  return 0;
+}
+
+ssize_t dummy_write(struct file *filp, const char __user *buf, size_t count,
+                    loff_t *offset) {
+  pr_info("Can't accept any data guy\n");
+  return count;
+}
+
+static struct file_operations fops = {
+  open : dummy_open,
+  release : dummy_release,
+  read : dummy_read,
+  write : dummy_write
+};
+
+static dev_t devt;
+struct cdev cdev;
+static struct class *dummy_class;
+
+static int __init dummy_char_init_module(void) {
+  pr_info("init\n");
+  int error;
+
+  error = alloc_chrdev_region(&devt, 0, 1, "dummy_cdev");
+  if (error < 0) {
+    pr_err("Failed to allocate chrdev region\n");
+    return error;
+  }
+
+  cdev_init(&cdev, &fops);
+  cdev.owner = THIS_MODULE;
+  error = cdev_add(&cdev, devt, 1);
+  if (error < 0) {
+    pr_err("Failed to add cdev\n");
+    goto unregister_region;
+  }
+
+  dummy_class = class_create("dummy_class");
+  if (IS_ERR(dummy_class)) {
+    pr_err("Failed to create class\n");
+    error = PTR_ERR(dummy_class);
+    goto del_cdev;
+  }
+
+  struct device *dummy_device =
+      device_create(dummy_class, NULL, devt, NULL, "dummy_device");
+  if (IS_ERR(dummy_device)) {
+    pr_err("Failed to create device\n");
+    error = PTR_ERR(dummy_device);
+    goto destroy_class;
+  }
+
+  pr_info("dummy_device added with major = %d and minor = %d\n", MAJOR(devt),
+          MINOR(devt));
+  return 0;
+
+destroy_class:
+  class_destroy(dummy_class);
+del_cdev:
+  cdev_del(&cdev);
+unregister_region:
+  unregister_chrdev_region(devt, 1);
+  return error;
+}
+
+static void __exit dummy_char_cleanup_module(void) {
+  pr_info("exit\n");
+  device_destroy(dummy_class, devt);
+  class_destroy(dummy_class);
+  cdev_del(&cdev);
+  unregister_chrdev_region(devt, 1);
+}
+
+module_init(dummy_char_init_module);
+module_exit(dummy_char_cleanup_module);
+
+MODULE_AUTHOR("Mohammad Rahimi <rahimi.mhmmd@gmail.com>");
+MODULE_DESCRIPTION("Dummy character driver");
+MODULE_LICENSE("GPL");
+```
+to create a character device driver.
+
 ## Builds
 
 ```bash
