@@ -2404,6 +2404,12 @@ scripts/config --enable CONFIG_STACK_VALIDATION
 ```
 to add debug configs to kernel
 
+```bash
+# Must build with CONFIG_IKCONFIG
+zcat /proc/config.gz
+```
+to see booted kernel build configs.
+
 ```c
 #include <linux/delay.h>
 #include <linux/init.h>
