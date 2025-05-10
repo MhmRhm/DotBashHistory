@@ -2635,6 +2635,159 @@ MODULE_LICENSE("GPL");
 ```
 to create a character device driver.
 
+```c
+#include <linux/init.h>
+#include <linux/module.h>
+#include <linux/platform_device.h>
+
+#define DEV_BASE 0x02008000
+#define DEV_IRQ 31
+
+static struct resource device_resources[] = {
+    [0] =
+        {
+            .start = DEV_BASE,
+            .end = DEV_BASE + 0x4000,
+            .flags = IORESOURCE_MEM,
+        },
+    [1] =
+        {
+            .start = DEV_IRQ,
+            .end = DEV_IRQ,
+            .flags = IORESOURCE_IRQ,
+        },
+};
+
+static struct platform_device my_device = {
+    .name = "pdev",
+    .id = 0,
+    .resource = device_resources,
+    .num_resources = ARRAY_SIZE(device_resources),
+};
+
+static int __init my_device_init(void) {
+  int ret;
+  ret = platform_device_register(&my_device);
+  if (ret) {
+    pr_err("Failed to register platform device\n");
+    return ret;
+  }
+  pr_info("Platform device registered successfully\n");
+  return 0;
+}
+
+static void __exit my_device_exit(void) {
+  platform_device_unregister(&my_device);
+  pr_info("Platform device unregistered successfully\n");
+}
+
+module_init(my_device_init);
+module_exit(my_device_exit);
+
+MODULE_LICENSE("GPL");
+MODULE_DESCRIPTION("Platform Device Example");
+MODULE_AUTHOR("Mohammad Rahimi<rahimi.mhmmd@gmail.com>");
+```
+to statically define a platform device.
+
+```c
+#include <linux/init.h>
+#include <linux/interrupt.h>
+#include <linux/module.h>
+#include <linux/of_platform.h>
+#include <linux/platform_device.h>
+
+static const struct of_device_id of_device_ids[] = {{
+                                                        .compatible = "pdev",
+                                                    },
+                                                    {}};
+MODULE_DEVICE_TABLE(of, of_device_ids);
+
+static const struct platform_device_id platform_device_ids[] = {
+    {
+        .name = "pdev",
+    },
+    {}};
+MODULE_DEVICE_TABLE(platform, platform_device_ids);
+
+static irqreturn_t irq_handler(int irq, void *dev_id) {
+  struct platform_device *pdev = dev_id;
+  pr_info("IRQ %d handled for device %s\n", irq, pdev->name);
+  return IRQ_HANDLED;
+}
+
+static u32 *reg_base;
+static struct resource *res_irq;
+
+static int pdrv_probe(struct platform_device *pdev) {
+  struct resource *regs;
+  int ret;
+
+  /* Get the memory resource */
+  regs = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+  if (!regs) {
+    dev_err(&pdev->dev, "Failed to get memory resource\n");
+    ret = -ENXIO;
+    goto err_out;
+  }
+
+  /* Map the memory resource */
+  reg_base = devm_ioremap(&pdev->dev, regs->start, resource_size(regs));
+  if (IS_ERR(reg_base)) {
+    dev_err(&pdev->dev, "Failed to map memory resource\n");
+    ret = PTR_ERR(reg_base);
+    goto err_out;
+  }
+
+  /* Get the IRQ resource */
+  res_irq = platform_get_resource(pdev, IORESOURCE_IRQ, 0);
+  if (!res_irq) {
+    dev_err(&pdev->dev, "Failed to get IRQ resource\n");
+    ret = -ENODEV;
+    goto err_unmap;
+  }
+
+  /* Request the IRQ */
+  ret = devm_request_irq(&pdev->dev, res_irq->start, irq_handler, IRQF_SHARED,
+                         pdev->name, pdev);
+  if (ret) {
+    dev_err(&pdev->dev, "Failed to request IRQ\n");
+    goto err_unmap;
+  }
+
+  dev_info(&pdev->dev, "Platform driver probed successfully\n");
+  return 0;
+
+err_unmap:
+  devm_iounmap(&pdev->dev, reg_base);
+err_out:
+  return ret;
+}
+
+static void pdrv_remove(struct platform_device *pdev) {
+  free_irq(res_irq->start, pdev);
+  devm_iounmap(&pdev->dev, reg_base);
+  dev_info(&pdev->dev, "Platform driver removed\n");
+}
+
+static struct platform_driver my_platform_driver = {
+    .probe = pdrv_probe,
+    .remove = pdrv_remove,
+    .driver =
+        {
+            .name = "pdev",
+            .owner = THIS_MODULE,
+        },
+    .id_table = platform_device_ids,
+};
+module_platform_driver(my_platform_driver);
+
+MODULE_LICENSE("GPL");
+MODULE_DESCRIPTION("Platform Driver Example");
+MODULE_AUTHOR("Mohammad Rahimi<rahimi.mhmmd@gmail.com>");
+```
+to create a platform device driver.
+
 ## Builds
 
 ```bash
