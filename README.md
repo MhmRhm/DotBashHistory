@@ -2410,6 +2410,33 @@ zcat /proc/config.gz
 ```
 to see booted kernel build configs.
 
+```
+// i2c-eeprom.dtso
+/dts-v1/;
+/plugin/;
+/ {
+    fragment@0 {
+        target = <&i2c_arm>;
+        __overlay__ {
+            mem@50 {
+                compatible = "atmel,24c256";
+                status = "okay";
+                pagesize = <64>;
+                reg = <0x50>;
+            };
+        };
+    };
+};
+```
+to add a node to I2C bus for an eeprom device.
+
+```bash
+dtc -@ -I dts -O dtb -o i2c-eeprom.dtbo i2c-eeprom.dtso 
+mkdir /sys/kernel/config/device-tree/overlays/i2c-eeprom
+cat i2c-eeprom.dtbo > /sys/kernel/config/device-tree/overlays/i2c-eeprom/dtbo
+```
+to compile and insert the device tree overlay at runtime.
+
 ```c
 #include <linux/delay.h>
 #include <linux/init.h>
