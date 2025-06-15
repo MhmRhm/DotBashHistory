@@ -2550,59 +2550,138 @@ to wait for events and defer work with workqueue in a kernel moule.
 
 ```c
 #include <linux/cdev.h>
-#include <linux/device.h>
+#include <linux/delay.h>
 #include <linux/fs.h>
+#include <linux/i2c.h>
 #include <linux/init.h>
+#include <linux/kernel.h>
 #include <linux/module.h>
-#include <linux/version.h>
+#include <linux/mutex.h>
+#include <linux/nvmem-provider.h>
 
-#define pr_fmt(fmt) KBUILD_MODNAME ": %s: " fmt, __func__
+#define MEM_SIZE 256
 
-int dummy_open(struct inode *inode, struct file *filp);
-int dummy_release(struct inode *inode, struct file *filp);
-ssize_t dummy_read(struct file *filp, char __user *buf, size_t count,
-                   loff_t *offset);
-ssize_t dummy_write(struct file *filp, const char __user *buf, size_t count,
-                    loff_t *offset);
+static struct class *class;
+static dev_t devt;
+struct cdev cdev;
+struct i2c_client *eeprom;
 
-int dummy_open(struct inode *inode, struct file *filp) {
-  pr_info("Someone tried to open me\n");
-  return 0;
-}
+int open(struct inode *inode, struct file *filp);
+int release(struct inode *inode, struct file *filp);
+ssize_t read(struct file *file, char __user *buf, size_t count, loff_t *offset);
+ssize_t write(struct file *file, const char __user *buf, size_t count,
+              loff_t *offset);
+static loff_t llseek(struct file *file, loff_t offset, int whence);
 
-int dummy_release(struct inode *inode, struct file *filp) {
-  pr_info("Someone closed me\n");
-  return 0;
-}
+int open(struct inode *inode, struct file *filp) { return 0; }
 
-ssize_t dummy_read(struct file *filp, char __user *buf, size_t count,
-                   loff_t *offset) {
-  pr_info("Nothing to read guy\n");
-  return 0;
-}
+int release(struct inode *inode, struct file *filp) { return 0; }
 
-ssize_t dummy_write(struct file *filp, const char __user *buf, size_t count,
-                    loff_t *offset) {
-  pr_info("Can't accept any data guy\n");
+ssize_t read(struct file *file, char __user *buf, size_t count,
+             loff_t *offset) {
+  struct device *dev = &eeprom->dev;
+  dev_info(dev, "read %lu bytes at %llu", count, *offset);
+
+  uint8_t addr_buf[2] = {(*offset >> 8) & 0xFF, *offset & 0xFF};
+  uint8_t data_buf[MEM_SIZE] = {};
+
+  dev_info(dev, "addr_buf[0] = 0x%x, addr_buf[1] = 0x%x", addr_buf[0],
+           addr_buf[1]);
+
+  if (count >= MEM_SIZE)
+    return -EINVAL;
+
+  int ret = i2c_master_send(eeprom, addr_buf, sizeof(addr_buf));
+  if (ret < 0)
+    return ret;
+
+  ret = i2c_master_recv(eeprom, data_buf, count);
+  if (copy_to_user(buf, data_buf, count))
+    return -EFAULT;
   return count;
 }
 
+ssize_t write(struct file *file, const char __user *buf, size_t count,
+              loff_t *offset) {
+  struct device *dev = &eeprom->dev;
+  dev_info(dev, "write %lu bytes at %llu", count, *offset);
+
+  uint8_t data[MEM_SIZE + 2] = {(*offset >> 8) & 0xFF, *offset & 0xFF};
+  if (count >= MEM_SIZE)
+    return -EINVAL;
+
+  if (copy_from_user(&data[2], buf, count))
+    return -EFAULT;
+  i2c_master_send(eeprom, data, count + 2);
+  return count;
+}
+
+static loff_t llseek(struct file *file, loff_t offset, int whence) {
+  loff_t new_pos;
+
+  switch (whence) {
+  case SEEK_SET:
+    new_pos = offset;
+    break;
+  case SEEK_CUR:
+    new_pos = file->f_pos + offset;
+    break;
+  case SEEK_END:
+    new_pos = MEM_SIZE + offset;
+    break;
+  default:
+    return -EINVAL;
+  }
+
+  if (new_pos < 0 || new_pos >= MEM_SIZE)
+    return -EINVAL;
+
+  struct device *dev = &eeprom->dev;
+  dev_info(dev, "seeking %llu", new_pos);
+
+  file->f_pos = new_pos;
+  return new_pos;
+}
+
 static struct file_operations fops = {
-  open : dummy_open,
-  release : dummy_release,
-  read : dummy_read,
-  write : dummy_write
+  open : open,
+  release : release,
+  read : read,
+  write : write,
+  llseek : llseek
 };
 
-static dev_t devt;
-struct cdev cdev;
-static struct class *dummy_class;
+static const struct i2c_device_id eeprom_device_id[] = {{"24c256,custom", 0},
+                                                        {}};
+MODULE_DEVICE_TABLE(i2c, eeprom_device_id);
 
-static int __init dummy_char_init_module(void) {
-  pr_info("init\n");
+static const struct of_device_id eeprom_of_match_table[] = {
+    {.compatible = "atmel,24c256,custom"}, {}};
+MODULE_DEVICE_TABLE(of, eeprom_of_match_table);
+
+static int probe(struct i2c_client *client) {
+  eeprom = client;
+
+  struct device *dev = &client->dev;
+  dev_info(dev, "eeprom driver probed");
+  return 0;
+}
+
+static void remove(struct i2c_client *client) {
+  struct device *dev = &client->dev;
+  dev_info(dev, "eeprom driver removed");
+}
+
+static struct i2c_driver eeprom_driver = {
+    .driver = {.name = "eeprom", .of_match_table = eeprom_of_match_table},
+    .probe = probe,
+    .remove = remove,
+    .id_table = eeprom_device_id};
+
+static int __init eeprom_driver_init(void) {
   int error;
 
-  error = alloc_chrdev_region(&devt, 0, 1, "dummy_cdev");
+  error = alloc_chrdev_region(&devt, 0, 1, "cdev");
   if (error < 0) {
     pr_err("Failed to allocate chrdev region\n");
     return error;
@@ -2616,50 +2695,50 @@ static int __init dummy_char_init_module(void) {
     goto unregister_region;
   }
 
-  dummy_class = class_create("dummy_class");
-  if (IS_ERR(dummy_class)) {
+  class = class_create("class");
+  if (IS_ERR(class)) {
     pr_err("Failed to create class\n");
-    error = PTR_ERR(dummy_class);
+    error = PTR_ERR(class);
     goto del_cdev;
   }
 
-  struct device *dummy_device =
-      device_create(dummy_class, NULL, devt, NULL, "dummy_device");
-  if (IS_ERR(dummy_device)) {
+  struct device *device = device_create(class, NULL, devt, NULL, "eeprom0");
+  if (IS_ERR(device)) {
     pr_err("Failed to create device\n");
-    error = PTR_ERR(dummy_device);
+    error = PTR_ERR(device);
     goto destroy_class;
   }
 
-  pr_info("dummy_device added with major = %d and minor = %d\n", MAJOR(devt),
+  pr_info("char device added with major = %d and minor = %d\n", MAJOR(devt),
           MINOR(devt));
-  return 0;
+
+  return i2c_add_driver(&eeprom_driver);
 
 destroy_class:
-  class_destroy(dummy_class);
+  class_destroy(class);
 del_cdev:
   cdev_del(&cdev);
 unregister_region:
   unregister_chrdev_region(devt, 1);
   return error;
 }
+module_init(eeprom_driver_init);
 
-static void __exit dummy_char_cleanup_module(void) {
-  pr_info("exit\n");
-  device_destroy(dummy_class, devt);
-  class_destroy(dummy_class);
+static void __exit eeprom_driver_exit(void) {
+  i2c_del_driver(&eeprom_driver);
+
+  device_destroy(class, devt);
+  class_destroy(class);
   cdev_del(&cdev);
   unregister_chrdev_region(devt, 1);
 }
+module_exit(eeprom_driver_exit);
 
-module_init(dummy_char_init_module);
-module_exit(dummy_char_cleanup_module);
-
+MODULE_DESCRIPTION("Dummy Driver for Atmel I2C EEPROM");
 MODULE_AUTHOR("Mohammad Rahimi <rahimi.mhmmd@gmail.com>");
-MODULE_DESCRIPTION("Dummy character driver");
 MODULE_LICENSE("GPL");
 ```
-to create a character device driver.
+to create a character device driver and link it to EEPROM I2C device driver.
 
 ```c
 #include <linux/init.h>
