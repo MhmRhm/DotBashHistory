@@ -18,6 +18,7 @@ The following contains some useful commands and configs as a day-to-day referenc
 - [Development](#development)
 - [Kernel Bootup](#kernel-bootup)
 - [Kernel Internals](#kernel-internals)
+- [Sample Drivers](#sample-drivers)
 - [Builds](#builds)
 - [Scripts](#scripts)
 
@@ -2429,12 +2430,31 @@ to see booted kernel build configs.
 ```
 to add a node to I2C bus for an eeprom device.
 
+```
+/dts-v1/;
+/plugin/;
+/ {
+        fragment@0 {
+                target = <&spidev0>;
+                __overlay__ {
+                        compatible = "bosch,bmp280";
+                        status = "okay";
+                        reg = <0x0>;
+                        spi-max-frequency = <10000000>;
+                };
+        };
+};
+```
+to add a node to SPI bus for a sensor.
+
 ```bash
 dtc -@ -I dts -O dtb -o i2c-eeprom.dtbo i2c-eeprom.dtso 
 mkdir /sys/kernel/config/device-tree/overlays/i2c-eeprom
 cat i2c-eeprom.dtbo > /sys/kernel/config/device-tree/overlays/i2c-eeprom/dtbo
 ```
 to compile and insert the device tree overlay at runtime.
+
+## Sample Drivers
 
 ```c
 #include <linux/delay.h>
@@ -2547,6 +2567,159 @@ MODULE_DESCRIPTION("Wait queue example with workqueue and interruptible sleep");
 MODULE_LICENSE("GPL");
 ```
 to wait for events and defer work with workqueue in a kernel moule.
+
+```c
+#include <linux/init.h>
+#include <linux/module.h>
+#include <linux/platform_device.h>
+
+#define DEV_BASE 0x02008000
+#define DEV_IRQ 31
+
+static struct resource device_resources[] = {
+    [0] =
+        {
+            .start = DEV_BASE,
+            .end = DEV_BASE + 0x4000,
+            .flags = IORESOURCE_MEM,
+        },
+    [1] =
+        {
+            .start = DEV_IRQ,
+            .end = DEV_IRQ,
+            .flags = IORESOURCE_IRQ,
+        },
+};
+
+static struct platform_device my_device = {
+    .name = "pdev",
+    .id = 0,
+    .resource = device_resources,
+    .num_resources = ARRAY_SIZE(device_resources),
+};
+
+static int __init my_device_init(void) {
+  int ret;
+  ret = platform_device_register(&my_device);
+  if (ret) {
+    pr_err("Failed to register platform device\n");
+    return ret;
+  }
+  pr_info("Platform device registered successfully\n");
+  return 0;
+}
+
+static void __exit my_device_exit(void) {
+  platform_device_unregister(&my_device);
+  pr_info("Platform device unregistered successfully\n");
+}
+
+module_init(my_device_init);
+module_exit(my_device_exit);
+
+MODULE_LICENSE("GPL");
+MODULE_DESCRIPTION("Platform Device Example");
+MODULE_AUTHOR("Mohammad Rahimi<rahimi.mhmmd@gmail.com>");
+```
+to statically define a platform device.
+
+```c
+#include <linux/init.h>
+#include <linux/interrupt.h>
+#include <linux/module.h>
+#include <linux/of_platform.h>
+#include <linux/platform_device.h>
+
+static const struct of_device_id of_device_ids[] = {{
+                                                        .compatible = "pdev",
+                                                    },
+                                                    {}};
+MODULE_DEVICE_TABLE(of, of_device_ids);
+
+static const struct platform_device_id platform_device_ids[] = {
+    {
+        .name = "pdev",
+    },
+    {}};
+MODULE_DEVICE_TABLE(platform, platform_device_ids);
+
+static irqreturn_t irq_handler(int irq, void *dev_id) {
+  struct platform_device *pdev = dev_id;
+  pr_info("IRQ %d handled for device %s\n", irq, pdev->name);
+  return IRQ_HANDLED;
+}
+
+static u32 *reg_base;
+static struct resource *res_irq;
+
+static int pdrv_probe(struct platform_device *pdev) {
+  struct resource *regs;
+  int ret;
+
+  /* Get the memory resource */
+  regs = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+  if (!regs) {
+    dev_err(&pdev->dev, "Failed to get memory resource\n");
+    ret = -ENXIO;
+    goto err_out;
+  }
+
+  /* Map the memory resource */
+  reg_base = devm_ioremap(&pdev->dev, regs->start, resource_size(regs));
+  if (IS_ERR(reg_base)) {
+    dev_err(&pdev->dev, "Failed to map memory resource\n");
+    ret = PTR_ERR(reg_base);
+    goto err_out;
+  }
+
+  /* Get the IRQ resource */
+  res_irq = platform_get_resource(pdev, IORESOURCE_IRQ, 0);
+  if (!res_irq) {
+    dev_err(&pdev->dev, "Failed to get IRQ resource\n");
+    ret = -ENODEV;
+    goto err_unmap;
+  }
+
+  /* Request the IRQ */
+  ret = devm_request_irq(&pdev->dev, res_irq->start, irq_handler, IRQF_SHARED,
+                         pdev->name, pdev);
+  if (ret) {
+    dev_err(&pdev->dev, "Failed to request IRQ\n");
+    goto err_unmap;
+  }
+
+  dev_info(&pdev->dev, "Platform driver probed successfully\n");
+  return 0;
+
+err_unmap:
+  devm_iounmap(&pdev->dev, reg_base);
+err_out:
+  return ret;
+}
+
+static void pdrv_remove(struct platform_device *pdev) {
+  free_irq(res_irq->start, pdev);
+  devm_iounmap(&pdev->dev, reg_base);
+  dev_info(&pdev->dev, "Platform driver removed\n");
+}
+
+static struct platform_driver my_platform_driver = {
+    .probe = pdrv_probe,
+    .remove = pdrv_remove,
+    .driver =
+        {
+            .name = "pdev",
+            .owner = THIS_MODULE,
+        },
+    .id_table = platform_device_ids,
+};
+module_platform_driver(my_platform_driver);
+
+MODULE_LICENSE("GPL");
+MODULE_DESCRIPTION("Platform Driver Example");
+MODULE_AUTHOR("Mohammad Rahimi<rahimi.mhmmd@gmail.com>");
+```
+to create a platform device driver.
 
 ```c
 #include <linux/cdev.h>
@@ -2741,157 +2914,160 @@ MODULE_LICENSE("GPL");
 to create a character device driver and link it to EEPROM I2C device driver.
 
 ```c
+#include <linux/cdev.h>
+#include <linux/delay.h>
+#include <linux/fs.h>
 #include <linux/init.h>
+#include <linux/kernel.h>
 #include <linux/module.h>
-#include <linux/platform_device.h>
+#include <linux/mutex.h>
+#include <linux/spi/spi.h>
 
-#define DEV_BASE 0x02008000
-#define DEV_IRQ 31
+static struct class *class;
+static dev_t devt;
+struct cdev cdev;
+struct spi_device *sensor;
 
-static struct resource device_resources[] = {
-    [0] =
-        {
-            .start = DEV_BASE,
-            .end = DEV_BASE + 0x4000,
-            .flags = IORESOURCE_MEM,
-        },
-    [1] =
-        {
-            .start = DEV_IRQ,
-            .end = DEV_IRQ,
-            .flags = IORESOURCE_IRQ,
-        },
+#define s32 int32_t
+#define u32 uint32_t
+#define s16 int16_t
+#define u16 uint16_t
+
+// Global fine temperature value
+s32 t_fine;
+
+s32 bmp280_compensate_T(s32 adc_T, u16 dig_T1, s16 dig_T2, s16 dig_T3) {
+  s32 var1, var2, T;
+  var1 = ((((adc_T >> 3) - ((s32)dig_T1 << 1))) * ((s32)dig_T2)) >> 11;
+  var2 = (((((adc_T >> 4) - ((s32)dig_T1)) * ((adc_T >> 4) - ((s32)dig_T1))) >>
+           12) *
+          ((s32)dig_T3)) >>
+         14;
+
+  t_fine = var1 + var2;
+  T = (t_fine * 5 + 128) >> 8; // Temperature in 0.01 °C
+  return T;
+}
+
+int open(struct inode *inode, struct file *filp);
+int release(struct inode *inode, struct file *filp);
+ssize_t read(struct file *file, char __user *buf, size_t count, loff_t *offset);
+
+int open(struct inode *inode, struct file *filp) { return 0; }
+int release(struct inode *inode, struct file *filp) { return 0; }
+ssize_t read(struct file *file, char __user *buf, size_t count,
+             loff_t *offset) {
+  u8 temp_buf[3] = {};
+  u8 calib_buf[26] = {};
+  u8 address[1] = {};
+
+  address[0] = 0xFA;
+  spi_write_then_read(sensor, address, 1, temp_buf, 3);
+  address[0] = 0x88;
+  spi_write_then_read(sensor, address, 1, calib_buf, 26);
+
+  print_hex_dump(KERN_INFO, "temp: ", DUMP_PREFIX_OFFSET, 16, 1, temp_buf,
+                 sizeof(temp_buf), true);
+  print_hex_dump(KERN_INFO, "calib: ", DUMP_PREFIX_OFFSET, 16, 1, calib_buf,
+                 sizeof(calib_buf), true);
+  s32 temp = bmp280_compensate_T(
+      temp_buf[0] << 12 | temp_buf[1] << 4 | temp_buf[2] >> 4,
+      calib_buf[1] << 8 | calib_buf[0], calib_buf[3] << 8 | calib_buf[2],
+      calib_buf[5] << 8 | calib_buf[4]);
+
+  struct device *dev = &sensor->dev;
+  dev_info(dev, "Temp = %d.%d", temp / 100, temp % 100);
+
+  return sprintf(buf, "%d.%d", temp / 100, temp % 100);
+}
+
+static struct file_operations fops = {
+  open : open,
+  release : release,
+  read : read,
 };
 
-static struct platform_device my_device = {
-    .name = "pdev",
-    .id = 0,
-    .resource = device_resources,
-    .num_resources = ARRAY_SIZE(device_resources),
-};
+static const struct spi_device_id sensor_device_id[] = {{"bmp280", 0}, {}};
+MODULE_DEVICE_TABLE(spi, sensor_device_id);
 
-static int __init my_device_init(void) {
-  int ret;
-  ret = platform_device_register(&my_device);
-  if (ret) {
-    pr_err("Failed to register platform device\n");
-    return ret;
-  }
-  pr_info("Platform device registered successfully\n");
+static const struct of_device_id sensor_of_match_table[] = {
+    {.compatible = "bosch,bmp280,custom"}, {}};
+MODULE_DEVICE_TABLE(of, sensor_of_match_table);
+
+static int probe(struct spi_device *spi) {
+  sensor = spi;
+
+  struct device *dev = &spi->dev;
+  dev_info(dev, "sensor driver probed");
   return 0;
 }
 
-static void __exit my_device_exit(void) {
-  platform_device_unregister(&my_device);
-  pr_info("Platform device unregistered successfully\n");
+static struct spi_driver sensor_driver = {
+    .driver = {.name = "sensor", .of_match_table = sensor_of_match_table},
+    .probe = probe,
+    .id_table = sensor_device_id};
+
+static int __init sensor_driver_init(void) {
+  int error;
+
+  error = alloc_chrdev_region(&devt, 0, 1, "cdev");
+  if (error < 0) {
+    pr_err("Failed to allocate chrdev region\n");
+    return error;
+  }
+
+  cdev_init(&cdev, &fops);
+  cdev.owner = THIS_MODULE;
+  error = cdev_add(&cdev, devt, 1);
+  if (error < 0) {
+    pr_err("Failed to add cdev\n");
+    goto unregister_region;
+  }
+
+  class = class_create("class");
+  if (IS_ERR(class)) {
+    pr_err("Failed to create class\n");
+    error = PTR_ERR(class);
+    goto del_cdev;
+  }
+
+  struct device *device = device_create(class, NULL, devt, NULL, "sensor");
+  if (IS_ERR(device)) {
+    pr_err("Failed to create device\n");
+    error = PTR_ERR(device);
+    goto destroy_class;
+  }
+
+  pr_info("char device added with major = %d and minor = %d\n", MAJOR(devt),
+          MINOR(devt));
+
+  return spi_register_driver(&sensor_driver);
+
+destroy_class:
+  class_destroy(class);
+del_cdev:
+  cdev_del(&cdev);
+unregister_region:
+  unregister_chrdev_region(devt, 1);
+  return error;
 }
+module_init(sensor_driver_init);
 
-module_init(my_device_init);
-module_exit(my_device_exit);
+static void __exit sensor_driver_exit(void) {
+  spi_unregister_driver(&sensor_driver);
 
+  device_destroy(class, devt);
+  class_destroy(class);
+  cdev_del(&cdev);
+  unregister_chrdev_region(devt, 1);
+}
+module_exit(sensor_driver_exit);
+
+MODULE_DESCRIPTION("Dummy Driver for BOSCH SPI BMP280");
+MODULE_AUTHOR("Mohammad Rahimi <rahimi.mhmmd@gmail.com>");
 MODULE_LICENSE("GPL");
-MODULE_DESCRIPTION("Platform Device Example");
-MODULE_AUTHOR("Mohammad Rahimi<rahimi.mhmmd@gmail.com>");
 ```
-to statically define a platform device.
-
-```c
-#include <linux/init.h>
-#include <linux/interrupt.h>
-#include <linux/module.h>
-#include <linux/of_platform.h>
-#include <linux/platform_device.h>
-
-static const struct of_device_id of_device_ids[] = {{
-                                                        .compatible = "pdev",
-                                                    },
-                                                    {}};
-MODULE_DEVICE_TABLE(of, of_device_ids);
-
-static const struct platform_device_id platform_device_ids[] = {
-    {
-        .name = "pdev",
-    },
-    {}};
-MODULE_DEVICE_TABLE(platform, platform_device_ids);
-
-static irqreturn_t irq_handler(int irq, void *dev_id) {
-  struct platform_device *pdev = dev_id;
-  pr_info("IRQ %d handled for device %s\n", irq, pdev->name);
-  return IRQ_HANDLED;
-}
-
-static u32 *reg_base;
-static struct resource *res_irq;
-
-static int pdrv_probe(struct platform_device *pdev) {
-  struct resource *regs;
-  int ret;
-
-  /* Get the memory resource */
-  regs = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-  if (!regs) {
-    dev_err(&pdev->dev, "Failed to get memory resource\n");
-    ret = -ENXIO;
-    goto err_out;
-  }
-
-  /* Map the memory resource */
-  reg_base = devm_ioremap(&pdev->dev, regs->start, resource_size(regs));
-  if (IS_ERR(reg_base)) {
-    dev_err(&pdev->dev, "Failed to map memory resource\n");
-    ret = PTR_ERR(reg_base);
-    goto err_out;
-  }
-
-  /* Get the IRQ resource */
-  res_irq = platform_get_resource(pdev, IORESOURCE_IRQ, 0);
-  if (!res_irq) {
-    dev_err(&pdev->dev, "Failed to get IRQ resource\n");
-    ret = -ENODEV;
-    goto err_unmap;
-  }
-
-  /* Request the IRQ */
-  ret = devm_request_irq(&pdev->dev, res_irq->start, irq_handler, IRQF_SHARED,
-                         pdev->name, pdev);
-  if (ret) {
-    dev_err(&pdev->dev, "Failed to request IRQ\n");
-    goto err_unmap;
-  }
-
-  dev_info(&pdev->dev, "Platform driver probed successfully\n");
-  return 0;
-
-err_unmap:
-  devm_iounmap(&pdev->dev, reg_base);
-err_out:
-  return ret;
-}
-
-static void pdrv_remove(struct platform_device *pdev) {
-  free_irq(res_irq->start, pdev);
-  devm_iounmap(&pdev->dev, reg_base);
-  dev_info(&pdev->dev, "Platform driver removed\n");
-}
-
-static struct platform_driver my_platform_driver = {
-    .probe = pdrv_probe,
-    .remove = pdrv_remove,
-    .driver =
-        {
-            .name = "pdev",
-            .owner = THIS_MODULE,
-        },
-    .id_table = platform_device_ids,
-};
-module_platform_driver(my_platform_driver);
-
-MODULE_LICENSE("GPL");
-MODULE_DESCRIPTION("Platform Driver Example");
-MODULE_AUTHOR("Mohammad Rahimi<rahimi.mhmmd@gmail.com>");
-```
-to create a platform device driver.
+to create a character device driver and link it to BMP280 sensor through SPI interface.
 
 ## Builds
 
