@@ -2295,7 +2295,8 @@ cat /proc/softirqs
 to see system stat on soft interrupt requests.
 
 ```bash
-/proc/<pid>/maps
+cat /proc/<pid>/maps
+cat /proc/<pid>/smaps
 ```
 to look up a process’s VAS.
 
