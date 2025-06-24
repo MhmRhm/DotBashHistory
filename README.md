@@ -2295,6 +2295,11 @@ cat /proc/softirqs
 to see system stat on soft interrupt requests.
 
 ```bash
+/proc/PID/maps
+```
+to look up a process’s VAS.
+
+```bash
 cat /proc/zoneinfo
 ```
 to print memory zone watermarks. If number of free pages drop below the min value, kernel will deny page allocation request on that zone. 
