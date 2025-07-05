@@ -3080,6 +3080,218 @@ MODULE_LICENSE("GPL");
 ```
 to create a character device driver and link it to BMP280 sensor through SPI interface.
 
+```c
+// sharedmem.c
+#include <linux/cdev.h>
+#include <linux/device.h>
+#include <linux/fs.h>
+#include <linux/init.h>
+#include <linux/mm.h>
+#include <linux/module.h>
+#include <linux/slab.h>
+#include <linux/uaccess.h>
+
+#define DEVICE_NAME "sharedmem"
+#define CLASS_NAME "sharedmem_class"
+
+static int major;
+static struct class *sharedmem_class;
+static struct cdev sharedmem_cdev;
+static void *kernel_mem;
+
+static int sharedmem_open(struct inode *inode, struct file *file) { return 0; }
+
+static int sharedmem_release(struct inode *inode, struct file *file) {
+  return 0;
+}
+
+static ssize_t sharedmem_write(struct file *file, const char __user *buf,
+                               size_t count, loff_t *ppos) {
+  memset(kernel_mem, 0, PAGE_SIZE);
+  printk(KERN_INFO "sharedmem: memory cleared by write\n");
+  return count;
+}
+
+static int sharedmem_mmap(struct file *file, struct vm_area_struct *vma) {
+  unsigned long pfn = page_to_pfn(virt_to_page(kernel_mem));
+  unsigned long size = vma->vm_end - vma->vm_start;
+
+  if (size > PAGE_SIZE)
+    return -EINVAL;
+
+  if (remap_pfn_range(vma, vma->vm_start, pfn, size, vma->vm_page_prot))
+    return -EAGAIN;
+
+  return 0;
+}
+
+static struct file_operations fops = {
+    .owner = THIS_MODULE,
+    .open = sharedmem_open,
+    .release = sharedmem_release,
+    .mmap = sharedmem_mmap,
+    .write = sharedmem_write,
+};
+
+static int __init sharedmem_init(void) {
+  dev_t dev;
+  int ret;
+
+  ret = alloc_chrdev_region(&dev, 0, 1, DEVICE_NAME);
+  if (ret < 0)
+    return ret;
+
+  major = MAJOR(dev);
+
+  cdev_init(&sharedmem_cdev, &fops);
+  ret = cdev_add(&sharedmem_cdev, dev, 1);
+  if (ret < 0)
+    goto err_unregister_chrdev;
+
+  sharedmem_class = class_create(CLASS_NAME);
+  if (IS_ERR(sharedmem_class)) {
+    ret = PTR_ERR(sharedmem_class);
+    goto err_cdev_del;
+  }
+
+  if (IS_ERR(device_create(sharedmem_class, NULL, dev, NULL, DEVICE_NAME))) {
+    ret = -ENOMEM;
+    goto err_class_destroy;
+  }
+
+  kernel_mem = (void *)get_zeroed_page(GFP_KERNEL);
+  if (!kernel_mem) {
+    ret = -ENOMEM;
+    goto err_device_destroy;
+  }
+
+  printk(KERN_INFO "sharedmem: module loaded\n");
+  printk(KERN_INFO "sharedmem: kernel_mem masked virtual address: %p\n",
+         kernel_mem);
+  printk(KERN_INFO "sharedmem: kernel_mem pfn: %lu\n",
+         page_to_pfn(virt_to_page(kernel_mem)));
+
+  return 0;
+
+err_device_destroy:
+  device_destroy(sharedmem_class, dev);
+err_class_destroy:
+  class_destroy(sharedmem_class);
+err_cdev_del:
+  cdev_del(&sharedmem_cdev);
+err_unregister_chrdev:
+  unregister_chrdev_region(dev, 1);
+  return ret;
+}
+
+static void __exit sharedmem_exit(void) {
+  dev_t dev = MKDEV(major, 0);
+
+  free_page((unsigned long)kernel_mem);
+  device_destroy(sharedmem_class, dev);
+  class_destroy(sharedmem_class);
+  cdev_del(&sharedmem_cdev);
+  unregister_chrdev_region(dev, 1);
+
+  printk(KERN_INFO "sharedmem: module unloaded\n");
+}
+
+module_init(sharedmem_init);
+module_exit(sharedmem_exit);
+
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Mohammad Rahimi <rahimi.mhmmd@gmail.com>");
+MODULE_DESCRIPTION("Shared memory mmap example");
+```
+
+```c
+// read.c
+#include <fcntl.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/mman.h>
+#include <unistd.h>
+
+#define DEVICE_PATH "/dev/sharedmem"
+#define PAGE_SIZE 4096
+
+int main() {
+  int fd = open(DEVICE_PATH, O_RDWR);
+  if (fd < 0) {
+    perror("Failed to open device");
+    return 1;
+  }
+  void *addr = mmap(NULL, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+  if (addr == MAP_FAILED) {
+    perror("mmap failed");
+    close(fd);
+    return 1;
+  }
+  printf("Mapped memory address: %p\n", addr);
+
+  // Print first 16 bytes of shared memory
+  printf("Initial contents of shared memory (first 16 bytes):\n");
+  for (int i = 0; i < 16; ++i) {
+    printf("%02x ", ((unsigned char *)addr)[i]);
+  }
+  printf("\n");
+
+  // Wait for user to press Enter
+  printf("Press Enter to read shared memory again...");
+  getchar();
+
+  // Print first 16 bytes again
+  printf("Contents of shared memory after modification (first 16 bytes):\n");
+  for (int i = 0; i < 16; ++i) {
+    printf("%02x ", ((unsigned char *)addr)[i]);
+  }
+  printf("\n");
+
+  munmap(addr, PAGE_SIZE);
+  write(fd, "clear", 5);
+  close(fd);
+  return 0;
+}
+```
+
+```c
+// write.c
+#include <fcntl.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/mman.h>
+#include <unistd.h>
+
+#define DEVICE_PATH "/dev/sharedmem"
+#define PAGE_SIZE 4096
+
+int main() {
+  int fd = open(DEVICE_PATH, O_RDWR);
+  if (fd < 0) {
+    perror("Failed to open device");
+    return 1;
+  }
+  void *addr = mmap(NULL, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+  if (addr == MAP_FAILED) {
+    perror("mmap failed");
+    close(fd);
+    return 1;
+  }
+  printf("Mapped memory address: %p\n", addr);
+
+  // Write binary values to shared memory
+  unsigned char values[16] = {0xDE, 0xAD, 0xBE, 0xEF, 0x12, 0x34, 0x56, 0x78,
+                              0x9A, 0xBC, 0xDE, 0xF0, 0x11, 0x22, 0x33, 0x44};
+  memcpy(addr, values, sizeof(values));
+  printf("Wrote binary values to shared memory.\n");
+
+  munmap(addr, PAGE_SIZE);
+  close(fd);
+  return 0;
+}
+```
+to allocate memory and share it between userspace process plus userspace programs to test.
+
 ## Builds
 
 ```bash
