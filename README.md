@@ -3292,6 +3292,154 @@ int main() {
 ```
 to allocate memory and share it between userspace process plus userspace programs to test.
 
+```c
+#include <linux/completion.h>
+#include <linux/delay.h>
+#include <linux/dma-mapping.h>
+#include <linux/dmaengine.h>
+#include <linux/init.h>
+#include <linux/kernel.h>
+#include <linux/module.h>
+#include <linux/mutex.h>
+#include <linux/slab.h>
+
+#define pr_fmt(fmt) "m2m module: " fmt
+
+#define BUF_SIZE 2 * PAGE_SIZE
+
+static void m2m_callback(void *completion) { complete(completion); }
+
+static int __init test_module_init(void) {
+  struct dma_async_tx_descriptor *m2m_desc;
+  struct completion m2m_completion;
+  struct dma_chan *m2m_chan;
+  dma_cap_mask_t mask;
+  dma_cookie_t cookie;
+  struct device *dev;
+  dma_addr_t m2m_src;
+  dma_addr_t m2m_dst;
+
+  u32 *write_buf;
+  u32 *read_buf;
+  int ret = 0;
+
+  read_buf = kzalloc(BUF_SIZE, GFP_KERNEL | GFP_DMA);
+  if (!read_buf) {
+    pr_err("failed to allocate read buffer\n");
+    ret = -ENOMEM;
+    goto err_out;
+  }
+
+  for (int i = 0; i < BUF_SIZE / sizeof(u32); i++) {
+    read_buf[i] = i;
+  }
+
+  write_buf = kzalloc(BUF_SIZE, GFP_KERNEL | GFP_DMA);
+  if (!write_buf) {
+    pr_err("failed to allocate write buffer\n");
+    ret = -ENOMEM;
+    goto err_free_read_buf;
+  }
+
+  dma_cap_zero(mask);
+  dma_cap_set(DMA_MEMCPY, mask);
+
+  m2m_chan = dma_request_channel(mask, NULL, NULL);
+  if (!m2m_chan) {
+    pr_err("failed to acquire DMA channel\n");
+    ret = -ENODEV;
+    goto err_free_write_buf;
+  }
+  dev = m2m_chan->device->dev;
+
+  pr_info("channel acquired: %d\n", m2m_chan->chan_id);
+  init_completion(&m2m_completion);
+
+  m2m_src = dma_map_single(dev, read_buf, BUF_SIZE, DMA_TO_DEVICE);
+  if (dma_mapping_error(dev, m2m_src)) {
+    pr_err("failed to map src buffer\n");
+    ret = -EIO;
+    goto err_release_chan;
+  }
+  pr_info("src buffer mapped\n");
+
+  m2m_dst = dma_map_single(dev, write_buf, BUF_SIZE, DMA_FROM_DEVICE);
+  if (dma_mapping_error(dev, m2m_dst)) {
+    pr_err("failed to map dst buffer\n");
+    ret = -EIO;
+    goto err_unmap_src_buf;
+  }
+  pr_info("dst buffer mapped\n");
+
+  m2m_desc = dmaengine_prep_dma_memcpy(m2m_chan, m2m_dst, m2m_src, BUF_SIZE, 0);
+  if (!m2m_desc) {
+    pr_err("failed to prepare DMA memcpy descriptor\n");
+    ret = -ENOMEM;
+    goto err_unmap_src_buf;
+  }
+  pr_info("DMA memcpy descriptor prepared\n");
+
+  m2m_desc->callback = m2m_callback;
+  m2m_desc->callback_param = &m2m_completion;
+
+  cookie = dmaengine_submit(m2m_desc);
+  if (dma_submit_error(cookie)) {
+    pr_err("failed to submit DMA descriptor\n");
+    ret = -EIO;
+    goto err_unmap_dst_buf;
+  }
+  pr_info("DMA descriptor submitted with cookie: %d\n", cookie);
+
+  wait_for_completion_timeout(&m2m_completion, msecs_to_jiffies(5000));
+  if (!completion_done(&m2m_completion)) {
+    pr_err("DMA transfer timed out\n");
+    ret = -ETIMEDOUT;
+    goto err_unmap_dst_buf;
+  }
+
+  dma_sync_single_for_cpu(dev, m2m_dst, BUF_SIZE, DMA_FROM_DEVICE);
+  pr_info("DMA transfer completed\n");
+
+  if (memcmp(read_buf, write_buf, BUF_SIZE)) {
+    pr_err("data mismatch after DMA transfer\n");
+    ret = -EIO;
+  } else {
+    pr_info("data verified successfully\n");
+  }
+
+err_unmap_dst_buf:
+  pr_info("unmapping destination buffer\n");
+  dma_unmap_single(dev, m2m_dst, BUF_SIZE, DMA_FROM_DEVICE);
+err_unmap_src_buf:
+  pr_info("unmapping source buffer\n");
+  dma_unmap_single(dev, m2m_src, BUF_SIZE, DMA_TO_DEVICE);
+err_release_chan:
+  pr_info("terminating DMA channel\n");
+  dmaengine_terminate_sync(m2m_chan);
+  pr_info("releasing DMA channel\n");
+  dma_release_channel(m2m_chan);
+err_free_write_buf:
+  pr_info("freeing write buffer\n");
+  kfree(write_buf);
+err_free_read_buf:
+  pr_info("freeing read buffer\n");
+  kfree(read_buf);
+err_out:
+  return ret;
+}
+module_init(test_module_init);
+
+static void __exit test_module_exit(void) {
+  pr_info("test module exited cleanly\n");
+}
+module_exit(test_module_exit);
+
+MODULE_DESCRIPTION("M2M Test Driver");
+MODULE_AUTHOR("Mohammad Rahimi <rahimi.mhmmd@gmail.com>");
+MODULE_LICENSE("GPL");
+```
+to use DMA for memory to memory data transfer.
+
 ## Builds
 
 ```bash
