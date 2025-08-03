@@ -3303,11 +3303,14 @@ to allocate memory and share it between userspace process plus userspace program
 #include <linux/mutex.h>
 #include <linux/slab.h>
 
-#define pr_fmt(fmt) "m2m module: " fmt
+#define pr_fmt(fmt) "test module: " fmt
 
 #define BUF_SIZE 2 * PAGE_SIZE
 
-static void m2m_callback(void *completion) { complete(completion); }
+static void m2m_callback(void *completion) {
+  pr_info("DMA transfer completed\n");
+  complete(completion);
+}
 
 static int __init test_module_init(void) {
   struct dma_async_tx_descriptor *m2m_desc;
@@ -3319,27 +3322,9 @@ static int __init test_module_init(void) {
   dma_addr_t m2m_src;
   dma_addr_t m2m_dst;
 
-  u32 *write_buf;
-  u32 *read_buf;
+  void *write_buf;
+  void *read_buf;
   int ret = 0;
-
-  read_buf = kzalloc(BUF_SIZE, GFP_KERNEL | GFP_DMA);
-  if (!read_buf) {
-    pr_err("failed to allocate read buffer\n");
-    ret = -ENOMEM;
-    goto err_out;
-  }
-
-  for (int i = 0; i < BUF_SIZE / sizeof(u32); i++) {
-    read_buf[i] = i;
-  }
-
-  write_buf = kzalloc(BUF_SIZE, GFP_KERNEL | GFP_DMA);
-  if (!write_buf) {
-    pr_err("failed to allocate write buffer\n");
-    ret = -ENOMEM;
-    goto err_free_read_buf;
-  }
 
   dma_cap_zero(mask);
   dma_cap_set(DMA_MEMCPY, mask);
@@ -3348,34 +3333,36 @@ static int __init test_module_init(void) {
   if (!m2m_chan) {
     pr_err("failed to acquire DMA channel\n");
     ret = -ENODEV;
-    goto err_free_write_buf;
+    goto err_out;
   }
   dev = m2m_chan->device->dev;
 
   pr_info("channel acquired: %d\n", m2m_chan->chan_id);
   init_completion(&m2m_completion);
 
-  m2m_src = dma_map_single(dev, read_buf, BUF_SIZE, DMA_TO_DEVICE);
-  if (dma_mapping_error(dev, m2m_src)) {
-    pr_err("failed to map src buffer\n");
-    ret = -EIO;
+  read_buf = dma_alloc_coherent(dev, BUF_SIZE, &m2m_src, GFP_KERNEL);
+  if (!read_buf) {
+    pr_err("failed to allocate read buffer\n");
+    ret = -ENOMEM;
     goto err_release_chan;
   }
-  pr_info("src buffer mapped\n");
+  pr_info("read_buf vir (%px) bus (%pad)\n", read_buf, &m2m_src);
 
-  m2m_dst = dma_map_single(dev, write_buf, BUF_SIZE, DMA_FROM_DEVICE);
-  if (dma_mapping_error(dev, m2m_dst)) {
-    pr_err("failed to map dst buffer\n");
-    ret = -EIO;
-    goto err_unmap_src_buf;
+  write_buf = dma_alloc_coherent(dev, BUF_SIZE, &m2m_dst, GFP_KERNEL);
+  if (!write_buf) {
+    pr_err("failed to allocate write buffer\n");
+    ret = -ENOMEM;
+    goto err_free_read_buf;
   }
-  pr_info("dst buffer mapped\n");
+  pr_info("write_buf vir (%px) bus (%pad)\n", write_buf, &m2m_dst);
+  
+  memset(write_buf, 0xAA, BUF_SIZE);
 
   m2m_desc = dmaengine_prep_dma_memcpy(m2m_chan, m2m_dst, m2m_src, BUF_SIZE, 0);
   if (!m2m_desc) {
     pr_err("failed to prepare DMA memcpy descriptor\n");
     ret = -ENOMEM;
-    goto err_unmap_src_buf;
+    goto err_free_write_buf;
   }
   pr_info("DMA memcpy descriptor prepared\n");
 
@@ -3386,19 +3373,21 @@ static int __init test_module_init(void) {
   if (dma_submit_error(cookie)) {
     pr_err("failed to submit DMA descriptor\n");
     ret = -EIO;
-    goto err_unmap_dst_buf;
+    goto err_free_write_buf;
   }
   pr_info("DMA descriptor submitted with cookie: %d\n", cookie);
 
-  wait_for_completion_timeout(&m2m_completion, msecs_to_jiffies(5000));
-  if (!completion_done(&m2m_completion)) {
+  dma_async_issue_pending(m2m_chan);
+  pr_info("DMA transfer started\n");
+
+  unsigned long timeout_jiffies = msecs_to_jiffies(5000);
+  if (!wait_for_completion_timeout(&m2m_completion, timeout_jiffies)) {
     pr_err("DMA transfer timed out\n");
     ret = -ETIMEDOUT;
-    goto err_unmap_dst_buf;
+    goto err_free_write_buf;
   }
 
   dma_sync_single_for_cpu(dev, m2m_dst, BUF_SIZE, DMA_FROM_DEVICE);
-  pr_info("DMA transfer completed\n");
 
   if (memcmp(read_buf, write_buf, BUF_SIZE)) {
     pr_err("data mismatch after DMA transfer\n");
@@ -3407,23 +3396,17 @@ static int __init test_module_init(void) {
     pr_info("data verified successfully\n");
   }
 
-err_unmap_dst_buf:
-  pr_info("unmapping destination buffer\n");
-  dma_unmap_single(dev, m2m_dst, BUF_SIZE, DMA_FROM_DEVICE);
-err_unmap_src_buf:
-  pr_info("unmapping source buffer\n");
-  dma_unmap_single(dev, m2m_src, BUF_SIZE, DMA_TO_DEVICE);
+err_free_write_buf:
+  pr_info("freeing write buffer\n");
+  dma_free_coherent(dev, BUF_SIZE, write_buf, m2m_dst);
+err_free_read_buf:
+  pr_info("freeing read buffer\n");
+  dma_free_coherent(dev, BUF_SIZE, read_buf, m2m_src);
 err_release_chan:
   pr_info("terminating DMA channel\n");
   dmaengine_terminate_sync(m2m_chan);
   pr_info("releasing DMA channel\n");
   dma_release_channel(m2m_chan);
-err_free_write_buf:
-  pr_info("freeing write buffer\n");
-  kfree(write_buf);
-err_free_read_buf:
-  pr_info("freeing read buffer\n");
-  kfree(read_buf);
 err_out:
   return ret;
 }
@@ -3434,7 +3417,7 @@ static void __exit test_module_exit(void) {
 }
 module_exit(test_module_exit);
 
-MODULE_DESCRIPTION("M2M Test Driver");
+MODULE_DESCRIPTION("Test module for DMA memory-to-memory transfer");
 MODULE_AUTHOR("Mohammad Rahimi <rahimi.mhmmd@gmail.com>");
 MODULE_LICENSE("GPL");
 ```
