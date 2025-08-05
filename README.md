@@ -2344,6 +2344,11 @@ sudo perf timechart -i ./perf.data
 to record context-switches on CPU cores.
 
 ```bash
+perf trace -e dma:dma_map_page -e dma:dma_unmap_page insmod dma_m2m_module.ko
+```
+to show trace events hit while running a process.
+
+```bash
 watch -n 0.3 cat /proc/<PID>/sched
 ```
 to watch scheduling statistics on a process.
