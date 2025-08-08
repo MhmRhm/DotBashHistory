@@ -3326,7 +3326,6 @@ static int __init test_module_init(void) {
   struct device *dev;
   dma_addr_t m2m_src;
   dma_addr_t m2m_dst;
-
   u32 *write_buf;
   u32 *read_buf;
   int ret = 0;
@@ -3369,7 +3368,7 @@ static int __init test_module_init(void) {
     ret = -EIO;
     goto err_release_chan;
   }
-  pr_info("src buffer mapped\n");
+  pr_info("read_buf mapped:  vir (%px) bus (%pad)\n", read_buf, &m2m_src);
 
   m2m_dst = dma_map_single(dev, write_buf, BUF_SIZE, DMA_FROM_DEVICE);
   if (dma_mapping_error(dev, m2m_dst)) {
@@ -3377,7 +3376,7 @@ static int __init test_module_init(void) {
     ret = -EIO;
     goto err_unmap_src_buf;
   }
-  pr_info("dst buffer mapped\n");
+  pr_info("write_buf mapped: vir (%px) bus (%pad)\n", write_buf, &m2m_dst);
 
   m2m_desc = dmaengine_prep_dma_memcpy(m2m_chan, m2m_dst, m2m_src, BUF_SIZE, 0);
   if (!m2m_desc) {
@@ -3448,6 +3447,68 @@ MODULE_AUTHOR("Mohammad Rahimi <rahimi.mhmmd@gmail.com>");
 MODULE_LICENSE("GPL");
 ```
 to use DMA for memory to memory data transfer.
+
+```c
+#include <linux/init.h>
+#include <linux/io.h>
+#include <linux/ioport.h>
+#include <linux/kernel.h>
+#include <linux/module.h>
+
+#define pr_fmt(fmt) "gpio_dma: " fmt
+
+// See "bcm2837.dtsi"
+#define GPIO_BASE_PHYS 0x3F200000
+// Chapter 6 of BCM2835 ARM Peripherals
+#define GPIO_SIZE 0xA0
+#define GPFSEL2 0x08
+#define GPSET0  0x1C
+#define GPCLR0  0x28
+
+static int __init gpio_dma_init(void) {
+  const int act_led_bit = (29 - 20) * 3;
+  void __iomem *gpio_base;
+  u32 gpfsel2;
+  int ret = 0;
+
+  gpio_base = ioremap(GPIO_BASE_PHYS, GPIO_SIZE);
+  if (!gpio_base) {
+    pr_err("Failed to ioremap GPIO memory\n");
+    ret = -ENOMEM;
+    goto err_out;
+  }
+  pr_info("Mapped GPIO memory at %px\n", gpio_base);
+
+  // Read, modify and write Act LED GPIO register 29
+  gpfsel2 = ioread32(gpio_base + GPFSEL2);
+  pr_info("GPFSEL2 before: 0x%08x\n", gpfsel2);
+
+  gpfsel2 &= ~(0b111 << act_led_bit); // Clear the bits
+  gpfsel2 |= (0b001 << act_led_bit);  // Set to output
+  iowrite32(gpfsel2, gpio_base + GPFSEL2);
+
+  gpfsel2 = ioread32(gpio_base + GPFSEL2);
+  pr_info("GPFSEL2 after:  0x%08x\n", gpfsel2);
+
+err_iounmap:
+  iounmap(gpio_base);
+  pr_info("Unmapped GPIO memory\n");
+err_out:
+  return ret;
+}
+
+static void __exit gpio_dma_exit(void) {
+  pr_info("Exiting GPIO DMA module\n");
+}
+
+module_init(gpio_dma_init);
+module_exit(gpio_dma_exit);
+
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Mohammad Rahimi");
+MODULE_DESCRIPTION("Direct memory access to GPIO registers");
+```
+to use DMA for memory to GPIO transfer.
 
 ## Builds
 
