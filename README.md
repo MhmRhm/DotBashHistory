@@ -3449,26 +3449,48 @@ MODULE_LICENSE("GPL");
 to use DMA for memory to memory data transfer.
 
 ```c
+#include <linux/completion.h>
+#include <linux/delay.h>
+#include <linux/dma-mapping.h>
+#include <linux/dmaengine.h>
 #include <linux/init.h>
 #include <linux/io.h>
 #include <linux/ioport.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
+#include <linux/mutex.h>
+#include <linux/slab.h>
 
 #define pr_fmt(fmt) "gpio_dma: " fmt
 
 // See "bcm2837.dtsi"
 #define GPIO_BASE_PHYS 0x3F200000
+#define GPIO_BASE_BUS 0x7E200000
 // Chapter 6 of BCM2835 ARM Peripherals
 #define GPIO_SIZE 0xA0
-#define GPFSEL2 0x08
-#define GPSET0  0x1C
-#define GPCLR0  0x28
+#define GPSET0 0x1C
+#define GPCLR0 0x28
+
+#define BIT29 (1u << 29)
+#define BUF_SIZE PAGE_SIZE
+#define DW_COUNT 6
+
+static void on_complete(void *completion) {
+  pr_info("DMA transfer completed\n");
+  complete(completion);
+}
 
 static int __init gpio_dma_init(void) {
-  const int act_led_bit = (29 - 20) * 3;
+  struct dma_async_tx_descriptor *mem2dev_desc;
+  struct dma_slave_config channel_cfg = {0};
+  struct completion mem2dev_completion;
+  struct dma_chan *mem2dev_chan;
   void __iomem *gpio_base;
-  u32 gpfsel2;
+  dma_cap_mask_t mask;
+  dma_cookie_t cookie;
+  struct device *dev;
+  dma_addr_t mem_src;
+  u32 *read_buf;
   int ret = 0;
 
   gpio_base = ioremap(GPIO_BASE_PHYS, GPIO_SIZE);
@@ -3479,17 +3501,86 @@ static int __init gpio_dma_init(void) {
   }
   pr_info("Mapped GPIO memory at %px\n", gpio_base);
 
-  // Read, modify and write Act LED GPIO register 29
-  gpfsel2 = ioread32(gpio_base + GPFSEL2);
-  pr_info("GPFSEL2 before: 0x%08x\n", gpfsel2);
+  iowrite32(BIT29, gpio_base + GPSET0); // Turn the Act LED off
+  iowrite32(BIT29, gpio_base + GPCLR0); // Turn the Act LED on
+  pr_info("Act LED toggled\n");
+  msleep(1000);
 
-  gpfsel2 &= ~(0b111 << act_led_bit); // Clear the bits
-  gpfsel2 |= (0b001 << act_led_bit);  // Set to output
-  iowrite32(gpfsel2, gpio_base + GPFSEL2);
+  read_buf = kzalloc(BUF_SIZE, GFP_KERNEL | GFP_DMA);
+  if (!read_buf) {
+    pr_err("failed to allocate read buffer\n");
+    ret = -ENOMEM;
+    goto err_out;
+  }
 
-  gpfsel2 = ioread32(gpio_base + GPFSEL2);
-  pr_info("GPFSEL2 after:  0x%08x\n", gpfsel2);
+  uint32_t on_array[DW_COUNT] = {0, 0, 0, BIT29, 0, 0};
+  uint32_t off_array[DW_COUNT] = {BIT29, 0, 0, 0, 0, 0};
+  memcpy((u8*)read_buf, (u8*)off_array, DW_COUNT * sizeof(uint32_t));
+  print_hex_dump(KERN_INFO, "Reaf Buffer: ", DUMP_PREFIX_OFFSET, 16, 4,
+                 read_buf, DW_COUNT * sizeof(uint32_t), false);
 
+  dma_cap_zero(mask);
+  dma_cap_set(DMA_SLAVE, mask);
+  mem2dev_chan = dma_request_channel(mask, NULL, NULL);
+  if (!mem2dev_chan) {
+    pr_err("failed to acquire DMA channel\n");
+    ret = -ENODEV;
+    goto err_free_read_buf;
+  }
+  dev = mem2dev_chan->device->dev;
+  pr_info("channel acquired: %d\n", mem2dev_chan->chan_id);
+
+  channel_cfg.direction = DMA_MEM_TO_DEV;
+  channel_cfg.dst_addr = GPIO_BASE_PHYS + GPSET0;
+  channel_cfg.dst_addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES;
+  dmaengine_slave_config(mem2dev_chan, &channel_cfg);
+  pr_info("DMA channel configured for GPIO\n");
+
+  mem_src = dma_map_single(dev, read_buf, BUF_SIZE, DMA_TO_DEVICE);
+  if (dma_mapping_error(dev, mem_src)) {
+    pr_err("failed to map src buffer\n");
+    ret = -EIO;
+    goto err_release_chan;
+  }
+  pr_info("read_buf mapped:  vir (%px) bus (%pad)\n", read_buf, &mem_src);
+
+  mem2dev_desc = dmaengine_prep_slave_single(
+      mem2dev_chan, mem_src, DW_COUNT * sizeof(uint32_t), DMA_MEM_TO_DEV,
+      DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
+
+  init_completion(&mem2dev_completion);
+  mem2dev_desc->callback = on_complete;
+  mem2dev_desc->callback_param = &mem2dev_completion;
+
+  cookie = dmaengine_submit(mem2dev_desc);
+  if (dma_submit_error(cookie)) {
+    pr_err("failed to submit DMA descriptor\n");
+    ret = -EIO;
+    goto err_unmap_src_buf;
+  }
+  pr_info("DMA descriptor submitted with cookie: %d\n", cookie);
+
+  dma_async_issue_pending(mem2dev_chan);
+  pr_info("DMA transfer started\n");
+
+  if (!wait_for_completion_timeout(&mem2dev_completion,
+                                   msecs_to_jiffies(5000))) {
+    pr_err("DMA transfer timed out\n");
+    ret = -ETIMEDOUT;
+    goto err_unmap_src_buf;
+  }
+
+err_unmap_src_buf:
+  pr_info("unmapping source buffer\n");
+  dma_unmap_single(dev, mem_src, BUF_SIZE, DMA_TO_DEVICE);
+err_release_chan:
+  pr_info("terminating DMA channel\n");
+  dmaengine_terminate_sync(mem2dev_chan);
+  pr_info("releasing DMA channel\n");
+  dma_release_channel(mem2dev_chan);
+err_free_read_buf:
+  pr_info("freeing read buffer\n");
+  kfree(read_buf);
 err_iounmap:
   iounmap(gpio_base);
   pr_info("Unmapped GPIO memory\n");
@@ -3497,9 +3588,7 @@ err_out:
   return ret;
 }
 
-static void __exit gpio_dma_exit(void) {
-  pr_info("Exiting GPIO DMA module\n");
-}
+static void __exit gpio_dma_exit(void) { pr_info("Exiting GPIO DMA module\n"); }
 
 module_init(gpio_dma_init);
 module_exit(gpio_dma_exit);
