@@ -3468,12 +3468,17 @@ to use DMA for memory to memory data transfer.
 #define GPIO_BASE_BUS 0x7E200000
 // Chapter 6 of BCM2835 ARM Peripherals
 #define GPIO_SIZE 0xA0
+#define GPFSEL2 0x08
 #define GPSET0 0x1C
 #define GPCLR0 0x28
 
 #define BIT29 (1u << 29)
+
 #define BUF_SIZE PAGE_SIZE
+
 #define DW_COUNT 6
+#define ON_CYCLES 100
+#define TOTAL_CYCLES PAGE_SIZE / sizeof(uint32_t) / DW_COUNT
 
 static void on_complete(void *completion) {
   pr_info("DMA transfer completed\n");
@@ -3481,16 +3486,9 @@ static void on_complete(void *completion) {
 }
 
 static int __init gpio_dma_init(void) {
-  struct dma_async_tx_descriptor *mem2dev_desc;
-  struct dma_slave_config channel_cfg = {0};
-  struct completion mem2dev_completion;
-  struct dma_chan *mem2dev_chan;
+  const int act_led_bit = (29 - 20) * 3;
   void __iomem *gpio_base;
-  dma_cap_mask_t mask;
-  dma_cookie_t cookie;
-  struct device *dev;
-  dma_addr_t mem_src;
-  u32 *read_buf;
+  u32 gpfsel2;
   int ret = 0;
 
   gpio_base = ioremap(GPIO_BASE_PHYS, GPIO_SIZE);
@@ -3501,10 +3499,31 @@ static int __init gpio_dma_init(void) {
   }
   pr_info("Mapped GPIO memory at %px\n", gpio_base);
 
-  iowrite32(BIT29, gpio_base + GPSET0); // Turn the Act LED off
-  iowrite32(BIT29, gpio_base + GPCLR0); // Turn the Act LED on
-  pr_info("Act LED toggled\n");
+  // Read, modify and write Act LED GPIO register 29
+  gpfsel2 = ioread32(gpio_base + GPFSEL2);
+  pr_info("GPFSEL2 before: 0x%08x\n", gpfsel2);
+
+  gpfsel2 &= ~(0b111 << act_led_bit); // Clear the bits
+  gpfsel2 |= (0b001 << act_led_bit);  // Set to output
+  iowrite32(gpfsel2, gpio_base + GPFSEL2);
+
+  gpfsel2 = ioread32(gpio_base + GPFSEL2);
+  pr_info("GPFSEL2 after:  0x%08x\n", gpfsel2);
+
+  // Turn the Act LED on
+  iowrite32(BIT29, gpio_base + GPCLR0);
+  pr_info("Act LED turned on\n");
   msleep(1000);
+
+  struct dma_async_tx_descriptor *mem2dev_desc;
+  struct dma_slave_config channel_cfg = {0};
+  struct completion mem2dev_completion;
+  struct dma_chan *mem2dev_chan;
+  dma_cap_mask_t mask;
+  dma_cookie_t cookie;
+  struct device *dev;
+  dma_addr_t mem_src;
+  u32 *read_buf;
 
   read_buf = kzalloc(BUF_SIZE, GFP_KERNEL | GFP_DMA);
   if (!read_buf) {
@@ -3513,11 +3532,19 @@ static int __init gpio_dma_init(void) {
     goto err_out;
   }
 
+  uint8_t *ptr = (uint8_t *)read_buf;
   uint32_t on_array[DW_COUNT] = {0, 0, 0, BIT29, 0, 0};
   uint32_t off_array[DW_COUNT] = {BIT29, 0, 0, 0, 0, 0};
-  memcpy((u8*)read_buf, (u8*)off_array, DW_COUNT * sizeof(uint32_t));
-  print_hex_dump(KERN_INFO, "Reaf Buffer: ", DUMP_PREFIX_OFFSET, 16, 4,
-                 read_buf, DW_COUNT * sizeof(uint32_t), false);
+  for (int i = 0; i < ON_CYCLES; ++i, ptr += sizeof(on_array)) {
+    memcpy(ptr, on_array, sizeof(on_array));
+  }
+  for (int i = ON_CYCLES; i < TOTAL_CYCLES; ++i, ptr += sizeof(off_array)) {
+    memcpy(ptr, off_array, sizeof(off_array));
+  }
+  pr_info("blinking LED initialized with %d on and %d off cycles\n", ON_CYCLES,
+          TOTAL_CYCLES - ON_CYCLES);
+  print_hex_dump(KERN_INFO, "Read Buffer: ", DUMP_PREFIX_OFFSET, 16, 4,
+                 read_buf, BUF_SIZE, false);
 
   dma_cap_zero(mask);
   dma_cap_set(DMA_SLAVE, mask);
@@ -3544,9 +3571,19 @@ static int __init gpio_dma_init(void) {
   }
   pr_info("read_buf mapped:  vir (%px) bus (%pad)\n", read_buf, &mem_src);
 
-  mem2dev_desc = dmaengine_prep_slave_single(
-      mem2dev_chan, mem_src, DW_COUNT * sizeof(uint32_t), DMA_MEM_TO_DEV,
-      DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
+  // mem2dev_desc = dmaengine_prep_dma_cyclic(mem2dev_chan, mem_src,
+  //                                          TOTAL_CYCLES * sizeof(on_array),
+  //                                          sizeof(on_array), DMA_MEM_TO_DEV,
+  //                                          0);
+  mem2dev_desc = dmaengine_prep_slave_single(mem2dev_chan, mem_src,
+                                             sizeof(off_array), DMA_MEM_TO_DEV,
+                                             DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
+  if (!mem2dev_desc) {
+    pr_err("failed to prepare DMA memcpy descriptor\n");
+    ret = -ENOMEM;
+    goto err_unmap_src_buf;
+  }
+  pr_info("DMA memcpy descriptor prepared\n");
 
   init_completion(&mem2dev_completion);
   mem2dev_desc->callback = on_complete;
