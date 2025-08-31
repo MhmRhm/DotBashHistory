@@ -3636,6 +3636,108 @@ MODULE_DESCRIPTION("Direct memory access to GPIO registers");
 ```
 to use DMA for memory to GPIO transfer.
 
+```c
+#include <linux/completion.h>
+#include <linux/ctype.h>
+#include <linux/delay.h>
+#include <linux/init.h>
+#include <linux/kernel.h>
+#include <linux/kobject.h>
+#include <linux/module.h>
+#include <linux/slab.h>
+#include <linux/sysfs.h>
+#include <linux/types.h>
+
+#define pr_fmt(fmt) "sysfs-demo: " fmt
+
+char *bin_buf;
+struct kobject *demo_kobj;
+
+static ssize_t demo_bin_read(struct file *filp, struct kobject *kobj,
+                             struct bin_attribute *attr, char *buf, loff_t off,
+                             size_t count) {
+  if (off >= attr->size)
+    return 0;
+  if (off + count > attr->size)
+    count = attr->size - off;
+
+  memcpy(buf, bin_buf + off, count);
+  pr_info("Read %zu bytes from offset %lld\n", count, off);
+  return count;
+}
+static ssize_t demo_bin_write(struct file *filp, struct kobject *kobj,
+                              struct bin_attribute *attr, char *buf, loff_t off,
+                              size_t count) {
+  if (off >= attr->size)
+    return -EINVAL;
+  if (off + count > attr->size)
+    count = attr->size - off;
+
+  memcpy(bin_buf + off, buf, count);
+  pr_info("Wrote %zu bytes to offset %lld\n", count, off);
+  return count;
+}
+
+static struct bin_attribute demo_bin_attr = {
+    .attr =
+        {
+            .name = "bin_attr",
+            .mode = S_IRUGO | S_IWUSR,
+        },
+    .size = PAGE_SIZE,
+    .read = demo_bin_read,
+    .write = demo_bin_write,
+};
+
+static int __init demo_init(void) {
+  pr_info("Initializing module\n");
+  int ret;
+
+  bin_buf = kzalloc(PAGE_SIZE, GFP_KERNEL);
+  if (!bin_buf) {
+    pr_err("Failed to allocate memory\n");
+    ret = -ENOMEM;
+    goto out;
+  }
+
+  demo_kobj = kobject_create_and_add("demo_sysfs", kernel_kobj);
+  if (!demo_kobj) {
+    pr_err("Failed to create kobject\n");
+    ret = -ENOMEM;
+    goto out_bin_buf;
+  }
+
+  ret = sysfs_create_bin_file(demo_kobj, &demo_bin_attr);
+  if (ret) {
+    pr_err("Failed to create the sysfs file\n");
+    goto out_demo_kobj;
+  }
+
+  return 0;
+
+out_demo_kobj:
+  kobject_put(demo_kobj);
+out_bin_buf:
+  kfree(bin_buf);
+out:
+  return ret;
+}
+
+static void __exit demo_exit(void) {
+  pr_info("Exiting module\n");
+  kobject_put(demo_kobj);
+  kfree(bin_buf);
+}
+
+module_init(demo_init);
+module_exit(demo_exit);
+
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Mohammad Rahimi");
+MODULE_DESCRIPTION("Creates a sysfs entry");
+```
+to create a sysfs entry with a binary attribute.
+
 ## Builds
 
 ```bash
