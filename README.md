@@ -3651,6 +3651,7 @@ to use DMA for memory to GPIO transfer.
 #define pr_fmt(fmt) "sysfs-demo: " fmt
 
 char *bin_buf;
+int value = 0;
 struct kobject *demo_kobj;
 
 static ssize_t demo_bin_read(struct file *filp, struct kobject *kobj,
@@ -3677,6 +3678,23 @@ static ssize_t demo_bin_write(struct file *filp, struct kobject *kobj,
   pr_info("Wrote %zu bytes to offset %lld\n", count, off);
   return count;
 }
+static ssize_t demo_ascii_show(struct kobject *kobj,
+                               struct kobj_attribute *attr, char *buf) {
+  pr_info("ASCII show called\n");
+  return sprintf(buf, "%u\n", value);
+}
+static ssize_t demo_ascii_store(struct kobject *kobj,
+                                struct kobj_attribute *attr, const char *buf,
+                                size_t count) {
+  pr_info("ASCII store called\n");
+  int rc;
+  rc = kstrtoint(buf, 0, &value);
+  if (rc) {
+    pr_err("Invalid input\n");
+    return rc;
+  }
+  return count;
+}
 
 static struct bin_attribute demo_bin_attr = {
     .attr =
@@ -3687,6 +3705,15 @@ static struct bin_attribute demo_bin_attr = {
     .size = PAGE_SIZE,
     .read = demo_bin_read,
     .write = demo_bin_write,
+};
+static struct kobj_attribute demo_ascii_attr = {
+    .attr =
+        {
+            .name = "ascii_attr",
+            .mode = S_IRUGO | S_IWUSR,
+        },
+    .show = demo_ascii_show,
+    .store = demo_ascii_store,
 };
 
 static int __init demo_init(void) {
@@ -3709,7 +3736,13 @@ static int __init demo_init(void) {
 
   ret = sysfs_create_bin_file(demo_kobj, &demo_bin_attr);
   if (ret) {
-    pr_err("Failed to create the sysfs file\n");
+    pr_err("Failed to create the sysfs binary file\n");
+    goto out_demo_kobj;
+  }
+
+  ret = sysfs_create_file(demo_kobj, &demo_ascii_attr.attr);
+  if (ret) {
+    pr_err("Failed to create the sysfs ascii file\n");
     goto out_demo_kobj;
   }
 
@@ -3734,9 +3767,9 @@ module_exit(demo_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Mohammad Rahimi");
-MODULE_DESCRIPTION("Creates a sysfs entry");
+MODULE_DESCRIPTION("Creates sysfs entries with binary and ASCII attributes");
 ```
-to create a sysfs entry with a binary attribute.
+to create a sysfs entry with an ascii and a binary attribute.
 
 ## Builds
 
