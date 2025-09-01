@@ -2430,15 +2430,21 @@ to see booted kernel build configs.
 ```
 /dts-v1/;
 /plugin/;
+
 / {
+	compatible = "brcm,bcm2835";
+
 	fragment@0 {
 		target = <&i2c_arm>;
 		__overlay__ {
-			mem@50 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "okay";
+
+			eeprom@50 {
 				compatible = "atmel,24c256";
-				status = "okay";
-				pagesize = <64>;
 				reg = <0x50>;
+				pagesize = <64>;
 			};
 		};
 	};
@@ -2450,15 +2456,15 @@ to add a node to I2C bus for an eeprom device.
 /dts-v1/;
 /plugin/;
 / {
-        fragment@0 {
-                target = <&spidev0>;
-                __overlay__ {
-                        compatible = "bosch,bmp280";
-                        status = "okay";
-                        reg = <0x0>;
-                        spi-max-frequency = <10000000>;
-                };
-        };
+	fragment@0 {
+		target = <&spidev0>;
+		__overlay__ {
+			compatible = "bosch,bmp280";
+			status = "okay";
+			reg = <0x0>;
+			spi-max-frequency = <10000000>;
+		};
+	};
 };
 ```
 to add a node to SPI bus for a sensor.
