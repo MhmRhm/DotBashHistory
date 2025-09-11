@@ -3777,6 +3777,68 @@ MODULE_DESCRIPTION("Creates sysfs entries with binary and ASCII attributes");
 ```
 to create a sysfs entry with an ascii and a binary attribute.
 
+```c
+#include <linux/ctype.h>
+#include <linux/delay.h>
+#include <linux/gpio.h>
+#include <linux/init.h>
+#include <linux/kernel.h>
+#include <linux/module.h>
+#include <linux/slab.h>
+#include <linux/types.h>
+
+#define pr_fmt(fmt) "gpio-demo: " fmt
+
+#define ACT_LED_GPIO 29
+
+static int __init demo_init(void) {
+  pr_info("Initializing module\n");
+  int ret;
+
+  if (!gpio_is_valid(ACT_LED_GPIO)) {
+    pr_err("GPIO 29 is not valid\n");
+    ret = -ENODEV;
+    goto err_out;
+  }
+
+  ret = gpio_request(ACT_LED_GPIO, "Act LED");
+  if (ret) {
+    pr_err("Failed to request GPIO 29\n");
+    goto err_out;
+  }
+
+  ret = gpio_direction_output(ACT_LED_GPIO, 1);
+  if (ret) {
+    pr_err("Failed to set Act LED as output\n");
+    goto err_free;
+  }
+
+  gpio_set_value(ACT_LED_GPIO, 1);
+  msleep(1000);
+  gpio_set_value(ACT_LED_GPIO, 1);
+  return 0;
+
+err_free:
+  gpio_free(ACT_LED_GPIO);
+err_out:
+  return ret;
+}
+
+static void __exit demo_exit(void) {
+  pr_info("Exiting module\n");
+  gpio_set_value(ACT_LED_GPIO, 0);
+  gpio_free(ACT_LED_GPIO);
+}
+
+module_init(demo_init);
+module_exit(demo_exit);
+
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Mohammad Rahimi");
+MODULE_DESCRIPTION("Manipulate GPIOs from a kernel module");
+```
+to control GPIOs directly with the old APIs.
+
 ## Builds
 
 ```bash
