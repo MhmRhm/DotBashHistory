@@ -2470,8 +2470,7 @@ to add a node to I2C bus for an eeprom device.
 ```
 to add a node to SPI bus for a sensor.
 
-```
-/dts-v1/;
+```/dts-v1/;
 /plugin/;
 
 / {
@@ -2481,9 +2480,9 @@ to add a node to SPI bus for a sensor.
 		target = <&gpio>;
 		__overlay__ {
 			light_controller_pins: light_controller_pins {
-				brcm,pins = <20 21>;   // GPIO20 = LED, GPIO21 = Button
-				brcm,function = <1 0>; // 1 = output (LED), 0 = input (Button)
-				brcm,pull = <0 2>;     // 0 = none (LED), 2 = pull-up (Button)
+				brcm,pins = <20 21 16>;  // GPIO20 = LED, GPIO21 = Button
+				brcm,function = <1 0 0>; // 1 = output (LED), 0 = input (Button)
+				brcm,pull = <0 2 2>;     // 0 = none (LED), 2 = pull-up (Button)
 			};
 		};
 	};
@@ -2499,6 +2498,7 @@ to add a node to SPI bus for a sensor.
 
 				led-gpios = <&gpio 20 0>; // 0 = GPIO_ACTIVE_HIGH
 				btn-gpios = <&gpio 21 1>; // 1 = GPIO_ACTIVE_LOW
+				bck-gpios = <&gpio 16 1>; // 1 = GPIO_ACTIVE_LOW
 			};
 		};
 	};
@@ -3829,6 +3829,7 @@ to create a sysfs entry with an ascii and a binary attribute.
 
 static struct gpio_desc *led_gpio;
 static struct gpio_desc *btn_gpio;
+static struct gpio_desc *bck_gpio;
 static bool led_on = false;
 static struct delayed_work work;
 
@@ -3839,9 +3840,16 @@ static void toggle_led(struct work_struct *work) {
 }
 
 static irqreturn_t btn_irq_handler(int irq, void *dev_id) {
-  pr_info("Button IRQ triggered\n");
+  pr_info("IRQ triggered for btn\n");
   mod_delayed_work(system_wq, &work,
-                   msecs_to_jiffies(200)); // Debounce delay
+                   msecs_to_jiffies(200)); // Software debounce delay
+  return IRQ_HANDLED;
+}
+static irqreturn_t bck_irq_handler(int irq, void *dev_id) {
+  pr_info("IRQ triggered for bck\n");
+  led_on = 0;
+  gpiod_set_value(led_gpio, led_on);
+  cancel_delayed_work_sync(&work);
   return IRQ_HANDLED;
 }
 
@@ -3856,15 +3864,32 @@ static int light_controller_probe(struct platform_device *pdev) {
   }
   btn_gpio = devm_gpiod_get(&pdev->dev, "btn", GPIOD_IN);
   if (IS_ERR(btn_gpio)) {
-    pr_err("Failed to get Button GPIO\n");
+    pr_err("Failed to get btn GPIO\n");
     ret = PTR_ERR(btn_gpio);
+    goto err_out;
+  }
+  bck_gpio = devm_gpiod_get(&pdev->dev, "bck", GPIOD_IN);
+  if (IS_ERR(bck_gpio)) {
+    pr_err("Failed to get bck GPIO\n");
+    ret = PTR_ERR(bck_gpio);
     goto err_out;
   }
 
   INIT_DELAYED_WORK(&work, toggle_led);
   irq_number = gpiod_to_irq(btn_gpio);
+  pr_info("IRQ number for btn: %d\n", irq_number);
   ret = devm_request_threaded_irq(&pdev->dev, irq_number, NULL, btn_irq_handler,
                                   IRQF_TRIGGER_RISING | IRQF_ONESHOT, "btn_irq",
+                                  NULL);
+  if (ret) {
+    pr_err("Failed to request IRQ\n");
+    goto err_out;
+  }
+
+  irq_number = gpiod_to_irq(bck_gpio);
+  pr_info("IRQ number for bck: %d\n", irq_number);
+  ret = devm_request_threaded_irq(&pdev->dev, irq_number, NULL, bck_irq_handler,
+                                  IRQF_TRIGGER_RISING | IRQF_ONESHOT, "bck_irq",
                                   NULL);
   if (ret) {
     pr_err("Failed to request IRQ\n");
