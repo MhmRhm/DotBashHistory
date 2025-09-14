@@ -2455,6 +2455,7 @@ to add a node to I2C bus for an eeprom device.
 ```
 /dts-v1/;
 /plugin/;
+
 / {
 	fragment@0 {
 		target = <&spidev0>;
@@ -2468,6 +2469,42 @@ to add a node to I2C bus for an eeprom device.
 };
 ```
 to add a node to SPI bus for a sensor.
+
+```
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "brcm,bcm2835";
+
+	fragment@0 {
+		target = <&gpio>;
+		__overlay__ {
+			light_controller_pins: light_controller_pins {
+				brcm,pins = <20 21>;   // GPIO20 = LED, GPIO21 = Button
+				brcm,function = <1 0>; // 1 = output (LED), 0 = input (Button)
+				brcm,pull = <0 2>;     // 0 = none (LED), 2 = pull-up (Button)
+			};
+		};
+	};
+
+	fragment@1 {
+		target-path = "/";
+		__overlay__ {
+			light_controller: light_controller@0 {
+				compatible = "custom,light-controller";
+				pinctrl-names = "default";
+				pinctrl-0 = <&light_controller_pins>;
+				status = "okay";
+
+				led-gpios = <&gpio 20 0>; // 0 = GPIO_ACTIVE_HIGH
+				btn-gpios = <&gpio 21 1>; // 1 = GPIO_ACTIVE_LOW
+			};
+		};
+	};
+};
+```
+to add a platform device node for a push button and an LED.
 
 ```bash
 dtc -@ -I dts -O dtb -o i2c-eeprom.dtbo i2c-eeprom.dtso 
@@ -3780,64 +3817,94 @@ to create a sysfs entry with an ascii and a binary attribute.
 ```c
 #include <linux/ctype.h>
 #include <linux/delay.h>
-#include <linux/gpio.h>
-#include <linux/init.h>
-#include <linux/kernel.h>
+#include <linux/gpio/consumer.h>
+#include <linux/interrupt.h>
 #include <linux/module.h>
-#include <linux/slab.h>
-#include <linux/types.h>
+#include <linux/of.h>
+#include <linux/platform_device.h>
+#include <linux/time.h>
+#include <linux/workqueue.h>
 
-#define pr_fmt(fmt) "gpio-demo: " fmt
+#define pr_fmt(fmt) "light-controller: " fmt
 
-#define ACT_LED_GPIO 29
+static struct gpio_desc *led_gpio;
+static struct gpio_desc *btn_gpio;
+static bool led_on = false;
+static struct delayed_work work;
 
-static int __init demo_init(void) {
-  pr_info("Initializing module\n");
-  int ret;
+static void toggle_led(struct work_struct *work) {
+  led_on = !led_on;
+  pr_info("Button pressed, LED is now %s\n", led_on ? "ON" : "OFF");
+  gpiod_set_value(led_gpio, led_on);
+}
 
-  if (!gpio_is_valid(ACT_LED_GPIO)) {
-    pr_err("GPIO 29 is not valid\n");
-    ret = -ENODEV;
+static irqreturn_t btn_irq_handler(int irq, void *dev_id) {
+  pr_info("Button IRQ triggered\n");
+  mod_delayed_work(system_wq, &work,
+                   msecs_to_jiffies(200)); // Debounce delay
+  return IRQ_HANDLED;
+}
+
+static int light_controller_probe(struct platform_device *pdev) {
+  int ret, irq_number;
+
+  led_gpio = devm_gpiod_get(&pdev->dev, "led", GPIOD_OUT_LOW);
+  if (IS_ERR(led_gpio)) {
+    pr_err("Failed to get LED GPIO\n");
+    ret = PTR_ERR(led_gpio);
+    goto err_out;
+  }
+  btn_gpio = devm_gpiod_get(&pdev->dev, "btn", GPIOD_IN);
+  if (IS_ERR(btn_gpio)) {
+    pr_err("Failed to get Button GPIO\n");
+    ret = PTR_ERR(btn_gpio);
     goto err_out;
   }
 
-  ret = gpio_request(ACT_LED_GPIO, "Act LED");
+  INIT_DELAYED_WORK(&work, toggle_led);
+  irq_number = gpiod_to_irq(btn_gpio);
+  ret = devm_request_threaded_irq(&pdev->dev, irq_number, NULL, btn_irq_handler,
+                                  IRQF_TRIGGER_RISING | IRQF_ONESHOT, "btn_irq",
+                                  NULL);
   if (ret) {
-    pr_err("Failed to request GPIO 29\n");
+    pr_err("Failed to request IRQ\n");
     goto err_out;
   }
 
-  ret = gpio_direction_output(ACT_LED_GPIO, 1);
-  if (ret) {
-    pr_err("Failed to set Act LED as output\n");
-    goto err_free;
-  }
-
-  gpio_set_value(ACT_LED_GPIO, 1);
-  msleep(1000);
-  gpio_set_value(ACT_LED_GPIO, 1);
-  return 0;
-
-err_free:
-  gpio_free(ACT_LED_GPIO);
+  ret = 0;
 err_out:
   return ret;
 }
 
-static void __exit demo_exit(void) {
-  pr_info("Exiting module\n");
-  gpio_set_value(ACT_LED_GPIO, 0);
-  gpio_free(ACT_LED_GPIO);
+static void light_controller_remove(struct platform_device *pdev) {
+  gpiod_set_value(led_gpio, 0); // Turn off LED
+  pr_info("Light controller module removed\n");
+  return;
 }
 
-module_init(demo_init);
-module_exit(demo_exit);
+static const struct of_device_id light_controller_of_match[] = {
+    {.compatible = "custom,light-controller"},
+    {},
+};
+MODULE_DEVICE_TABLE(of, light_controller_of_match);
+
+static struct platform_driver light_controller_driver = {
+    .probe = light_controller_probe,
+    .remove = light_controller_remove,
+    .driver =
+        {
+            .name = "light-controller",
+            .of_match_table = light_controller_of_match,
+            .owner = THIS_MODULE,
+        },
+};
+module_platform_driver(light_controller_driver);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Mohammad Rahimi");
 MODULE_DESCRIPTION("Manipulate GPIOs from a kernel module");
 ```
-to control GPIOs directly with the old APIs.
+to monitor and control GPIOs for a platform device.
 
 ## Builds
 
