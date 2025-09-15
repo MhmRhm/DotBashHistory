@@ -2504,7 +2504,7 @@ to add a node to SPI bus for a sensor.
 	};
 };
 ```
-to add a platform device node for a push button and an LED.
+to add a platform device node for a push button and an LED. Take a look at gpio-key-overlay.dts and gpio-led-overlay.dts in Raspberry Pi project.
 
 ```bash
 dtc -@ -I dts -O dtb -o i2c-eeprom.dtbo i2c-eeprom.dtso 
