@@ -2470,7 +2470,8 @@ to add a node to I2C bus for an eeprom device.
 ```
 to add a node to SPI bus for a sensor.
 
-```/dts-v1/;
+```
+/dts-v1/;
 /plugin/;
 
 / {
@@ -2505,6 +2506,59 @@ to add a node to SPI bus for a sensor.
 };
 ```
 to add a platform device node for a push button and an LED. Take a look at gpio-key-overlay.dts and gpio-led-overlay.dts in Raspberry Pi project.
+
+```
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "brcm,bcm2835";
+
+	fragment@0 {
+		target = <&gpio>;
+		__overlay__ {
+			light_controller_pins: light_controller_pins {
+				brcm,pins = <20 21 16>;  // GPIO20 = LED, GPIO21 = Button
+				brcm,function = <1 0 0>; // 1 = output (LED), 0 = input (Button)
+				brcm,pull = <0 2 2>;     // 0 = none (LED), 2 = pull-up (Button)
+			};
+		};
+	};
+
+	fragment@1 {
+		target-path = "/";
+		__overlay__ {
+			light_controller: light_controller@0 {
+				compatible = "custom,light-controller";
+				pinctrl-names = "default";
+				pinctrl-0 = <&light_controller_pins>;
+				status = "okay";
+
+				gpios = <&gpio 20 0>,
+					<&gpio 21 1>,
+					<&gpio 16 1>;
+				gpio-line-names = "led", "btn", "bck";
+			};
+		};
+	};
+};
+```
+to aggregate GPIOs.
+
+```bash
+echo gpio-aggregator > /sys/bus/platform/devices/light_controller\@0/driver_override
+echo light_controller@0 > /sys/bus/platform/drivers/gpio-aggregator/bind
+gpiodetect
+# gpiochip0 [pinctrl-bcm2835] (54 lines)
+# gpiochip1 [light_controller@0] (3 lines)
+gpioinfo gpiochip1
+# gpiochip1 - 3 lines:
+#         line   0:        "led"       unused  output  active-high 
+#         line   1:        "btn"       unused   input  active-high 
+#         line   2:        "bck"       unused   input  active-high
+gpioset gpiochip1 0=1
+```
+to control aggregated GPIOs.
 
 ```bash
 dtc -@ -I dts -O dtb -o i2c-eeprom.dtbo i2c-eeprom.dtso 
