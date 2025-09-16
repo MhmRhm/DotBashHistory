@@ -2567,6 +2567,14 @@ cat i2c-eeprom.dtbo > /sys/kernel/config/device-tree/overlays/i2c-eeprom/dtbo
 ```
 to compile and insert the device tree overlay at runtime.
 
+```
+enable_uart=1
+dtoverlay=at24c256
+dtoverlay=bmp280
+dtoverlay=light-controller
+```
+to load overlays at boot time add above to config.txt in Raspberry Pi's /boot directory.
+
 ## Sample Drivers
 
 ```c
