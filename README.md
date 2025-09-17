@@ -236,7 +236,7 @@ to generate a set of keys and export the public and private keys.
 gpg --import public.key
 gpg --fingerprint "user@mail.com"
 ```
-to import someone else's public key or your private key.
+to import someone else's public key.
 
 ```bash
 # export GPG_TTY=$(tty)
