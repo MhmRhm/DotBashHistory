@@ -239,7 +239,7 @@ to import someone else's public key or your private key.
 
 ```bash
 # export GPG_TTY=$(tty)
-gpg --default-key 'user@mail.com' --sign file
+gpg --armor --output file.gpg --encrypt --sign --recipient "user@mail.com" file
 ```
 to encrypt and sign contents.
 
