@@ -227,13 +227,14 @@ gpg --gen-key
 gpg --list-keys
 gpg --list-secret-keys
 gpg --list-public-keys
-gpg --export --armor 'user@mail.com' > public.key
+gpg --export --armor "user@mail.com" > public.key
 gpg --export-secret-keys --armor 'user@mail.com' > private.key
 ```
 to generate a set of keys and export the public and private keys.
 
 ```bash
 gpg --import public.key
+gpg --fingerprint "user@mail.com"
 ```
 to import someone else's public key or your private key.
 
